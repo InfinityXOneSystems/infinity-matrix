@@ -1,0 +1,24 @@
+# Core linting and code quality
+flake8>=7.0.0
+
+# GitHub API integration
+PyGithub>=2.1.1
+requests>=2.31.0
+
+# Future AI agent dependencies (placeholders - uncomment when needed)
+# openai>=1.0.0
+# anthropic>=0.7.0
+# langchain>=0.1.0
+# transformers>=4.30.0
+
+# Utilities
+python-dotenv>=1.0.0
+pyyaml>=6.0.1
+
+# Logging and monitoring
+colorlog>=6.8.0
+
+# Future dependencies for advanced features
+# pandas>=2.0.0
+# numpy>=1.24.0
+# scikit-learn>=1.3.0
