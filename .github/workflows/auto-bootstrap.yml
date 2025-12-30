@@ -169,7 +169,10 @@ jobs:
     runs-on: ubuntu-latest
     needs: autonomous-analysis
     if: github.event_name == 'workflow_dispatch' || github.event_name == 'schedule'
-    
+
+    permissions:
+      contents: read
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
