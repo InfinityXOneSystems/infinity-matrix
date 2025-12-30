@@ -1,0 +1,168 @@
+policy:
+  id: escalation-policy-001
+  name: Incident Escalation Policy
+  version: 1.0.0
+  category: operational
+  enabled: true
+  
+  description: |
+    Defines escalation paths and procedures for incidents based on severity.
+    Ensures proper stakeholders are notified and engaged at appropriate times.
+  
+  severity_levels:
+    P0:
+      name: Critical
+      description: Complete system outage or data breach
+      response_time: 15 minutes
+      resolution_target: 1 hour
+      
+    P1:
+      name: High
+      description: Major service degradation affecting customers
+      response_time: 30 minutes
+      resolution_target: 4 hours
+      
+    P2:
+      name: Medium
+      description: Minor service issues or degradation
+      response_time: 2 hours
+      resolution_target: 24 hours
+      
+    P3:
+      name: Low
+      description: Cosmetic issues or minor bugs
+      response_time: 1 business day
+      resolution_target: 1 week
+  
+  escalation_paths:
+    P0:
+      level_1:
+        role: On-call Engineer
+        timeout: 5 minutes
+        notification: [pagerduty, phone, sms]
+        
+      level_2:
+        role: Engineering Manager
+        timeout: 10 minutes
+        notification: [pagerduty, phone, email]
+        
+      level_3:
+        role: VP Engineering
+        timeout: 15 minutes
+        notification: [phone, email]
+        
+      level_4:
+        role: CTO
+        timeout: 20 minutes
+        notification: [phone, email]
+    
+    P1:
+      level_1:
+        role: On-call Engineer
+        timeout: 10 minutes
+        notification: [pagerduty, slack]
+        
+      level_2:
+        role: Engineering Manager
+        timeout: 20 minutes
+        notification: [pagerduty, email]
+        
+      level_3:
+        role: VP Engineering
+        timeout: 30 minutes
+        notification: [email]
+    
+    P2:
+      level_1:
+        role: On-call Engineer
+        timeout: 30 minutes
+        notification: [slack]
+        
+      level_2:
+        role: Team Lead
+        timeout: 60 minutes
+        notification: [email]
+    
+    P3:
+      level_1:
+        role: Assigned Engineer
+        timeout: 1 business day
+        notification: [email, slack]
+  
+  escalation_triggers:
+    - trigger: No response to initial alert
+      condition: response_time > timeout
+      action: Escalate to next level
+      
+    - trigger: Issue not resolved within target
+      condition: resolution_time > resolution_target
+      action: Escalate to next level
+      
+    - trigger: Severity upgraded
+      condition: severity increases
+      action: Reset escalation path for new severity
+      
+    - trigger: Manual escalation requested
+      condition: engineer_requests_escalation
+      action: Escalate immediately
+  
+  communication_procedures:
+    internal:
+      channels:
+        - "#incident-response" Slack channel
+        - Incident command post (Zoom/Meet)
+        - Email updates to stakeholders
+      
+      frequency:
+        P0: Every 15 minutes
+        P1: Every 30 minutes
+        P2: Every 2 hours
+        P3: Daily updates
+    
+    external:
+      customer_communication:
+        P0: Status page + email to all customers
+        P1: Status page update
+        P2: Status page if customer-facing
+        P3: No external communication unless requested
+      
+      template: |
+        We are currently investigating an issue affecting {{affected_services}}.
+        
+        Impact: {{impact_description}}
+        Started: {{incident_start_time}}
+        Status: {{current_status}}
+        
+        We will provide updates every {{update_frequency}}.
+        
+        For more information: {{status_page_url}}
+  
+  post_incident:
+    requirements:
+      - Post-mortem document within 48 hours (P0/P1)
+      - Root cause analysis
+      - Timeline of events
+      - Action items with owners
+      - Prevention measures
+    
+    review_meeting:
+      P0: Within 24 hours
+      P1: Within 3 days
+      P2: Within 1 week
+      P3: Optional
+    
+    attendees:
+      - Incident commander
+      - All responders
+      - Engineering manager
+      - Affected team leads
+  
+  enforcement:
+    mode: enforcing
+    exceptions: []
+  
+  metadata:
+    owner: sre-team
+    reviewers: [engineering-managers, vp-engineering]
+    last_reviewed: 2025-12-30
+    next_review: 2026-01-30

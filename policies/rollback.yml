@@ -1,0 +1,102 @@
+policy:
+  id: rollback-policy-001
+  name: Automated Rollback Policy
+  version: 1.0.0
+  category: operational
+  enabled: true
+  
+  description: |
+    Defines conditions and procedures for automated rollback of deployments.
+    Ensures system stability and quick recovery from failed deployments.
+  
+  rules:
+    - id: error-rate-threshold
+      description: Rollback if error rate exceeds 5%
+      condition: error_rate > 0.05 AND duration > 300
+      action: trigger_rollback
+      severity: critical
+      
+    - id: response-time-threshold
+      description: Rollback if p95 response time exceeds 2 seconds
+      condition: response_time_p95 > 2000 AND duration > 300
+      action: trigger_rollback
+      severity: high
+    
+    - id: availability-threshold
+      description: Rollback if availability drops below 99.5%
+      condition: availability < 0.995 AND duration > 180
+      action: trigger_rollback
+      severity: critical
+    
+    - id: health-check-failures
+      description: Rollback if health checks consistently fail
+      condition: health_check_failures >= 3 consecutive
+      action: trigger_rollback
+      severity: critical
+    
+    - id: cpu-threshold
+      description: Rollback if CPU usage exceeds 90% for 5 minutes
+      condition: cpu_usage > 0.90 AND duration > 300
+      action: trigger_rollback
+      severity: high
+    
+    - id: memory-threshold
+      description: Rollback if memory usage exceeds 90% for 5 minutes
+      condition: memory_usage > 0.90 AND duration > 300
+      action: trigger_rollback
+      severity: high
+  
+  rollback_procedure:
+    steps:
+      - name: Detect issue
+        description: Automated monitoring detects threshold violation
+        
+      - name: Verify issue
+        description: Run additional checks to confirm the issue
+        timeout: 60 seconds
+        
+      - name: Initiate rollback
+        description: Begin rollback to last stable version
+        
+      - name: Switch traffic
+        description: Route traffic back to previous version
+        
+      - name: Verify rollback
+        description: Confirm metrics return to normal
+        timeout: 300 seconds
+        
+      - name: Notify team
+        description: Send notification about rollback with details
+        
+      - name: Create incident
+        description: Create incident ticket for post-mortem
+  
+  notification:
+    channels:
+      - slack: "#production-alerts"
+      - pagerduty: on-call
+      - email: platform-team@example.com
+    
+    template: |
+      🚨 AUTOMATED ROLLBACK TRIGGERED
+      
+      Environment: {{environment}}
+      Version: {{current_version}} → {{previous_version}}
+      Trigger: {{trigger_rule}}
+      Metric: {{metric_name}} = {{metric_value}}
+      Threshold: {{threshold_value}}
+      
+      Rollback Status: {{rollback_status}}
+      Incident: {{incident_id}}
+      
+      Details: {{workflow_url}}
+  
+  enforcement:
+    mode: enforcing
+    exceptions: []
+  
+  metadata:
+    owner: sre-team
+    reviewers: [platform-team, engineering-lead]
+    last_reviewed: 2025-12-30
+    next_review: 2026-01-30
