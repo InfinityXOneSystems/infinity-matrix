@@ -1,0 +1,57 @@
+# Infinity Matrix - Python Dependencies
+
+# FastAPI and web framework
+fastapi==0.109.0
+uvicorn[standard]==0.27.0
+python-multipart==0.0.6
+
+# Pydantic for data validation
+pydantic==2.5.3
+pydantic-settings==2.1.0
+
+# Authentication and security
+python-jose[cryptography]==3.3.0
+passlib[bcrypt]==1.7.4
+python-dotenv==1.0.0
+
+# Database
+sqlalchemy==2.0.25
+alembic==1.13.1
+psycopg2-binary==2.9.9
+
+# Caching
+redis==5.0.1
+hiredis==2.3.2
+
+# Google Cloud integrations
+google-cloud-aiplatform==1.39.0
+google-cloud-storage==2.14.0
+google-cloud-logging==3.9.0
+google-cloud-pubsub==2.19.0
+google-cloud-secret-manager==2.17.0
+
+# Firebase
+firebase-admin==6.3.0
+
+# Google Workspace
+google-api-python-client==2.111.0
+google-auth-httplib2==0.2.0
+google-auth-oauthlib==1.2.0
+
+# HTTP clients
+httpx==0.26.0
+aiohttp==3.9.1
+
+# Task queue and async
+celery==5.3.4
+kombu==5.3.4
+
+# Monitoring and observability
+prometheus-client==0.19.0
+opentelemetry-api==1.22.0
+opentelemetry-sdk==1.22.0
+opentelemetry-instrumentation-fastapi==0.43b0
+
+# Utilities
+python-dateutil==2.8.2
+pytz==2023.3
