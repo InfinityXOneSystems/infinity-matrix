@@ -9,10 +9,12 @@ Provides commands for:
 """
 
 import asyncio
+import time
 from pathlib import Path
 from typing import Optional
 
 import typer
+import uvicorn
 import yaml
 from rich.console import Console
 from rich.progress import Progress, SpinnerColumn, TextColumn
@@ -184,10 +186,6 @@ def serve(
     reload: bool = typer.Option(False, "--reload", "-r", help="Enable auto-reload"),
 ) -> None:
     """Start the API server."""
-    import uvicorn
-
-    from infinity_matrix.api.main import app as api_app
-
     console.print(f"[bold green]Starting API server on {host}:{port}[/bold green]")
 
     uvicorn.run(
@@ -246,8 +244,6 @@ def validate(
 
 def _watch_build(build_id: str) -> None:
     """Watch build progress."""
-    import time
-
     with Progress(console=console) as progress:
         task = progress.add_task("[cyan]Building...", total=100)
 

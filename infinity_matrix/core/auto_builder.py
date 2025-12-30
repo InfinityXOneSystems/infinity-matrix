@@ -3,6 +3,7 @@ Auto-Builder main class - High-level interface for the auto-builder system.
 """
 
 import asyncio
+import yaml
 from pathlib import Path
 from typing import Any, Optional
 from uuid import uuid4
@@ -129,8 +130,6 @@ class AutoBuilder:
         Returns:
             Blueprint object
         """
-        import yaml
-
         with open(path, "r") as f:
             data = yaml.safe_load(f)
 

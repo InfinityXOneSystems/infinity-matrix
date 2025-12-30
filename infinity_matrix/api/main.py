@@ -5,8 +5,9 @@ This module provides HTTP endpoints for triggering builds, monitoring status,
 and managing the auto-builder system.
 """
 
+from contextlib import asynccontextmanager
 from datetime import datetime, timedelta
-from typing import Any, Optional
+from typing import Any, AsyncGenerator, Optional
 
 from fastapi import Depends, FastAPI, HTTPException, status
 from fastapi.middleware.cors import CORSMiddleware
@@ -18,6 +19,18 @@ from infinity_matrix.core.auto_builder import AutoBuilder, BuildStatus
 from infinity_matrix.core.blueprint import Blueprint
 from infinity_matrix.core.config import settings
 
+
+@asynccontextmanager
+async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
+    """Manage application lifespan."""
+    # Startup
+    print(f"Starting {settings.app_name} v{settings.app_version}")
+    print(f"API available at: http://{settings.api_host}:{settings.api_port}{settings.api_prefix}")
+    yield
+    # Shutdown
+    print("Shutting down Infinity Matrix Auto-Builder")
+
+
 # Initialize FastAPI app
 app = FastAPI(
     title=settings.app_name,
@@ -25,6 +38,7 @@ app = FastAPI(
     description="Enterprise-grade autonomous code generation and deployment system",
     docs_url="/docs",
     redoc_url="/redoc",
+    lifespan=lifespan,
 )
 
 # Add CORS middleware
@@ -248,20 +262,6 @@ async def validate_blueprint(
         "blueprint": blueprint,
         "message": "Blueprint is valid",
     }
-
-
-# Startup and shutdown events
-@app.on_event("startup")
-async def startup_event() -> None:
-    """Initialize on startup."""
-    print(f"Starting {settings.app_name} v{settings.app_version}")
-    print(f"API available at: http://{settings.api_host}:{settings.api_port}{settings.api_prefix}")
-
-
-@app.on_event("shutdown")
-async def shutdown_event() -> None:
-    """Cleanup on shutdown."""
-    print("Shutting down Infinity Matrix Auto-Builder")
 
 
 if __name__ == "__main__":
