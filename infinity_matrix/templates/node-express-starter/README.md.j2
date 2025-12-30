@@ -1,0 +1,76 @@
+# {{ app_name }}
+
+A modern Express.js-based REST API {% if use_typescript %}with TypeScript{% endif %}.
+
+## Features
+
+- ⚡ Express.js framework
+{% if use_typescript %}- 📘 TypeScript for type safety{% endif %}
+- 🔒 JWT authentication{% if include_auth %} (enabled){% endif %}
+- 🗄️ {{ database }} database integration
+- 📝 Winston logging
+- 🐳 Docker support
+- 🧪 Testing with Jest
+
+## Quick Start
+
+### Prerequisites
+
+- Node.js 18 or higher
+- npm or yarn
+
+### Installation
+
+1. Install dependencies:
+```bash
+npm install
+```
+
+2. Set up environment variables:
+```bash
+cp .env.example .env
+# Edit .env with your configuration
+```
+
+3. Start the application:
+```bash
+{% if use_typescript %}npm run dev{% else %}npm start{% endif %}
+```
+
+The API will be available at `http://localhost:3000`
+
+## Project Structure
+
+```
+{{ app_name }}/
+├── src/
+│   ├── index.{% if use_typescript %}ts{% else %}js{% endif %}
+│   ├── routes/
+│   ├── controllers/
+│   ├── models/
+│   ├── middleware/
+│   └── utils/
+├── tests/
+{% if use_typescript %}├── tsconfig.json
+{% endif %}├── package.json
+└── README.md
+```
+
+## Development
+
+### Running Tests
+
+```bash
+npm test
+```
+
+### Code Quality
+
+```bash
+npm run lint
+npm run format
+```
+
+## License
+
+MIT License
