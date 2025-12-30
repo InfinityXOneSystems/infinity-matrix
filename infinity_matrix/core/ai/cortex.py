@@ -119,9 +119,9 @@ class VisionCortex:
         
         # Determine complexity
         complexity = "simple"
-        if len(requirements) > 3:
+        if len(requirements) > 5:
             complexity = "complex"
-        elif len(requirements) > 1:
+        elif len(requirements) > 2:
             complexity = "moderate"
         
         return PromptAnalysis(
