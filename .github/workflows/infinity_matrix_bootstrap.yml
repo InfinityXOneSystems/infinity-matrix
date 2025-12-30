@@ -45,7 +45,8 @@ jobs:
       - name: Create Code Review SOP
         run: |
           echo "📝 Creating Code Review SOP..."
-          cat > docs/sops/CODE_REVIEW_SOP.md << 'EOF'
+          CURRENT_DATE=$(date +%Y-%m-%d)
+          cat > docs/sops/CODE_REVIEW_SOP.md << EOF
           # Code Review Standard Operating Procedure
           
           ## Purpose
@@ -121,7 +122,7 @@ jobs:
           
           ---
           **Document Version**: 1.0.0  
-          **Last Updated**: $(date +%Y-%m-%d)  
+          **Last Updated**: $CURRENT_DATE  
           **Owner**: Engineering Team
           EOF
           echo "✅ Code Review SOP created"
@@ -129,7 +130,8 @@ jobs:
       - name: Create Deployment SOP
         run: |
           echo "📝 Creating Deployment SOP..."
-          cat > docs/sops/DEPLOYMENT_SOP.md << 'EOF'
+          CURRENT_DATE=$(date +%Y-%m-%d)
+          cat > docs/sops/DEPLOYMENT_SOP.md << EOF
           # Deployment Standard Operating Procedure
           
           ## Purpose
@@ -273,7 +275,7 @@ jobs:
           
           ---
           **Document Version**: 1.0.0  
-          **Last Updated**: $(date +%Y-%m-%d)  
+          **Last Updated**: $CURRENT_DATE  
           **Owner**: DevOps Team
           EOF
           echo "✅ Deployment SOP created"
@@ -281,7 +283,8 @@ jobs:
       - name: Create Incident Response SOP
         run: |
           echo "📝 Creating Incident Response SOP..."
-          cat > docs/sops/INCIDENT_RESPONSE_SOP.md << 'EOF'
+          CURRENT_DATE=$(date +%Y-%m-%d)
+          cat > docs/sops/INCIDENT_RESPONSE_SOP.md << EOF
           # Incident Response Standard Operating Procedure
           
           ## Purpose
@@ -482,7 +485,7 @@ jobs:
           
           ---
           **Document Version**: 1.0.0  
-          **Last Updated**: $(date +%Y-%m-%d)  
+          **Last Updated**: $CURRENT_DATE  
           **Owner**: SRE Team
           EOF
           echo "✅ Incident Response SOP created"
@@ -490,7 +493,8 @@ jobs:
       - name: Create Security SOP
         run: |
           echo "📝 Creating Security SOP..."
-          cat > docs/sops/SECURITY_SOP.md << 'EOF'
+          CURRENT_DATE=$(date +%Y-%m-%d)
+          cat > docs/sops/SECURITY_SOP.md << EOF
           # Security Standard Operating Procedure
           
           ## Purpose
@@ -714,7 +718,7 @@ jobs:
           
           ---
           **Document Version**: 1.0.0  
-          **Last Updated**: $(date +%Y-%m-%d)  
+          **Last Updated**: $CURRENT_DATE  
           **Owner**: Security Team
           EOF
           echo "✅ Security SOP created"
@@ -722,15 +726,17 @@ jobs:
       - name: Create Bootstrap Status Tracking Document
         run: |
           echo "📝 Creating bootstrap status tracking document..."
-          cat > docs/tracking/BOOTSTRAP_STATUS.md << 'EOF'
+          CURRENT_DATE=$(date +%Y-%m-%d)
+          CURRENT_TIME=$(date +%H:%M:%S)
+          cat > docs/tracking/BOOTSTRAP_STATUS.md << EOF
           # Infinity Matrix Bootstrap Status
           
           ## Bootstrap Execution Summary
           
-          **Execution Date**: $(date +%Y-%m-%d)  
-          **Execution Time**: $(date +%H:%M:%S) UTC  
-          **Workflow Run**: [View Run](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})  
-          **Triggered By**: ${{ github.actor }}
+          **Execution Date**: $CURRENT_DATE  
+          **Execution Time**: $CURRENT_TIME UTC  
+          **Workflow Run**: [View Run](https://github.com/\${{ github.repository }}/actions/runs/\${{ github.run_id }})  
+          **Triggered By**: \${{ github.actor }}
           
           ## Bootstrap Checklist
           
@@ -850,8 +856,8 @@ jobs:
           ## Support
           
           For issues or questions:
-          1. Check workflow logs: [Run #${{ github.run_id }}](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})
-          2. Review bootstrap documentation: `docs/INFINITY_MATRIX_ENTERPRISE_BOOTSTRAP.md`
+          1. Check workflow logs: [Run #\${{ github.run_id }}](https://github.com/\${{ github.repository }}/actions/runs/\${{ github.run_id }})
+          2. Review bootstrap documentation: \`docs/INFINITY_MATRIX_ENTERPRISE_BOOTSTRAP.md\`
           3. Create an issue in the repository
           
           ## Metrics
@@ -865,14 +871,15 @@ jobs:
           ---
           **Status**: ✅ Bootstrap Completed Successfully  
           **Version**: 1.0.0  
-          **Repository**: ${{ github.repository }}
+          **Repository**: \${{ github.repository }}
           EOF
           echo "✅ Bootstrap status document created"
       
       - name: Create Architecture Directory README
         run: |
           echo "📝 Creating architecture directory README..."
-          cat > docs/architecture/README.md << 'EOF'
+          CURRENT_DATE=$(date +%Y-%m-%d)
+          cat > docs/architecture/README.md << EOF
           # Architecture Documentation
           
           This directory contains architecture documentation for the Infinity Matrix system.
@@ -1007,7 +1014,7 @@ jobs:
           5. Link architecture docs from main README
           
           ---
-          **Last Updated**: $(date +%Y-%m-%d)  
+          **Last Updated**: $CURRENT_DATE  
           **Maintained By**: Engineering Team
           EOF
           echo "✅ Architecture README created"
@@ -1015,6 +1022,7 @@ jobs:
       - name: Commit and push all generated files
         run: |
           echo "💾 Committing bootstrap files..."
+          COMMIT_DATE=$(date +%Y-%m-%d)
           git add .
           git status
           git commit -m "🚀 Bootstrap Infinity Matrix Enterprise System
@@ -1035,7 +1043,7 @@ jobs:
           
           Workflow Run: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
           Triggered By: ${{ github.actor }}
-          Date: $(date +%Y-%m-%d)"
+          Date: $COMMIT_DATE"
           
           echo "📤 Pushing to repository..."
           git push
