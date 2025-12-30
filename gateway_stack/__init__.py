@@ -22,12 +22,12 @@ Example:
     # gateway_stack/github_app.py
     import jwt
     from github import Github, GithubIntegration
-    
+
     class GitHubAppIntegration:
         def __init__(self, app_id, private_key):
             self.app_id = app_id
             self.private_key = private_key
-        
+
         def get_installation_client(self, installation_id):
             # Your integration logic
             pass

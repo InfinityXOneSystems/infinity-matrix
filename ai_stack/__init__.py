@@ -1,7 +1,8 @@
 """
 AI Stack - Future AI-Driven Orchestration Modules
 
-This package is a placeholder for future AI-driven modules and orchestration logic.
+This package is a placeholder for future AI-driven modules and
+orchestration logic.
 
 Example modules that could be added:
 - Code analysis with AI models
@@ -20,11 +21,11 @@ To add a new AI module:
 Example:
     # ai_stack/code_analyzer.py
     from openai import OpenAI
-    
+
     class AICodeAnalyzer:
         def __init__(self, api_key):
             self.client = OpenAI(api_key=api_key)
-        
+
         def analyze_code(self, code):
             # Your AI analysis logic
             pass
