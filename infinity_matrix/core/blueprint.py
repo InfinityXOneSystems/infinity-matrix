@@ -1,6 +1,6 @@
 """Blueprint models for defining build specifications."""
 
-from datetime import datetime
+from datetime import datetime, timezone
 from enum import Enum
 from typing import Any, Optional
 

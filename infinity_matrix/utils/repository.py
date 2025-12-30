@@ -1,7 +1,7 @@
 """Repository management utilities for Git operations."""
 
 from pathlib import Path
-from typing import Optional
+from typing import List, Optional
 
 from git import Repo
 from git.exc import GitCommandError
@@ -66,7 +66,7 @@ class RepositoryManager:
         new_branch = self.repo.create_head(branch_name)
         new_branch.checkout()
 
-    def commit_changes(self, message: str, files: Optional[list[str]] = None) -> None:
+    def commit_changes(self, message: str, files: Optional[List[str]] = None) -> None:
         """
         Commit changes to the repository.
         
@@ -116,7 +116,7 @@ class RepositoryManager:
 
         return self.repo.active_branch.name
 
-    def get_status(self) -> dict[str, list[str]]:
+    def get_status(self) -> dict[str, List[str]]:
         """
         Get repository status.
         

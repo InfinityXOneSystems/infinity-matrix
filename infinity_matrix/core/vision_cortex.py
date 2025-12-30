@@ -5,7 +5,7 @@ Vision Cortex coordinates all agents and manages the build lifecycle.
 """
 
 import asyncio
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Any, Optional
 from uuid import uuid4
 

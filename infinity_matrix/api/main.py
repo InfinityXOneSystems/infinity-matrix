@@ -6,7 +6,7 @@ and managing the auto-builder system.
 """
 
 from contextlib import asynccontextmanager
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from typing import Any, AsyncGenerator, Optional
 
 from fastapi import Depends, FastAPI, HTTPException, status
@@ -101,7 +101,7 @@ class TokenData(BaseModel):
 def create_access_token(data: dict[str, Any]) -> str:
     """Create JWT access token."""
     to_encode = data.copy()
-    expire = datetime.utcnow() + timedelta(minutes=settings.access_token_expire_minutes)
+    expire = datetime.now(timezone.utc) + timedelta(minutes=settings.access_token_expire_minutes)
     to_encode.update({"exp": expire})
     encoded_jwt = jwt.encode(
         to_encode,
