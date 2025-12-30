@@ -20,7 +20,7 @@ fi
 
 # Collect OS information
 collect_os_info() {
-    echo "  → Collecting OS information..."
+    echo "  → Collecting OS information..." >&2
     
     OS_TYPE=$(uname -s)
     OS_VERSION=$(uname -r)
@@ -38,7 +38,7 @@ EOF
 
 # Collect hardware information
 collect_hardware_info() {
-    echo "  → Collecting hardware information..."
+    echo "  → Collecting hardware information..." >&2
     
     CPU_CORES=$(nproc 2>/dev/null || echo "0")
     
@@ -65,7 +65,7 @@ EOF
 
 # Collect network information
 collect_network_info() {
-    echo "  → Collecting network information..."
+    echo "  → Collecting network information..." >&2
     
     HOSTNAME=$(hostname)
     IP_ADDRESS=$(hostname -I 2>/dev/null | awk '{print $1}' || echo "unknown")
@@ -81,7 +81,7 @@ EOF
 
 # Scan for installed applications
 scan_applications() {
-    echo "  → Scanning installed applications..."
+    echo "  → Scanning installed applications..." >&2
     
     declare -A apps=(
         ["git"]="git --version"
@@ -114,6 +114,7 @@ EOF
 }
 
 # Main manifest generation
+{
 echo "{"
 echo "  \"metadata\": {"
 echo "    \"version\": \"1.0.0\","
@@ -139,7 +140,8 @@ echo "    \"repository\": \"https://github.com/InfinityXOneSystems/infinity-matr
 echo "    \"branch\": \"$(git rev-parse --abbrev-ref HEAD 2>/dev/null || echo 'unknown')\","
 echo "    \"commit\": \"$(git rev-parse HEAD 2>/dev/null || echo 'unknown')\""
 echo "  }"
-echo "}" > "$OUTPUT_FILE"
+echo "}"
+} > "$OUTPUT_FILE"
 
 echo ""
 echo "✓ Manifest generated successfully: $OUTPUT_FILE"
