@@ -60,11 +60,18 @@ jobs:
       
       - name: Update dashboard metrics
         run: |
-          # Update the dashboard with current metrics
-          sed -i 's/id="workflowCount">[0-9]*/id="workflowCount">${{ steps.metrics.outputs.workflows }}/' dashboard/index.html
-          sed -i 's/id="sopCount">[0-9]*/id="sopCount">${{ steps.metrics.outputs.sops }}/' dashboard/index.html
-          sed -i 's/id="trackingCount">[0-9]*/id="trackingCount">${{ steps.metrics.outputs.tracking }}/' dashboard/index.html
-          sed -i 's/id="agentCount">[0-9]*/id="agentCount">${{ steps.metrics.outputs.agents }}/' dashboard/index.html
+          # Create a temporary updated dashboard
+          cp dashboard/index.html dashboard/index.html.tmp
+          
+          # Update metrics using proper JSON approach
+          # Replace the metric values in the HTML
+          sed -i "s/<div class=\"metric-value\" id=\"workflowCount\">[0-9]*/<div class=\"metric-value\" id=\"workflowCount\">${{ steps.metrics.outputs.workflows }}/" dashboard/index.html.tmp
+          sed -i "s/<div class=\"metric-value\" id=\"sopCount\">[0-9]*/<div class=\"metric-value\" id=\"sopCount\">${{ steps.metrics.outputs.sops }}/" dashboard/index.html.tmp
+          sed -i "s/<div class=\"metric-value\" id=\"trackingCount\">[0-9]*/<div class=\"metric-value\" id=\"trackingCount\">${{ steps.metrics.outputs.tracking }}/" dashboard/index.html.tmp
+          sed -i "s/<div class=\"metric-value\" id=\"agentCount\">[0-9]*/<div class=\"metric-value\" id=\"agentCount\">${{ steps.metrics.outputs.agents }}/" dashboard/index.html.tmp
+          
+          # Move updated file to replace original
+          mv dashboard/index.html.tmp dashboard/index.html
           
           echo "✅ Dashboard metrics updated"
       

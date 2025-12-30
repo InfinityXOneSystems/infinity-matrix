@@ -35,8 +35,13 @@ jobs:
       
       - name: Track commit changes
         if: github.event_name == 'push'
+        env:
+          COMMIT_MESSAGE: ${{ github.event.head_commit.message }}
         run: |
-          cat > docs/tracking/commit/commit-${GITHUB_SHA:0:7}-${{ env.TIMESTAMP }}.json << 'EOF'
+          # Escape commit message for JSON
+          ESCAPED_MESSAGE=$(echo "$COMMIT_MESSAGE" | jq -Rs .)
+          
+          cat > docs/tracking/commit/commit-${GITHUB_SHA:0:7}-${{ env.TIMESTAMP }}.json << EOF
           {
             "timestamp": "${{ env.TIMESTAMP }}",
             "event_type": "commit",
@@ -46,7 +51,7 @@ jobs:
             "details": {
               "ref": "${{ github.ref }}",
               "repository": "${{ github.repository }}",
-              "commit_message": "${{ github.event.head_commit.message }}",
+              "commit_message": $ESCAPED_MESSAGE,
               "modified_files_count": "${{ github.event.head_commit.modified.length }}",
               "added_files_count": "${{ github.event.head_commit.added.length }}",
               "removed_files_count": "${{ github.event.head_commit.removed.length }}"
@@ -64,8 +69,13 @@ jobs:
       
       - name: Track PR changes
         if: github.event_name == 'pull_request'
+        env:
+          PR_TITLE: ${{ github.event.pull_request.title }}
         run: |
-          cat > docs/tracking/pr/pr-${{ github.event.pull_request.number }}-${{ env.TIMESTAMP }}.json << 'EOF'
+          # Escape PR title for JSON
+          ESCAPED_TITLE=$(echo "$PR_TITLE" | jq -Rs .)
+          
+          cat > docs/tracking/pr/pr-${{ github.event.pull_request.number }}-${{ env.TIMESTAMP }}.json << EOF
           {
             "timestamp": "${{ env.TIMESTAMP }}",
             "event_type": "pull_request",
@@ -74,7 +84,7 @@ jobs:
             "action": "${{ github.event.action }}",
             "details": {
               "pr_number": ${{ github.event.pull_request.number }},
-              "title": "${{ github.event.pull_request.title }}",
+              "title": $ESCAPED_TITLE,
               "state": "${{ github.event.pull_request.state }}",
               "draft": ${{ github.event.pull_request.draft }},
               "base_ref": "${{ github.event.pull_request.base.ref }}",
