@@ -59,11 +59,14 @@ class GitHubActionsIntegration(CICDIntegration):
                 step_yaml += f"          {script_line}\n"
             steps_yaml.append(step_yaml)
         
+        # Format triggers as YAML list
+        triggers_yaml = "\n".join([f"  {trigger}:" for trigger in pipeline.triggers])
+        
         config = f"""
 name: {pipeline.name}
 
 on:
-  {', '.join(pipeline.triggers)}
+{triggers_yaml}
 
 jobs:
   build:

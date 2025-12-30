@@ -57,8 +57,11 @@ def create_application():
     print(f"Suggested Modules: {', '.join(analysis.suggested_modules)}")
     print(f"Requirements extracted: {len(analysis.requirements)}")
     
-    # Select blueprint
+    # Select blueprint - use a known existing template
     template = cortex.select_blueprint(analysis)
+    # Ensure we use an existing template
+    if template not in ["python-fastapi-starter", "node-express-starter", "go-gin-starter"]:
+        template = "python-fastapi-starter"
     print(f"\nSelected Template: {template}")
     
     # Set up secrets

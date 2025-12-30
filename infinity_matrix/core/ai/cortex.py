@@ -166,7 +166,7 @@ class VisionCortex:
         elif stack == "node":
             return "node-express-starter"
         elif stack == "go":
-            return "go-standard-starter"
+            return "go-gin-starter"
         
         return "python-fastapi-starter"
     
