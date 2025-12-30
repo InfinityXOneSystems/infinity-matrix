@@ -4,12 +4,40 @@ An autonomous, self-managing repository platform with AI-driven orchestration ca
 
 ## 🚀 Features
 
+- **Vision Cortex Multi-Agent System**: Manus.im-inspired orchestration with 8 specialized agents
 - **Autonomous Bootstrap System**: Self-updating GitHub Actions workflow that can analyze, update, and create PRs automatically
 - **Python Coding Agent**: Extensible autonomous agent for repository analysis and code actions
+- **FAANG-Grade Architecture**: Enterprise-level standards for scalability and reliability
 - **Safety First**: Dry-run/log-only mode by default to prevent unintended changes
 - **GitHub App Ready**: Pre-configured structure for GitHub App integration
-- **AI Orchestration**: Placeholder infrastructure for future AI-driven modules
+- **AI Orchestration**: Vision Cortex with intelligent agent coordination
 - **Gateway Stack**: API integration layer for external orchestration services
+
+## 🧠 Vision Cortex: Multi-Agent System
+
+The Vision Cortex is a sophisticated multi-agent orchestration system that coordinates 8 specialized agents:
+
+1. **CrawlerAgent** - Data collection from repos, web, and APIs
+2. **IngestionAgent** - Data cleaning and normalization
+3. **PredictorAgent** - AI-driven analytics and predictions
+4. **CEOAgent** - Business-level decision making
+5. **StrategistAgent** - Strategic planning and roadmapping
+6. **OrganizerAgent** - Data organization and indexing
+7. **ValidatorAgent** - Quality assurance and validation
+8. **DocumentorAgent** - Enterprise-grade documentation generation
+
+### Quick Run
+
+```bash
+# Run Vision Cortex with defaults
+python scripts/run_vision_cortex.py
+
+# Run with input signal
+python scripts/run_vision_cortex.py --signal "market_analysis"
+
+# Save complete results
+python scripts/run_vision_cortex.py --save-result
+```
 
 ## 📁 Project Structure
 
@@ -17,16 +45,33 @@ An autonomous, self-managing repository platform with AI-driven orchestration ca
 infinity-matrix/
 ├── .github/
 │   └── workflows/
-│       └── auto-bootstrap.yml    # Autonomous workflow for scheduled updates
+│       ├── auto-bootstrap.yml         # Autonomous workflow for scheduled updates
+│       └── vision_cortex_genesis.yml  # Vision Cortex execution workflow
+├── cortex/
+│   └── agents/                        # Vision Cortex multi-agent system
+│       ├── vision_cortex.py          # Main orchestrator
+│       ├── crawler_agent.py          # Data crawling
+│       ├── ingestion_agent.py        # Data cleaning
+│       ├── predictor_agent.py        # AI predictions
+│       ├── ceo_agent.py              # Business decisions
+│       ├── strategist_agent.py       # Strategic planning
+│       ├── organizer_agent.py        # Data organization
+│       ├── validator_agent.py        # Quality validation
+│       └── documentor_agent.py       # Documentation generation
 ├── scripts/
-│   └── autonomous_agent.py       # Main autonomous coding agent
-├── ai_stack/                     # Future AI-driven orchestration modules
-├── gateway_stack/                # GitHub App and API integrations
+│   ├── autonomous_agent.py            # Main autonomous coding agent
+│   └── run_vision_cortex.py          # Vision Cortex CLI runner
+├── ai_stack/                          # Future AI-driven orchestration modules
+├── gateway_stack/                     # GitHub App and API integrations
 ├── docs/
-│   └── quickstart.md            # Setup and operation guide
-├── requirements.txt              # Python dependencies
-├── .env.example                  # Environment variable template
-└── README.md                     # This file
+│   ├── quickstart.md                 # Setup and operation guide
+│   ├── blueprint.md                  # Vision Cortex architecture
+│   ├── schemas/
+│   │   └── document_schema.json      # Document schema definition
+│   └── output/                       # Auto-generated documentation
+├── requirements.txt                   # Python dependencies
+├── .env.example                       # Environment variable template
+└── README.md                          # This file
 ```
 
 ## 🛠️ Quick Start
@@ -158,16 +203,67 @@ class CustomAgent(AutonomousAgent):
         pass
 ```
 
+### Extending Vision Cortex
+
+Add new agents to the Vision Cortex system:
+
+```python
+# cortex/agents/custom_agent.py
+class CustomAgent:
+    def process(self, data):
+        # Your agent logic
+        return processed_data
+
+# Update cortex/agents/vision_cortex.py
+from .custom_agent import CustomAgent
+
+class VisionCortex:
+    def __init__(self, config=None):
+        # ...existing agents...
+        self.custom = CustomAgent(self.config.get("custom"))
+```
+
+## 🧠 Vision Cortex Workflows
+
+### GitHub Actions Integration
+
+The Vision Cortex can be triggered via GitHub Actions:
+
+```bash
+# Go to Actions → Vision Cortex Genesis → Run workflow
+# Select mode: dry-run, analysis, or full
+# Optionally provide an input signal
+```
+
+The workflow will:
+- Execute all 8 agents in sequence
+- Generate comprehensive documentation
+- Commit outputs to `docs/output/`
+- Create milestone issues with summaries
+- Upload artifacts for review
+
+### Generated Documentation
+
+Vision Cortex automatically generates:
+- **auto_generated_doc.md** - Complete analysis and recommendations
+- **summary_report.md** - Executive summary
+- **metadata.json** - Structured metadata
+- **cortex_result.json** - Full workflow results
+
 ## 🛡️ Safety Features
 
 - **Dry-run mode by default**: No changes made without explicit configuration
 - **Detailed logging**: All actions are logged for audit
 - **Analysis-only mode**: Can run read-only analysis
 - **PR-based changes**: Changes submitted as PRs for review
+- **Quality validation**: Automated quality checks and scoring
+- **Fact-checking**: Validation agent ensures accuracy
 
 ## 📚 Documentation
 
 - [Quick Start Guide](docs/quickstart.md) - Detailed setup and operation guide
+- [Vision Cortex Blueprint](docs/blueprint.md) - Multi-agent architecture
+- [Document Schema](docs/schemas/document_schema.json) - Data schemas
 - [Agent Architecture](docs/agent-architecture.md) - (Coming soon)
 - [API Reference](docs/api-reference.md) - (Coming soon)
 

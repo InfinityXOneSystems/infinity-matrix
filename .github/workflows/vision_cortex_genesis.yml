@@ -1,0 +1,260 @@
+name: Vision Cortex Genesis
+
+on:
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: 'Execution mode'
+        required: true
+        default: 'dry-run'
+        type: choice
+        options:
+          - dry-run
+          - analysis
+          - full
+      input_signal:
+        description: 'Input signal for agents (optional)'
+        required: false
+        type: string
+
+  push:
+    paths:
+      - 'cortex/**'
+      - '.github/workflows/vision_cortex_genesis.yml'
+    branches:
+      - main
+
+  schedule:
+    # Run weekly on Mondays at 00:00 UTC
+    - cron: '0 0 * * 1'
+
+env:
+  PYTHON_VERSION: '3.11'
+
+jobs:
+  vision-cortex-execution:
+    name: Execute Vision Cortex Multi-Agent System
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: write
+      issues: write
+      pull-requests: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Create output directory
+        run: |
+          mkdir -p docs/output
+          mkdir -p docs/logs
+
+      - name: Execute Vision Cortex
+        id: cortex
+        run: |
+          echo "::group::Vision Cortex Execution"
+          
+          # Create a runner script
+          cat > run_cortex.py << 'EOFPYTHON'
+          #!/usr/bin/env python3
+          import sys
+          import json
+          from datetime import datetime
+          from cortex.agents import VisionCortex
+          
+          # Configuration
+          config = {
+              "documentor": {
+                  "output_dir": "docs/output"
+              },
+              "predictor": {
+                  "model": "default"
+              },
+              "ceo": {
+                  "decision_threshold": 0.7
+              },
+              "validator": {
+                  "quality_threshold": 0.8
+              }
+          }
+          
+          # Get input signal from environment
+          input_signal = "${{ github.event.inputs.input_signal }}"
+          if not input_signal:
+              input_signal = "automated_workflow_run"
+          
+          # Initialize and run Vision Cortex
+          try:
+              cortex = VisionCortex(config)
+              result = cortex.run(input_signal)
+              
+              # Save result to file
+              with open("docs/logs/cortex_run.json", "w") as f:
+                  json.dump(result, f, indent=2, default=str)
+              
+              print(f"\n{'='*80}")
+              print("Vision Cortex execution completed successfully!")
+              print(f"Status: {result.get('status')}")
+              print(f"Workflow ID: {result.get('workflow_id')}")
+              print(f"{'='*80}\n")
+              
+              sys.exit(0)
+          except Exception as e:
+              print(f"Error: {e}", file=sys.stderr)
+              sys.exit(1)
+          EOFPYTHON
+          
+          python run_cortex.py
+          echo "::endgroup::"
+
+      - name: Check generated documentation
+        run: |
+          echo "::group::Generated Documentation"
+          ls -lah docs/output/
+          echo ""
+          echo "=== Auto-Generated Doc Preview ==="
+          head -n 50 docs/output/auto_generated_doc.md || echo "No doc found"
+          echo "::endgroup::"
+
+      - name: Generate workflow summary
+        run: |
+          echo "## 🧠 Vision Cortex Execution Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Timestamp:** $(date -u '+%Y-%m-%d %H:%M:%S UTC')" \
+            >> $GITHUB_STEP_SUMMARY
+          echo "**Mode:** ${{ github.event.inputs.mode || 'scheduled' }}" \
+            >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          if [ -f "docs/output/summary_report.md" ]; then
+            echo "### Summary Report" >> $GITHUB_STEP_SUMMARY
+            cat docs/output/summary_report.md >> $GITHUB_STEP_SUMMARY
+          fi
+          
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Generated Artifacts" >> $GITHUB_STEP_SUMMARY
+          echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+          ls -1 docs/output/ >> $GITHUB_STEP_SUMMARY
+          echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+
+      - name: Commit generated documentation
+        if: success()
+        run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "Vision Cortex Bot"
+          
+          git add docs/output/ docs/logs/
+          
+          if git diff --staged --quiet; then
+            echo "No changes to commit"
+          else
+            git commit -m "🧠 Vision Cortex: Auto-generated documentation
+
+            Generated by Vision Cortex multi-agent system
+            Workflow ID: vision_cortex_genesis_${{ github.run_id }}
+            Timestamp: $(date -u '+%Y-%m-%d %H:%M:%S UTC')
+            
+            Agents executed:
+            - CrawlerAgent
+            - IngestionAgent
+            - PredictorAgent
+            - CEOAgent
+            - StrategistAgent
+            - OrganizerAgent
+            - ValidatorAgent
+            - DocumentorAgent
+            "
+            
+            git push
+            echo "Documentation committed and pushed"
+          fi
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: vision-cortex-output-${{ github.run_id }}
+          path: |
+            docs/output/
+            docs/logs/
+          retention-days: 90
+
+      - name: Create milestone issue
+        if: success() && github.event_name == 'workflow_dispatch'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            
+            // Read the generated summary
+            let summaryContent = 'Summary not available';
+            try {
+              summaryContent = fs.readFileSync(
+                'docs/output/summary_report.md', 'utf8');
+            } catch (e) {
+              console.log('Could not read summary report');
+            }
+            
+            // Read metadata
+            let metadata = {};
+            try {
+              metadata = JSON.parse(fs.readFileSync(
+                'docs/output/metadata.json', 'utf8'));
+            } catch (e) {
+              console.log('Could not read metadata');
+            }
+            
+            const issueBody = `## 🧠 Vision Cortex Milestone Report
+            
+            **Workflow Run:** ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+            **Timestamp:** ${new Date().toISOString()}
+            **Quality Score:** ${metadata.validation?.quality_score || 'N/A'}
+            
+            ### Summary
+            
+            ${summaryContent}
+            
+            ### Artifacts
+            
+            Generated documentation available in \`docs/output/\`:
+            - auto_generated_doc.md
+            - summary_report.md
+            - metadata.json
+            
+            ### Next Steps
+            
+            Review the generated documentation and strategic recommendations.
+            
+            ---
+            
+            *Automatically generated by Vision Cortex*
+            `;
+            
+            await github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: '🧠 Vision Cortex Milestone: ' + new Date().toISOString().split('T')[0],
+              body: issueBody,
+              labels: ['vision-cortex', 'automated', 'milestone']
+            });
+
+      - name: Notify completion
+        if: success()
+        run: |
+          echo "✅ Vision Cortex execution completed successfully!"
+          echo "📄 Documentation generated in docs/output/"
+          echo "📊 Check the workflow summary for details"
