@@ -1,0 +1,94 @@
+site_name: Infinity Matrix Documentation
+site_description: A fully autonomous multi-agent system for enterprise automation
+site_author: InfinityXOne Systems
+site_url: https://infinityxonesystems.github.io/infinity-matrix/
+
+repo_name: InfinityXOneSystems/infinity-matrix
+repo_url: https://github.com/InfinityXOneSystems/infinity-matrix
+edit_uri: edit/main/docs/
+
+theme:
+  name: material
+  palette:
+    - scheme: default
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    - scheme: slate
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+  features:
+    - navigation.instant
+    - navigation.tracking
+    - navigation.tabs
+    - navigation.sections
+    - navigation.expand
+    - navigation.indexes
+    - toc.follow
+    - search.suggest
+    - search.highlight
+    - content.code.annotate
+    - content.code.copy
+
+plugins:
+  - search
+  - mkdocstrings:
+      handlers:
+        python:
+          options:
+            show_source: true
+            show_root_heading: true
+            show_root_toc_entry: true
+
+markdown_extensions:
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.superfences
+  - pymdownx.tabbed:
+      alternate_style: true
+  - admonition
+  - pymdownx.details
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
+  - attr_list
+  - md_in_html
+
+nav:
+  - Home: index.md
+  - Getting Started:
+    - Installation: getting-started/installation.md
+    - Quick Start: getting-started/quickstart.md
+    - Configuration: getting-started/configuration.md
+  - Architecture:
+    - Overview: architecture/overview.md
+    - Components: architecture/components.md
+    - Agent System: architecture/agents.md
+  - Components:
+    - Vision Cortex: components/vision.md
+    - Auto-Builder: components/builder.md
+    - Evolution Docs: components/docs.md
+    - Index System: components/index.md
+    - Taxonomy: components/taxonomy.md
+    - PR Engine: components/pr-engine.md
+    - ETL System: components/etl.md
+  - Integrations:
+    - GitHub: integrations/github.md
+    - Google Cloud: integrations/gcp.md
+    - Hostinger: integrations/hostinger.md
+    - VS Code: integrations/vscode.md
+  - API Reference:
+    - Core: api/core.md
+    - Agents: api/agents.md
+    - Components: api/components.md
+  - Development:
+    - Contributing: development/contributing.md
+    - Testing: development/testing.md
+    - Deployment: development/deployment.md
