@@ -1,183 +1,275 @@
-# Infinity Matrix - Master Universal System/App Builder
+# Infinity Matrix - Automated PR System
 
-**The AI-Powered Universal Application Builder & Orchestrator**
+![Auto-Fix](https://img.shields.io/badge/auto--fix-enabled-brightgreen)
+![Auto-Resolve](https://img.shields.io/badge/auto--resolve-enabled-blue)
+![Auto-Merge](https://img.shields.io/badge/auto--merge-enabled-purple)
 
-Infinity Matrix is a next-generation, AI-driven system builder that transforms natural language prompts into production-ready applications across any stack. Powered by advanced AI vision cortex and autonomous agent orchestration, it provides zero-to-deploy capabilities for modern cloud-native applications.
+An intelligent GitHub automation system that automatically fixes, resolves, and merges pull requests.
 
 ## 🚀 Features
 
-### 1. Universal Templating System
-- **Multi-Stack Support**: Python, Node.js, Go, Rust, Java, .NET, and more
-- **Modular Components**: Plug-and-play modules for auth, APIs, UIs, databases, cloud, CI/CD
-- **Strongly Typed**: Type-safe templates with comprehensive validation
-- **Parameterized**: Fully customizable templates for rapid deployment
+### 1. Auto-Fix (`auto-fix.yml`)
+Automatically fixes common code issues in pull requests:
+- **Code Formatting**: Applies Black formatter to Python code
+- **Import Sorting**: Organizes imports with isort
+- **Style Fixes**: Applies autopep8 for PEP 8 compliance
+- **Whitespace Cleanup**: Removes trailing whitespace
+- **Line Endings**: Normalizes line endings
 
-### 2. AI Vision Cortex & Auto-Builder
-- **Intelligent Prompt Interpretation**: Advanced NLP to understand requirements
-- **Automated Blueprint Selection**: AI selects optimal architecture patterns
-- **Agent Orchestration**: Integration with Auto-GPT, SuperAGI, Langchain, Haystack, Ray
-- **Continuous Learning**: Improves recommendations based on usage patterns
+**Triggers**: Runs on PR open, synchronize, or reopened events
 
-### 3. Auto Prompt CLI
-- **Natural Language Interface**: Describe what you want, get a working application
-- **Prompt Chaining**: Complex workflows through sequential prompts
-- **Scheduling**: Automated builds, deploys, and maintenance tasks
-- **Code Review Integration**: AI-powered code review and optimization
-- **Action Logging**: Complete audit trail for compliance and documentation
+### 2. Auto-Resolve (`auto-resolve.yml`)
+Automatically resolves merge conflicts and validates PRs:
+- **Conflict Detection**: Identifies merge conflicts with base branch
+- **Smart Resolution**: Attempts automatic conflict resolution
+- **Validation**: Runs checks after resolution
+- **Status Monitoring**: Tracks PR status and checks
+- **Labeling**: Adds `ready-to-merge` label when PR is ready
 
-### 4. Agent & App Universal Integration
-- **Agent Registry**: Centralized management for all autonomous agents
-- **Auto-Schedulers**: Intelligent task scheduling and resource allocation
-- **Sync & Validation**: Continuous validation with code and cloud infrastructure
-- **Self-Healing**: Automatic detection and resolution of issues
-- **Self-Documenting**: Auto-generated documentation from code and configs
+**Triggers**: Runs on PR open, synchronize, or reopened events
 
-### 5. Enterprise-Grade Security & Governance
-- **Secrets Management**: Encrypted storage with rotation policies
-- **RBAC**: Fine-grained role-based access control
-- **Audit Logging**: Comprehensive activity tracking
-- **Encryption by Default**: Data encryption at rest and in transit
-- **CI/CD Integration**: Automated testing, security scanning, deployment
-- **Rollback Support**: One-click rollback for failed deployments
+### 3. Auto-Merge (`auto-merge.yml`)
+Automatically merges PRs when all criteria are met:
+- **Criteria Checking**: Validates merge requirements
+- **Status Verification**: Ensures all checks pass
+- **Review Validation**: Checks for approvals and requested changes
+- **Conflict Prevention**: Verifies PR is mergeable
+- **Safe Merging**: Only merges when all conditions are satisfied
 
-### 6. Manus.im Integration
-- **Fully Automated Workflows**: AI-driven orchestration and management
-- **Auto-Scaling**: Intelligent resource scaling based on load
-- **Self-Updating**: Automatic updates and dependency management
-- **Management Dashboard**: Visual control center for all operations
-- **Code-First Design**: Everything is code, optionally visual
+**Triggers**: Runs on PR events, reviews, check completions, or manually
 
-### 7. Developer Experience
-- **Self-Documented**: Templates include comprehensive documentation
-- **Quick Onboarding**: Get started in minutes
-- **Community Templates**: Share and remix templates
-- **No-Code Friendly**: Visual builders for common patterns
+## 📋 Merge Criteria
 
-## 📦 Installation
+A PR will be automatically merged when:
+- ✅ All status checks pass
+- ✅ No merge conflicts exist
+- ✅ PR is not in draft mode
+- ✅ No blocking labels (`do-not-merge`, `wip`, `work-in-progress`, `needs-review`)
+- ✅ No changes requested in reviews
+- ✅ All required checks complete
 
-```bash
-pip install infinity-matrix
+## 🔧 Configuration
+
+### Workflow Permissions
+All workflows require:
+```yaml
+permissions:
+  contents: write
+  pull-requests: write
+  checks: read
 ```
 
-Or install from source:
+### Merge Method
+By default, PRs are merged using the **squash** method. To change this, edit `.github/workflows/auto-merge.yml`:
 
-```bash
-git clone https://github.com/InfinityXOneSystems/infinity-matrix.git
-cd infinity-matrix
-pip install -e .
+```yaml
+merge_method: 'squash'  # Options: 'merge', 'squash', 'rebase'
 ```
 
-## 🎯 Quick Start
+### Blocking Labels
+To prevent auto-merge, add any of these labels to your PR:
+- `do-not-merge`
+- `wip`
+- `work-in-progress`
+- `needs-review`
 
-### Create Your First App
+## 🛠️ Setup Instructions
 
-```bash
-# Initialize Infinity Matrix
-infinity-matrix init
+1. **Enable GitHub Actions**
+   - Go to your repository settings
+   - Navigate to Actions → General
+   - Enable "Allow all actions and reusable workflows"
 
-# Create an app from a natural language prompt
-infinity-matrix create "Build a REST API for a task management system with user authentication"
+2. **Configure Branch Protection** (Optional but Recommended)
+   - Go to Settings → Branches
+   - Add rules for your main branch:
+     - Require pull request reviews before merging
+     - Require status checks to pass before merging
+     - Require conversation resolution before merging
 
-# Or use interactive mode
-infinity-matrix create --interactive
+3. **Set Up Secrets** (if needed)
+   - The workflows use `GITHUB_TOKEN` which is automatically provided
+   - No additional secrets are required for basic functionality
 
-# Deploy your app
-infinity-matrix deploy
+## 📝 Usage
+
+### For Pull Request Authors
+
+1. **Create a Pull Request**
+   - Open a PR as usual
+   - The auto-fix workflow will automatically run and fix formatting issues
+   - Auto-resolve will check for conflicts and attempt to resolve them
+
+2. **Monitor Automation**
+   - Check PR comments for automation status
+   - Review auto-fix commits if any were made
+   - Ensure all checks pass
+
+3. **Prevent Auto-Merge** (if needed)
+   - Mark PR as draft, OR
+   - Add a blocking label (`do-not-merge`, `wip`, etc.)
+
+### For Repository Maintainers
+
+1. **Review Automated Changes**
+   - Auto-fix commits are clearly labeled
+   - Review the changes before merging (if auto-merge is not desired)
+
+2. **Customize Workflows**
+   - Edit workflow files in `.github/workflows/`
+   - Adjust merge criteria in `auto-merge.yml`
+   - Modify fix tools in `auto-fix.yml`
+
+3. **Monitor Workflow Runs**
+   - Check Actions tab for workflow status
+   - Review logs for any issues
+   - Adjust configurations as needed
+
+## 🔍 Workflow Details
+
+### Auto-Fix Workflow
+```yaml
+Trigger: pull_request [opened, synchronize, reopened]
+Steps:
+  1. Checkout code
+  2. Setup Python environment
+  3. Install formatting tools
+  4. Run Black formatter
+  5. Run isort
+  6. Run autopep8
+  7. Fix whitespace and line endings
+  8. Commit and push fixes (if any)
+  9. Comment on PR
 ```
 
-### Using Templates Directly
-
-```bash
-# List available templates
-infinity-matrix templates list
-
-# Create from a specific template
-infinity-matrix create --template python-fastapi-postgres
-
-# Customize with parameters
-infinity-matrix create --template python-fastapi-postgres \
-  --param app_name=my-api \
-  --param include_auth=true \
-  --param database=postgresql
+### Auto-Resolve Workflow
+```yaml
+Trigger: pull_request [opened, synchronize, reopened]
+Steps:
+  1. Checkout code
+  2. Fetch base branch
+  3. Check for conflicts
+  4. Attempt automatic resolution
+  5. Run validation checks
+  6. Add ready-to-merge label
+  7. Comment on PR with results
 ```
 
-### Agent-Powered Development
-
-```bash
-# Enable AI agent assistance
-infinity-matrix agent enable --type code-review
-
-# Schedule automated tasks
-infinity-matrix schedule --task "update dependencies" --cron "0 0 * * 0"
-
-# Self-healing mode
-infinity-matrix monitor --auto-heal
+### Auto-Merge Workflow
+```yaml
+Trigger: pull_request, pull_request_review, check_suite, workflow_dispatch
+Steps:
+  1. Get PR details
+  2. Check merge criteria:
+     - PR state and draft status
+     - Merge conflicts
+     - Blocking labels
+     - Status checks
+     - Reviews
+  3. Merge PR (if criteria met)
+  4. Comment on PR with results
 ```
 
-## 🏗️ Architecture
+## ⚙️ Advanced Configuration
 
-```
-infinity-matrix/
-├── core/                   # Core system components
-│   ├── cli/               # Command-line interface
-│   ├── engine/            # Template engine
-│   ├── ai/                # AI/LLM integration
-│   └── config/            # Configuration management
-├── templates/             # Universal templates
-│   ├── python/           # Python templates
-│   ├── node/             # Node.js templates
-│   ├── go/               # Go templates
-│   └── ...               # More stacks
-├── modules/               # Plug-and-play modules
-│   ├── auth/             # Authentication modules
-│   ├── api/              # API modules
-│   ├── ui/               # UI modules
-│   ├── database/         # Database modules
-│   └── ...               # More modules
-├── agents/                # Agent framework
-│   ├── registry/         # Agent registry
-│   ├── scheduler/        # Task scheduler
-│   └── orchestrator/     # Agent orchestrator
-├── security/              # Security & governance
-│   ├── secrets/          # Secrets management
-│   ├── rbac/             # Access control
-│   └── audit/            # Audit logging
-└── integrations/          # External integrations
-    ├── manus/            # Manus.im integration
-    ├── cloud/            # Cloud providers
-    └── cicd/             # CI/CD platforms
+### Custom Validation Checks
+Add your project-specific checks to `auto-resolve.yml`:
+
+```yaml
+- name: Run validation checks
+  run: |
+    # Python tests
+    pytest tests/
+    
+    # JavaScript tests
+    npm test
+    
+    # Linting
+    flake8 .
+    
+    # Type checking
+    mypy .
 ```
 
-## 📚 Documentation
+### Customize Auto-Fix Tools
+Modify `auto-fix.yml` to add or remove formatting tools:
 
-- [Getting Started Guide](docs/getting-started.md)
-- [Template Development](docs/templates.md)
-- [AI Vision Cortex](docs/ai-vision.md)
-- [Agent Framework](docs/agents.md)
-- [Security Best Practices](docs/security.md)
-- [API Reference](docs/api-reference.md)
+```yaml
+- name: Run additional formatter
+  run: |
+    # Add your custom formatting commands
+    prettier --write "**/*.js"
+    eslint --fix "**/*.js"
+```
+
+### Change Merge Strategy
+In `auto-merge.yml`, modify the merge method:
+
+```yaml
+merge_method: 'merge'    # Standard merge commit
+merge_method: 'squash'   # Squash and merge (default)
+merge_method: 'rebase'   # Rebase and merge
+```
+
+## 🚦 Status Indicators
+
+The workflows will comment on PRs with status indicators:
+- ✅ Success: Action completed successfully
+- ⚠️ Warning: Action completed with warnings or unable to complete
+- ❌ Error: Action failed
+
+## 🔒 Security Considerations
+
+1. **Token Permissions**: Workflows use `GITHUB_TOKEN` with minimal required permissions
+2. **Branch Protection**: Enable branch protection rules to prevent unwanted merges
+3. **Review Requirements**: Configure required approvals for sensitive repositories
+4. **Workflow Approval**: Consider requiring approval for workflows from first-time contributors
+
+## 📊 Monitoring and Debugging
+
+### View Workflow Runs
+1. Go to the "Actions" tab in your repository
+2. Select the workflow you want to inspect
+3. Click on a specific run to view logs
+
+### Common Issues
+
+**Auto-fix not running**
+- Verify GitHub Actions are enabled
+- Check workflow file syntax
+- Ensure Python files exist in the repository
+
+**Auto-merge not working**
+- Check merge criteria are met
+- Verify no blocking labels are present
+- Ensure all status checks pass
+- Review branch protection rules
+
+**Conflicts not resolving**
+- Complex conflicts may require manual resolution
+- Check auto-resolve comments for details
+- Review merge strategy settings
 
 ## 🤝 Contributing
 
-We welcome contributions! See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
+To improve these workflows:
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Test with a pull request
+5. Submit your improvements
 
 ## 📄 License
 
-MIT License - see [LICENSE](LICENSE) for details.
+This automation system is part of the infinity-matrix project.
 
-## 🔗 Links
+## 🆘 Support
 
-- [Website](https://infinityxone.systems)
-- [Documentation](https://docs.infinityxone.systems)
-- [Community Forum](https://community.infinityxone.systems)
-- [Issue Tracker](https://github.com/InfinityXOneSystems/infinity-matrix/issues)
+For issues or questions:
+- Open an issue in the repository
+- Check workflow logs in the Actions tab
+- Review GitHub Actions documentation
 
-## 🌟 Examples
+---
 
-Check out the [examples](examples/) directory for sample applications built with Infinity Matrix:
-- E-commerce platform
-- SaaS starter kit
-- Microservices architecture
-- Data pipeline
-- ML model serving
-- And more!
+**Note**: These workflows are designed to be safe and conservative. They will never force-merge a PR that doesn't meet the criteria or has active concerns from reviewers.

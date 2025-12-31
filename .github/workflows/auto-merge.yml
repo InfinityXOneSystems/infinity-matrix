@@ -1,0 +1,206 @@
+name: Auto-Merge PR
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, labeled]
+  pull_request_review:
+    types: [submitted]
+  check_suite:
+    types: [completed]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+  checks: read
+
+jobs:
+  auto-merge:
+    runs-on: ubuntu-latest
+    if: |
+      github.event_name == 'pull_request' ||
+      github.event_name == 'pull_request_review' ||
+      github.event_name == 'check_suite' ||
+      github.event_name == 'workflow_dispatch'
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Get PR details
+        id: pr_details
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            let pr;
+            if (context.payload.pull_request) {
+              pr = context.payload.pull_request;
+            } else if (context.payload.check_suite) {
+              const { data: prs } = await github.rest.pulls.list({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                state: 'open',
+                head: context.payload.check_suite.head_branch,
+              });
+              pr = prs[0];
+            } else {
+              const { data: prs } = await github.rest.pulls.list({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                state: 'open',
+              });
+              pr = prs[0];
+            }
+            
+            if (!pr) {
+              core.setOutput('skip', 'true');
+              return null;
+            }
+            
+            core.setOutput('pr_number', pr.number);
+            core.setOutput('pr_state', pr.state);
+            core.setOutput('mergeable', pr.mergeable);
+            core.setOutput('draft', pr.draft);
+            return pr;
+
+      - name: Check merge criteria
+        id: check_criteria
+        if: steps.pr_details.outputs.skip != 'true'
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const prNumber = parseInt('${{ steps.pr_details.outputs.pr_number }}');
+            
+            if (!prNumber || '${{ steps.pr_details.outputs.draft }}' === 'true') {
+              core.setOutput('can_merge', 'false');
+              core.setOutput('reason', 'PR is draft or not found');
+              return false;
+            }
+            
+            // Check if PR is mergeable
+            if ('${{ steps.pr_details.outputs.mergeable }}' === 'false') {
+              core.setOutput('can_merge', 'false');
+              core.setOutput('reason', 'PR has conflicts');
+              return false;
+            }
+            
+            // Get PR details
+            const { data: pr } = await github.rest.pulls.get({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: prNumber,
+            });
+            
+            // Check for blocking labels
+            const blockingLabels = ['do-not-merge', 'wip', 'work-in-progress', 'needs-review'];
+            const hasBlockingLabel = pr.labels.some(label => 
+              blockingLabels.includes(label.name.toLowerCase())
+            );
+            
+            if (hasBlockingLabel) {
+              core.setOutput('can_merge', 'false');
+              core.setOutput('reason', 'PR has blocking labels');
+              return false;
+            }
+            
+            // Check status checks
+            const { data: checks } = await github.rest.checks.listForRef({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              ref: pr.head.sha,
+            });
+            
+            // Allow merge if no checks or all checks passed
+            const hasFailedChecks = checks.check_runs.some(check => 
+              check.conclusion === 'failure' || check.conclusion === 'cancelled'
+            );
+            
+            if (hasFailedChecks) {
+              core.setOutput('can_merge', 'false');
+              core.setOutput('reason', 'Some checks failed');
+              return false;
+            }
+            
+            // Check if checks are still running
+            const hasRunningChecks = checks.check_runs.some(check => 
+              check.status === 'in_progress' || check.status === 'queued'
+            );
+            
+            if (hasRunningChecks) {
+              core.setOutput('can_merge', 'false');
+              core.setOutput('reason', 'Checks are still running');
+              return false;
+            }
+            
+            // Check reviews (optional - can be configured)
+            const { data: reviews } = await github.rest.pulls.listReviews({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: prNumber,
+            });
+            
+            const hasRequestedChanges = reviews.some(review => 
+              review.state === 'CHANGES_REQUESTED'
+            );
+            
+            if (hasRequestedChanges) {
+              core.setOutput('can_merge', 'false');
+              core.setOutput('reason', 'Changes requested in review');
+              return false;
+            }
+            
+            core.setOutput('can_merge', 'true');
+            return true;
+
+      - name: Merge PR
+        if: steps.check_criteria.outputs.can_merge == 'true'
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const prNumber = parseInt('${{ steps.pr_details.outputs.pr_number }}');
+            
+            try {
+              await github.rest.pulls.merge({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                pull_number: prNumber,
+                merge_method: 'squash', # Options: 'merge', 'squash', 'rebase'
+                commit_title: `Auto-merge: PR #${prNumber}`,
+                commit_message: 'Automatically merged by GitHub Actions workflow',
+              });
+              
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: prNumber,
+                body: '✅ Auto-merged: This PR has been automatically merged after passing all checks.',
+              });
+              
+              console.log('PR merged successfully');
+            } catch (error) {
+              console.error('Failed to merge PR:', error);
+              
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: prNumber,
+                body: `⚠️ Auto-merge failed: ${error.message}`,
+              });
+              
+              throw error;
+            }
+
+      - name: Comment on merge criteria not met
+        if: steps.check_criteria.outputs.can_merge == 'false' && steps.pr_details.outputs.skip != 'true'
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const prNumber = parseInt('${{ steps.pr_details.outputs.pr_number }}');
+            const reason = '${{ steps.check_criteria.outputs.reason }}';
+            
+            console.log(`Cannot merge PR #${prNumber}: ${reason}`);
