@@ -1,0 +1,2 @@
+# Infinity Matrix - Auto-Resolve and Auto-Merge System
+# No external dependencies required - uses Python standard library only
