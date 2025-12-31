@@ -62,19 +62,29 @@ class ReviewAgent(BaseAgent):
             return False
         return True
 
-    async def _code_review(
-        self, code: str, context: Dict[str, Any]
-    ) -> Dict[str, Any]:
+    async def _code_review(self, code: str, context: Dict[str, Any]) -> Dict[str, Any]:
         """Perform comprehensive code review."""
         self.logger.info("performing_code_review", code_length=len(code))
 
         review = {
             "overall_score": 8.5,
             "categories": {
-                "readability": {"score": 9.0, "comments": ["Clear variable names", "Good function structure"]},
-                "maintainability": {"score": 8.5, "comments": ["Well modularized", "Consider adding more comments"]},
-                "performance": {"score": 8.0, "comments": ["Generally efficient", "Could optimize loop in line 45"]},
-                "security": {"score": 8.5, "comments": ["No major issues", "Validate all user inputs"]},
+                "readability": {
+                    "score": 9.0,
+                    "comments": ["Clear variable names", "Good function structure"],
+                },
+                "maintainability": {
+                    "score": 8.5,
+                    "comments": ["Well modularized", "Consider adding more comments"],
+                },
+                "performance": {
+                    "score": 8.0,
+                    "comments": ["Generally efficient", "Could optimize loop in line 45"],
+                },
+                "security": {
+                    "score": 8.5,
+                    "comments": ["No major issues", "Validate all user inputs"],
+                },
             },
             "issues": [
                 {
@@ -115,28 +125,34 @@ class ReviewAgent(BaseAgent):
 
         # Check for common security issues
         if "eval(" in code:
-            vulnerabilities.append({
-                "severity": "critical",
-                "type": "code_injection",
-                "message": "Use of eval() detected - potential code injection vulnerability",
-                "remediation": "Avoid eval(), use ast.literal_eval() for safe evaluation",
-            })
+            vulnerabilities.append(
+                {
+                    "severity": "critical",
+                    "type": "code_injection",
+                    "message": "Use of eval() detected - potential code injection vulnerability",
+                    "remediation": "Avoid eval(), use ast.literal_eval() for safe evaluation",
+                }
+            )
 
         if "pickle.loads(" in code:
-            vulnerabilities.append({
-                "severity": "high",
-                "type": "insecure_deserialization",
-                "message": "Unsafe pickle deserialization",
-                "remediation": "Use JSON or validate pickle data source",
-            })
+            vulnerabilities.append(
+                {
+                    "severity": "high",
+                    "type": "insecure_deserialization",
+                    "message": "Unsafe pickle deserialization",
+                    "remediation": "Use JSON or validate pickle data source",
+                }
+            )
 
         if "password" in code.lower() and "=" in code:
-            vulnerabilities.append({
-                "severity": "medium",
-                "type": "hardcoded_credentials",
-                "message": "Possible hardcoded credentials",
-                "remediation": "Use environment variables or secure key management",
-            })
+            vulnerabilities.append(
+                {
+                    "severity": "medium",
+                    "type": "hardcoded_credentials",
+                    "message": "Possible hardcoded credentials",
+                    "remediation": "Use environment variables or secure key management",
+                }
+            )
 
         return {
             "status": "completed",
@@ -145,9 +161,7 @@ class ReviewAgent(BaseAgent):
             "scan_timestamp": "2025-12-31T02:30:00Z",
         }
 
-    async def _architecture_review(
-        self, architecture: Dict[str, Any]
-    ) -> Dict[str, Any]:
+    async def _architecture_review(self, architecture: Dict[str, Any]) -> Dict[str, Any]:
         """Review system architecture."""
         self.logger.info("performing_architecture_review")
 
@@ -189,10 +203,10 @@ class ReviewAgent(BaseAgent):
         """Calculate overall risk level."""
         if not vulnerabilities:
             return "low"
-        
+
         severity_scores = {"critical": 4, "high": 3, "medium": 2, "low": 1}
         total_score = sum(severity_scores.get(v["severity"], 0) for v in vulnerabilities)
-        
+
         if total_score >= 4:
             return "critical"
         elif total_score >= 3:

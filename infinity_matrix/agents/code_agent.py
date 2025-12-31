@@ -69,24 +69,28 @@ class CodeAgent(BaseAgent):
 
         # In production, use AST parsing, linters, and static analysis tools
         issues = []
-        
+
         # Basic checks
         lines = code.split("\n")
         for i, line in enumerate(lines, 1):
             if len(line) > 100:
-                issues.append({
-                    "line": i,
-                    "severity": "warning",
-                    "message": "Line too long",
-                    "type": "style",
-                })
+                issues.append(
+                    {
+                        "line": i,
+                        "severity": "warning",
+                        "message": "Line too long",
+                        "type": "style",
+                    }
+                )
             if "TODO" in line or "FIXME" in line:
-                issues.append({
-                    "line": i,
-                    "severity": "info",
-                    "message": "TODO/FIXME comment found",
-                    "type": "maintenance",
-                })
+                issues.append(
+                    {
+                        "line": i,
+                        "severity": "info",
+                        "message": "TODO/FIXME comment found",
+                        "type": "maintenance",
+                    }
+                )
 
         metrics = {
             "lines_of_code": len(lines),

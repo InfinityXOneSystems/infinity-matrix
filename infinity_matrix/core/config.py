@@ -29,9 +29,7 @@ class Settings(BaseSettings):
     api_prefix: str = Field(default="/api/v1", description="API prefix")
 
     # Database Configuration
-    database_url: str = Field(
-        default="sqlite:///./infinity_matrix.db", description="Database URL"
-    )
+    database_url: str = Field(default="sqlite:///./infinity_matrix.db", description="Database URL")
     redis_url: str = Field(default="redis://localhost:6379/0", description="Redis URL")
 
     # Vision Cortex Configuration
@@ -49,9 +47,7 @@ class Settings(BaseSettings):
     # Security Configuration
     secret_key: str = Field(default="change-me-in-production", description="Secret key")
     api_key_header: str = Field(default="X-API-Key", description="API key header")
-    allowed_origins: List[str] = Field(
-        default=["*"], description="CORS allowed origins"
-    )
+    allowed_origins: List[str] = Field(default=["*"], description="CORS allowed origins")
     rate_limit_per_minute: int = Field(default=60, description="Rate limit per minute")
 
     # Monitoring Configuration
@@ -61,9 +57,7 @@ class Settings(BaseSettings):
 
     # Auto-Builder Configuration
     builder_workspace: str = Field(default="./workspace", description="Builder workspace")
-    builder_max_concurrent: int = Field(
-        default=5, description="Max concurrent builds"
-    )
+    builder_max_concurrent: int = Field(default=5, description="Max concurrent builds")
 
     # Proof Logs Configuration
     logs_retention_days: int = Field(default=90, description="Log retention days")

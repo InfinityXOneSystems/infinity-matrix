@@ -52,21 +52,21 @@ def main():
     """Main application entry point."""
     args = parse_args()
     settings = get_settings()
-    
+
     logger.info(
         "infinity_matrix_starting",
         version="1.0.0",
         environment=settings.environment,
     )
-    
+
     # Determine configuration
     host = args.host or settings.api_host
     port = args.port or settings.api_port
     workers = args.workers or settings.api_workers
-    
+
     # Create app
     app = create_app()
-    
+
     # Run server
     if args.dev:
         logger.info("running_in_development_mode")

@@ -56,13 +56,13 @@ class AuditLogger(BaseService):
     async def _initialize(self) -> None:
         """Initialize audit logger."""
         self.logger.info("audit_logger_initializing")
-        
+
         # Create storage directory
         self._storage_path.mkdir(parents=True, exist_ok=True)
-        
+
         # Load existing events (if any)
         await self._load_events()
-        
+
         self.logger.info(
             "audit_logger_initialized",
             storage_path=str(self._storage_path),
@@ -72,7 +72,7 @@ class AuditLogger(BaseService):
     async def _shutdown(self) -> None:
         """Shutdown audit logger."""
         self.logger.info("audit_logger_shutting_down")
-        
+
         # Persist all events
         await self._persist_events()
 
@@ -96,9 +96,9 @@ class AuditLogger(BaseService):
             metadata=metadata or {},
             correlation_id=correlation_id,
         )
-        
+
         self._events.append(event)
-        
+
         self.logger.info(
             "audit_event_logged",
             event_id=event.id,
@@ -106,11 +106,11 @@ class AuditLogger(BaseService):
             actor=actor,
             action=action,
         )
-        
+
         # Persist periodically
         if len(self._events) % 100 == 0:
             await self._persist_events()
-        
+
         return event
 
     async def get_events(
@@ -150,16 +150,14 @@ class AuditLogger(BaseService):
                 return event
         return None
 
-    async def get_events_by_correlation(
-        self, correlation_id: str
-    ) -> List[AuditEvent]:
+    async def get_events_by_correlation(self, correlation_id: str) -> List[AuditEvent]:
         """Get all events with the same correlation ID."""
         return [e for e in self._events if e.correlation_id == correlation_id]
 
     async def verify_event(self, event_id: str) -> Dict[str, Any]:
         """Verify event integrity and authenticity."""
         event = await self.get_event(event_id)
-        
+
         if not event:
             return {"verified": False, "reason": "Event not found"}
 
@@ -222,14 +220,14 @@ class AuditLogger(BaseService):
             # Create daily log file
             today = datetime.utcnow().strftime("%Y-%m-%d")
             log_file = self._storage_path / f"audit_{today}.jsonl"
-            
+
             # Append new events
             with open(log_file, "a") as f:
                 for event in self._events:
                     f.write(json.dumps(event.model_dump(), default=str) + "\n")
-            
+
             self.logger.debug("audit_events_persisted", count=len(self._events))
-            
+
         except Exception as e:
             self.logger.error("audit_persist_failed", error=str(e))
 
@@ -239,16 +237,16 @@ class AuditLogger(BaseService):
             # Load today's events
             today = datetime.utcnow().strftime("%Y-%m-%d")
             log_file = self._storage_path / f"audit_{today}.jsonl"
-            
+
             if log_file.exists():
                 with open(log_file, "r") as f:
                     for line in f:
                         data = json.loads(line)
                         event = AuditEvent(**data)
                         self._events.append(event)
-            
+
             self.logger.debug("audit_events_loaded", count=len(self._events))
-            
+
         except Exception as e:
             self.logger.error("audit_load_failed", error=str(e))
 

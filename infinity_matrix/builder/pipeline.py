@@ -67,16 +67,16 @@ class BuildPipeline(BaseService):
     async def _initialize(self) -> None:
         """Initialize build pipeline."""
         self.logger.info("build_pipeline_initializing")
-        
+
         # Create workspace directory
         self._workspace.mkdir(parents=True, exist_ok=True)
-        
+
         self.logger.info("build_pipeline_initialized", workspace=str(self._workspace))
 
     async def _shutdown(self) -> None:
         """Shutdown build pipeline."""
         self.logger.info("build_pipeline_shutting_down")
-        
+
         # Cancel all running builds
         for build_id, task in self._running_builds.items():
             if not task.done():
@@ -88,7 +88,7 @@ class BuildPipeline(BaseService):
         """Execute a build."""
         build_id = str(uuid4())
         start_time = datetime.utcnow()
-        
+
         self.logger.info(
             "build_starting",
             build_id=build_id,
@@ -100,31 +100,31 @@ class BuildPipeline(BaseService):
             status=BuildStatus.RUNNING,
             start_time=start_time,
         )
-        
+
         self._builds[build_id] = result
 
         try:
             # Create build task
             task = asyncio.create_task(self._run_build(build_id, config))
             self._running_builds[build_id] = task
-            
+
             # Wait for build to complete
             await task
-            
+
             # Update result
             result = self._builds[build_id]
             result.end_time = datetime.utcnow()
             result.duration = (result.end_time - start_time).total_seconds()
-            
+
             self.metrics.record_build(result.status.value)
-            
+
             self.logger.info(
                 "build_completed",
                 build_id=build_id,
                 status=result.status,
                 duration=result.duration,
             )
-            
+
             return result
 
         except asyncio.CancelledError:
@@ -150,7 +150,7 @@ class BuildPipeline(BaseService):
     async def _run_build(self, build_id: str, config: BuildConfig) -> None:
         """Run the actual build process."""
         result = self._builds[build_id]
-        
+
         try:
             # Step 1: Lint (if configured)
             if config.lint_command:
@@ -204,7 +204,7 @@ class BuildPipeline(BaseService):
     ) -> str:
         """Execute a shell command."""
         full_env = {**os.environ, **env}
-        
+
         process = await asyncio.create_subprocess_shell(
             command,
             cwd=cwd,
@@ -212,13 +212,13 @@ class BuildPipeline(BaseService):
             stdout=asyncio.subprocess.PIPE,
             stderr=asyncio.subprocess.PIPE,
         )
-        
+
         stdout, stderr = await process.communicate()
-        
+
         if process.returncode != 0:
             error_msg = stderr.decode() if stderr else "Command failed"
             raise RuntimeError(f"Command failed: {error_msg}")
-        
+
         return stdout.decode()
 
     def get_build_status(self, build_id: str) -> Optional[BuildResult]:
@@ -233,10 +233,10 @@ class BuildPipeline(BaseService):
         """Cancel a running build."""
         if build_id not in self._running_builds:
             return False
-        
+
         task = self._running_builds[build_id]
         if not task.done():
             task.cancel()
             return True
-        
+
         return False

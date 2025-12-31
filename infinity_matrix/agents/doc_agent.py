@@ -102,31 +102,33 @@ class DocAgent(BaseAgent):
             "changes_applied": len(changes),
         }
 
-    async def _validate_docs(
-        self, documentation: str, code: str
-    ) -> Dict[str, Any]:
+    async def _validate_docs(self, documentation: str, code: str) -> Dict[str, Any]:
         """Validate documentation completeness."""
         self.logger.info("validating_documentation")
 
         issues = []
-        
+
         # Check for required sections
         required_sections = ["Overview", "Installation", "Usage", "API"]
         for section in required_sections:
             if section.lower() not in documentation.lower():
-                issues.append({
-                    "type": "missing_section",
-                    "severity": "warning",
-                    "message": f"Missing section: {section}",
-                })
+                issues.append(
+                    {
+                        "type": "missing_section",
+                        "severity": "warning",
+                        "message": f"Missing section: {section}",
+                    }
+                )
 
         # Check if documentation matches code
         if code and len(documentation) < len(code) * 0.1:
-            issues.append({
-                "type": "incomplete",
-                "severity": "error",
-                "message": "Documentation seems too brief for the codebase",
-            })
+            issues.append(
+                {
+                    "type": "incomplete",
+                    "severity": "error",
+                    "message": "Documentation seems too brief for the codebase",
+                }
+            )
 
         is_valid = len([i for i in issues if i["severity"] == "error"]) == 0
 

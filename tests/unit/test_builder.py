@@ -19,11 +19,11 @@ async def test_build_status_tracking():
     """Test build status tracking."""
     pipeline = BuildPipeline()
     await pipeline.initialize()
-    
+
     # Initially no builds
     builds = pipeline.list_builds()
     assert len(builds) == 0
-    
+
     await pipeline.shutdown()
 
 
@@ -32,9 +32,9 @@ async def test_get_build_status():
     """Test getting build status."""
     pipeline = BuildPipeline()
     await pipeline.initialize()
-    
+
     # Non-existent build
     status = pipeline.get_build_status("non-existent")
     assert status is None
-    
+
     await pipeline.shutdown()

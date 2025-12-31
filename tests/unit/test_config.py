@@ -18,7 +18,7 @@ def test_settings_validation():
     # Valid environment
     settings = Settings(environment="production")
     assert settings.environment == "production"
-    
+
     # Invalid environment should raise error
     with pytest.raises(ValueError):
         Settings(environment="invalid")
@@ -29,7 +29,7 @@ def test_settings_log_level_validation():
     # Valid log level
     settings = Settings(log_level="DEBUG")
     assert settings.log_level == "DEBUG"
-    
+
     # Invalid log level should raise error
     with pytest.raises(ValueError):
         Settings(log_level="INVALID")

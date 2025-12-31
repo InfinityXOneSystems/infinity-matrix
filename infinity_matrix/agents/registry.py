@@ -118,9 +118,7 @@ class AgentRegistry(BaseService):
                 return agent
         return None
 
-    async def execute_on_agent(
-        self, agent_name: str, task: Dict
-    ) -> Dict:
+    async def execute_on_agent(self, agent_name: str, task: Dict) -> Dict:
         """Execute task on specific agent."""
         agent = self.get_agent(agent_name)
         if not agent:
@@ -128,9 +126,7 @@ class AgentRegistry(BaseService):
 
         return await agent.execute(task)
 
-    async def execute_on_available_agent(
-        self, agent_type: str, task: Dict
-    ) -> Dict:
+    async def execute_on_available_agent(self, agent_type: str, task: Dict) -> Dict:
         """Execute task on any available agent of specified type."""
         agent = await self.get_available_agent(agent_type)
         if not agent:

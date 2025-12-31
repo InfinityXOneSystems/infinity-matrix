@@ -42,13 +42,9 @@ VISION_PROCESSING_COUNT = Counter(
     ["task_type", "status"],
 )
 
-BUILD_COUNT = Counter(
-    "infinity_matrix_builds_total", "Total build count", ["status"]
-)
+BUILD_COUNT = Counter("infinity_matrix_builds_total", "Total build count", ["status"])
 
-ACTIVE_AGENTS = Gauge(
-    "infinity_matrix_active_agents", "Number of active agents", ["agent_type"]
-)
+ACTIVE_AGENTS = Gauge("infinity_matrix_active_agents", "Number of active agents", ["agent_type"])
 
 
 class MetricsCollector:
@@ -67,22 +63,16 @@ class MetricsCollector:
         try:
             start_http_server(self.settings.prometheus_port)
             self._server_started = True
-            logger.info(
-                "metrics_server_started", port=self.settings.prometheus_port
-            )
+            logger.info("metrics_server_started", port=self.settings.prometheus_port)
         except Exception as e:
             logger.error("metrics_server_start_failed", error=str(e))
 
-    def record_request(
-        self, method: str, endpoint: str, status: int, duration: float
-    ) -> None:
+    def record_request(self, method: str, endpoint: str, status: int, duration: float) -> None:
         """Record API request metrics."""
         REQUEST_COUNT.labels(method=method, endpoint=endpoint, status=status).inc()
         REQUEST_DURATION.labels(method=method, endpoint=endpoint).observe(duration)
 
-    def record_agent_execution(
-        self, agent_type: str, status: str, duration: float
-    ) -> None:
+    def record_agent_execution(self, agent_type: str, status: str, duration: float) -> None:
         """Record agent execution metrics."""
         AGENT_EXECUTION_COUNT.labels(agent_type=agent_type, status=status).inc()
         AGENT_EXECUTION_DURATION.labels(agent_type=agent_type).observe(duration)
