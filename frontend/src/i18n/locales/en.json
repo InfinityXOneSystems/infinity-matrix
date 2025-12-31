@@ -1,0 +1,25 @@
+{
+  "app": {
+    "name": "Infinity-Matrix",
+    "tagline": "Enterprise-Grade AI Platform"
+  },
+  "nav": {
+    "dashboard": "Dashboard",
+    "security": "Security",
+    "monitoring": "Monitoring",
+    "governance": "Governance",
+    "compliance": "Compliance",
+    "costs": "Cost Analysis",
+    "docs": "Documentation",
+    "feedback": "Feedback"
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "welcome": "Welcome to Infinity-Matrix"
+  },
+  "common": {
+    "search": "Search",
+    "submit": "Submit",
+    "loading": "Loading..."
+  }
+}

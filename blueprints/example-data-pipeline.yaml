@@ -1,0 +1,71 @@
+name: data-processing-pipeline
+version: 1.0.0
+type: data-pipeline
+
+description: |
+  ETL data processing pipeline for ingesting, transforming,
+  and loading data from multiple sources.
+
+requirements:
+  - data-ingestion
+  - data-transformation
+  - data-storage
+  - monitoring
+
+components:
+  - name: ingestion-worker
+    type: worker
+    framework: celery
+    language: python
+    features:
+      - async-processing
+      - retry-logic
+      - dead-letter-queue
+
+  - name: transformation-service
+    type: backend
+    framework: apache-spark
+    language: python
+    features:
+      - batch-processing
+      - streaming
+      - data-validation
+
+  - name: storage-layer
+    type: database
+    framework: postgresql
+    features:
+      - partitioning
+      - compression
+      - indexing
+
+deployment:
+  platform: kubernetes
+  replicas: 5
+  resources:
+    cpu: "2000m"
+    memory: "4Gi"
+  environment:
+    - name: DATABASE_URL
+      secret: true
+    - name: RABBITMQ_URL
+      secret: true
+    - name: S3_BUCKET
+      secret: false
+
+testing:
+  unit_tests: true
+  integration_tests: true
+  coverage_threshold: 75
+
+documentation:
+  readme: true
+  architecture_diagram: true
+  deployment_guide: true
+
+tags:
+  - etl
+  - data-pipeline
+  - batch-processing
+
+license: Apache-2.0
