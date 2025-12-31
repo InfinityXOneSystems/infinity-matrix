@@ -6,6 +6,7 @@
 import { useEffect, useState, useCallback } from 'react';
 import { apiClient } from '../services/api';
 import { wsService } from '../services/websocket';
+import { WebSocketMessageType } from '../types';
 import type {
   Agent,
   Workflow,
@@ -15,7 +16,6 @@ import type {
   OnboardingGuide,
   Runbook,
   DemoScenario,
-  WebSocketMessageType,
   PaginatedResponse,
   AuditFilters,
 } from '../types';
@@ -100,7 +100,7 @@ export const useAgents = (filters?: { status?: string; type?: string }): UseData
     fetchData();
 
     // Subscribe to real-time updates
-    const unsubscribe = wsService.subscribe<Agent>('agent_status' as WebSocketMessageType, (updatedAgent) => {
+    const unsubscribe = wsService.subscribe<Agent>(WebSocketMessageType.AGENT_STATUS, (updatedAgent) => {
       setState(prev => ({
         ...prev,
         data: prev.data?.map(agent => agent.id === updatedAgent.id ? updatedAgent : agent) || null,
@@ -137,7 +137,7 @@ export const useAgent = (id: string): UseDataState<Agent> => {
     fetchData();
 
     // Subscribe to real-time updates
-    const unsubscribe = wsService.subscribe<Agent>('agent_status' as WebSocketMessageType, (updatedAgent) => {
+    const unsubscribe = wsService.subscribe<Agent>(WebSocketMessageType.AGENT_STATUS, (updatedAgent) => {
       if (updatedAgent.id === id) {
         setState(prev => ({ ...prev, data: updatedAgent }));
       }
@@ -190,7 +190,7 @@ export const useWorkflows = (filters?: { status?: string }): UsePaginatedDataSta
     fetchData();
 
     // Subscribe to real-time updates
-    const unsubscribe = wsService.subscribe<Workflow>('workflow_update' as WebSocketMessageType, (updatedWorkflow) => {
+    const unsubscribe = wsService.subscribe<Workflow>(WebSocketMessageType.WORKFLOW_UPDATE, (updatedWorkflow) => {
       setState(prev => ({
         ...prev,
         data: prev.data.map(workflow => workflow.id === updatedWorkflow.id ? updatedWorkflow : workflow),
@@ -227,7 +227,7 @@ export const useWorkflow = (id: string): UseDataState<Workflow> => {
     fetchData();
 
     // Subscribe to real-time updates
-    const unsubscribe = wsService.subscribe<Workflow>('workflow_update' as WebSocketMessageType, (updatedWorkflow) => {
+    const unsubscribe = wsService.subscribe<Workflow>(WebSocketMessageType.WORKFLOW_UPDATE, (updatedWorkflow) => {
       if (updatedWorkflow.id === id) {
         setState(prev => ({ ...prev, data: updatedWorkflow }));
       }
@@ -280,7 +280,7 @@ export const useAuditLogs = (filters: AuditFilters): UsePaginatedDataState<Audit
     fetchData();
 
     // Subscribe to real-time audit log updates
-    const unsubscribe = wsService.subscribe<AuditLog>('audit_log' as WebSocketMessageType, (newLog) => {
+    const unsubscribe = wsService.subscribe<AuditLog>(WebSocketMessageType.AUDIT_LOG, (newLog) => {
       setState(prev => ({
         ...prev,
         data: [newLog, ...prev.data].slice(0, pageSize),
@@ -335,7 +335,7 @@ export const useProofLogs = (params?: { workflowId?: string }): UsePaginatedData
     fetchData();
 
     // Subscribe to proof verification updates
-    const unsubscribe = wsService.subscribe<ProofLog>('proof_verification' as WebSocketMessageType, (updatedProof) => {
+    const unsubscribe = wsService.subscribe<ProofLog>(WebSocketMessageType.PROOF_VERIFICATION, (updatedProof) => {
       setState(prev => ({
         ...prev,
         data: prev.data.map(proof => proof.id === updatedProof.id ? updatedProof : proof),

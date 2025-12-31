@@ -76,7 +76,7 @@ class ApiClient {
     this.client.interceptors.response.use(
       (response) => response,
       async (error: AxiosError) => {
-        const config = error.config as AxiosRequestConfig & { _retry?: boolean };
+        const config = error.config;
         
         if (!config) {
           return Promise.reject(error);
