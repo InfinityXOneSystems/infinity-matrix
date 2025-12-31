@@ -1,274 +1,200 @@
-"""
-Command-line interface for Infinity Matrix Auto-Builder.
-
-Provides commands for:
-- Building projects from prompts or blueprints
-- Checking build status
-- Managing builds
-- Starting the API server
-"""
+"""Command-line interface for Infinity Matrix."""
 
 import asyncio
-import time
-from pathlib import Path
-from typing import Optional
+import sys
+from typing import Any, Optional
 
-import typer
-import uvicorn
-import yaml
+import click
 from rich.console import Console
-from rich.progress import Progress, SpinnerColumn, TextColumn
 from rich.table import Table
 
-from infinity_matrix.core.auto_builder import AutoBuilder
-from infinity_matrix.core.blueprint import Blueprint, ProjectType
-
-app = typer.Typer(
-    name="infinity-builder",
-    help="Infinity Matrix Auto-Builder CLI",
-    add_completion=True,
-)
+from infinity_matrix.core.config import settings
 
 console = Console()
-auto_builder = AutoBuilder()
 
 
-@app.command()
-def init(
-    name: str = typer.Argument(..., help="Project name"),
-    template: Optional[str] = typer.Option(None, "--template", "-t", help="Template type"),
-    output: Path = typer.Option(Path("."), "--output", "-o", help="Output directory"),
-) -> None:
-    """Initialize a new project from a template."""
-    console.print(f"[bold green]Initializing project:[/bold green] {name}")
-
-    # Create a basic blueprint
-    blueprint = Blueprint(
-        name=name,
-        type=ProjectType.API,
-        description=f"Generated project: {name}",
-    )
-
-    # Trigger build
-    with Progress(
-        SpinnerColumn(),
-        TextColumn("[progress.description]{task.description}"),
-        console=console,
-    ) as progress:
-        task = progress.add_task("Building project...", total=None)
-
-        build_status = asyncio.run(auto_builder.build(blueprint=blueprint))
-
-        progress.update(task, completed=True)
-
-    console.print(f"[bold green]✓[/bold green] Project initialized: {name}")
-    console.print(f"Build ID: {build_status.id}")
+@click.group()
+@click.version_option(version="1.0.0")
+def main() -> None:
+    """Infinity Matrix - Enterprise Intelligence Platform."""
+    pass
 
 
-@app.command()
-def build(
-    prompt: Optional[str] = typer.Argument(None, help="Natural language prompt"),
-    blueprint: Optional[Path] = typer.Option(None, "--blueprint", "-b", help="Blueprint file"),
-    watch: bool = typer.Option(False, "--watch", "-w", help="Watch build progress"),
-) -> None:
-    """Build a project from a prompt or blueprint."""
-    if not prompt and not blueprint:
-        console.print("[bold red]Error:[/bold red] Must provide either a prompt or blueprint file")
-        raise typer.Exit(1)
-
-    console.print("[bold green]Starting build...[/bold green]")
-
-    with Progress(
-        SpinnerColumn(),
-        TextColumn("[progress.description]{task.description}"),
-        console=console,
-    ) as progress:
-        task = progress.add_task("Building...", total=None)
-
-        build_status = asyncio.run(
-            auto_builder.build(
-                prompt=prompt,
-                blueprint_path=blueprint,
-            )
-        )
-
-        progress.update(task, completed=True)
-
-    console.print(f"[bold green]✓[/bold green] Build created")
-    console.print(f"Build ID: {build_status.id}")
-    console.print(f"Status: {build_status.status}")
-
-    if watch:
-        console.print("\nWatching build progress...")
-        _watch_build(build_status.id)
-
-
-@app.command()
-def status(
-    build_id: str = typer.Argument(..., help="Build ID"),
-) -> None:
-    """Check the status of a build."""
-    build_status = asyncio.run(auto_builder.get_build_status(build_id))
-
-    if not build_status:
-        console.print(f"[bold red]Error:[/bold red] Build {build_id} not found")
-        raise typer.Exit(1)
-
-    # Display status
-    table = Table(title=f"Build Status: {build_id}")
-    table.add_column("Property", style="cyan")
-    table.add_column("Value", style="green")
-
-    table.add_row("Name", build_status.name)
-    table.add_row("Status", build_status.status)
-    table.add_row("Progress", f"{build_status.progress}%")
-    table.add_row("Phases", f"{build_status.phases_completed}/{build_status.phases_total}")
-    table.add_row("Created", build_status.created_at)
-
-    if build_status.error:
-        table.add_row("Error", build_status.error, style="bold red")
-
-    console.print(table)
-
-    # Display artifacts if available
-    if build_status.artifacts:
-        console.print("\n[bold]Artifacts:[/bold]")
-        for key, value in build_status.artifacts.items():
-            console.print(f"  {key}: {value}")
-
-
-@app.command()
-def list() -> None:
-    """List all builds."""
-    builds = asyncio.run(auto_builder.list_builds())
-
-    if not builds:
-        console.print("No builds found")
-        return
-
-    table = Table(title="Builds")
-    table.add_column("ID", style="cyan")
-    table.add_column("Name", style="green")
-    table.add_column("Status", style="yellow")
-    table.add_column("Progress", style="blue")
-    table.add_column("Created", style="magenta")
-
-    for build in builds:
-        table.add_row(
-            build.id[:8] + "...",
-            build.name,
-            build.status,
-            f"{build.progress}%",
-            build.created_at,
-        )
-
-    console.print(table)
-
-
-@app.command()
-def cancel(
-    build_id: str = typer.Argument(..., help="Build ID"),
-) -> None:
-    """Cancel a running build."""
-    success = asyncio.run(auto_builder.cancel_build(build_id))
-
-    if success:
-        console.print(f"[bold green]✓[/bold green] Build {build_id} cancelled")
-    else:
-        console.print(f"[bold red]Error:[/bold red] Could not cancel build {build_id}")
-        raise typer.Exit(1)
-
-
-@app.command()
-def serve(
-    host: str = typer.Option("0.0.0.0", "--host", "-h", help="Host to bind to"),
-    port: int = typer.Option(8000, "--port", "-p", help="Port to bind to"),
-    reload: bool = typer.Option(False, "--reload", "-r", help="Enable auto-reload"),
-) -> None:
+@main.command()
+@click.option("--host", default=settings.api_host, help="API host")
+@click.option("--port", default=settings.api_port, help="API port")
+@click.option("--reload", is_flag=True, help="Enable auto-reload")
+def serve(host: str, port: int, reload: bool) -> None:
     """Start the API server."""
-    console.print(f"[bold green]Starting API server on {host}:{port}[/bold green]")
-
+    import uvicorn
+    
+    console.print(f"[bold green]Starting Infinity Matrix API Server[/bold green]")
+    console.print(f"Host: {host}")
+    console.print(f"Port: {port}")
+    console.print(f"Reload: {reload}")
+    
     uvicorn.run(
-        "infinity_matrix.api.main:app",
+        "infinity_matrix.api.server:app",
         host=host,
         port=port,
         reload=reload,
     )
 
 
-@app.command()
-def agents() -> None:
-    """List all registered agents."""
-    vision_cortex = auto_builder.get_vision_cortex()
-    agents_list = vision_cortex.list_agents()
-
-    table = Table(title="Registered Agents")
-    table.add_column("Type", style="cyan")
-    table.add_column("Status", style="green")
-    table.add_column("Capabilities", style="yellow")
-
-    for agent_info in agents_list:
-        capabilities = ", ".join(agent_info["capabilities"])
-        table.add_row(
-            agent_info["type"],
-            agent_info["status"],
-            capabilities,
-        )
-
-    console.print(table)
-
-
-@app.command()
-def validate(
-    blueprint_path: Path = typer.Argument(..., help="Path to blueprint file"),
-) -> None:
-    """Validate a blueprint file."""
-    if not blueprint_path.exists():
-        console.print(f"[bold red]Error:[/bold red] File not found: {blueprint_path}")
-        raise typer.Exit(1)
-
-    try:
-        with open(blueprint_path) as f:
-            data = yaml.safe_load(f)
-
-        blueprint = Blueprint(**data)
-        console.print("[bold green]✓[/bold green] Blueprint is valid")
-        console.print(f"\nName: {blueprint.name}")
-        console.print(f"Type: {blueprint.type.value}")
-        console.print(f"Description: {blueprint.description}")
-
-    except Exception as e:
-        console.print(f"[bold red]Error:[/bold red] Invalid blueprint: {str(e)}")
-        raise typer.Exit(1)
+@main.command()
+@click.argument("symbol")
+@click.option("--timeframe", default="1d", help="Timeframe")
+def analyze_stock(symbol: str, timeframe: str) -> None:
+    """Analyze a stock."""
+    async def _analyze() -> None:
+        from infinity_matrix.industries.finance import FinancialAnalyzer
+        
+        analyzer = FinancialAnalyzer()
+        await analyzer.initialize()
+        
+        console.print(f"[bold]Analyzing {symbol}...[/bold]")
+        result = await analyzer.analyze_stock(symbol, timeframe)
+        
+        await analyzer.shutdown()
+        
+        if result.get("success"):
+            table = Table(title=f"Analysis for {symbol}")
+            table.add_column("Metric", style="cyan")
+            table.add_column("Value", style="green")
+            
+            for key, value in result.items():
+                if key not in ["success", "timestamp"]:
+                    table.add_row(str(key), str(value))
+            
+            console.print(table)
+        else:
+            console.print(f"[red]Error: {result.get('error')}[/red]")
+    
+    asyncio.run(_analyze())
 
 
-def _watch_build(build_id: str) -> None:
-    """Watch build progress."""
-    with Progress(console=console) as progress:
-        task = progress.add_task("[cyan]Building...", total=100)
+@main.command()
+@click.argument("location")
+@click.option("--lead-type", default="buyer", help="Lead type")
+def discover_leads(location: str, lead_type: str) -> None:
+    """Discover real estate leads."""
+    async def _discover() -> None:
+        from infinity_matrix.industries.real_estate import RealEstateEngine
+        
+        engine = RealEstateEngine()
+        await engine.initialize()
+        
+        console.print(f"[bold]Discovering {lead_type} leads in {location}...[/bold]")
+        leads = await engine.discover_leads(location, {"lead_type": lead_type})
+        
+        await engine.shutdown()
+        
+        table = Table(title=f"Leads in {location}")
+        table.add_column("ID", style="cyan")
+        table.add_column("Name", style="green")
+        table.add_column("Email", style="blue")
+        table.add_column("Score", style="yellow")
+        
+        for lead in leads[:10]:  # Show first 10
+            table.add_row(
+                lead["id"],
+                lead["contact"]["name"],
+                lead["contact"]["email"],
+                f"{lead['score']:.2f}",
+            )
+        
+        console.print(table)
+        console.print(f"\nTotal leads: {len(leads)}")
+    
+    asyncio.run(_discover())
 
-        while True:
-            build_status = asyncio.run(auto_builder.get_build_status(build_id))
 
-            if not build_status:
-                break
+@main.command()
+@click.argument("url")
+@click.option("--headless/--no-headless", default=True, help="Use headless browser")
+def crawl(url: str, headless: bool) -> None:
+    """Crawl a URL."""
+    async def _crawl() -> None:
+        if headless:
+            from infinity_matrix.crawlers import HeadlessCrawler
+            crawler = HeadlessCrawler()
+        else:
+            from infinity_matrix.crawlers import ScrapingAgent
+            crawler = ScrapingAgent()
+        
+        await crawler.initialize()
+        
+        console.print(f"[bold]Crawling {url}...[/bold]")
+        result = await crawler.crawl(url)
+        
+        await crawler.shutdown()
+        
+        if result.get("success", True):
+            console.print("[green]Crawl successful![/green]")
+            console.print(f"Title: {result.get('title', 'N/A')}")
+            console.print(f"Status: {result.get('status', 'N/A')}")
+        else:
+            console.print(f"[red]Error: {result.get('error')}[/red]")
+    
+    asyncio.run(_crawl())
 
-            progress.update(task, completed=build_status.progress)
 
-            if build_status.status in ["completed", "failed", "cancelled"]:
-                break
+@main.command()
+@click.argument("text")
+@click.option("--method", default="vader", help="Analysis method")
+def sentiment(text: str, method: str) -> None:
+    """Analyze sentiment of text."""
+    async def _sentiment() -> None:
+        from infinity_matrix.analytics.sentiment import SentimentAnalyzer
+        
+        analyzer = SentimentAnalyzer()
+        
+        console.print("[bold]Analyzing sentiment...[/bold]")
+        result = await analyzer.analyze_text(text, method)
+        
+        if result.get("success"):
+            console.print(f"Score: [bold]{result['score']:.2f}[/bold]")
+            console.print(f"Label: [bold]{result['label']}[/bold]")
+        else:
+            console.print(f"[red]Error: {result.get('error')}[/red]")
+    
+    asyncio.run(_sentiment())
 
-            time.sleep(2)
 
-    build_status = asyncio.run(auto_builder.get_build_status(build_id))
-    if build_status:
-        if build_status.status == "completed":
-            console.print("[bold green]✓[/bold green] Build completed successfully")
-        elif build_status.status == "failed":
-            console.print(f"[bold red]✗[/bold red] Build failed: {build_status.error}")
-        elif build_status.status == "cancelled":
-            console.print("[bold yellow]⚠[/bold yellow] Build cancelled")
+@main.command()
+@click.argument("indicator")
+@click.option("--region", default="US", help="Region code")
+def economic(indicator: str, region: str) -> None:
+    """Get economic indicator."""
+    async def _economic() -> None:
+        from infinity_matrix.industries.economic import EconomicAnalyzer
+        
+        analyzer = EconomicAnalyzer()
+        await analyzer.initialize()
+        
+        console.print(f"[bold]Fetching {indicator} for {region}...[/bold]")
+        result = await analyzer.get_indicator(indicator, region)
+        
+        await analyzer.shutdown()
+        
+        if result.get("success"):
+            console.print(f"Current Value: [bold]{result['current_value']:.2f}[/bold]")
+            console.print(f"Change: [bold]{result.get('change', 0):.2f}[/bold]")
+            console.print(f"Trend: [bold]{result.get('trend', 'N/A')}[/bold]")
+        else:
+            console.print(f"[red]Error: {result.get('error')}[/red]")
+    
+    asyncio.run(_economic())
+
+
+@main.command()
+def version() -> None:
+    """Show version information."""
+    from infinity_matrix import __version__
+    
+    console.print(f"[bold]Infinity Matrix v{__version__}[/bold]")
+    console.print(f"Environment: {settings.environment}")
 
 
 if __name__ == "__main__":
-    app()
+    main()

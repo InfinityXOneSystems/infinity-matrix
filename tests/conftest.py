@@ -1,34 +1,31 @@
-"""Test suite initialization."""
+"""Test configuration."""
 
 import pytest
 
 
 @pytest.fixture
-def sample_config():
-    """Sample configuration for testing."""
-    from infinity_matrix.core.config import Config
-    return Config()
+def sample_lead():
+    """Sample lead for testing."""
+    return {
+        "id": "test_lead_1",
+        "type": "business",
+        "contact": {
+            "name": "Test Lead",
+            "email": "test@example.com",
+            "phone": "+1-555-1234",
+        },
+        "profile": {
+            "location": "San Francisco, CA",
+            "price_range": (100000, 500000),
+        },
+    }
 
 
 @pytest.fixture
-async def registry():
-    """Agent registry fixture."""
-    from infinity_matrix.core.registry import AgentRegistry
-    
-    reg = AgentRegistry()
-    await reg.start()
-    yield reg
-    await reg.stop()
-
-
-@pytest.fixture
-async def system():
-    """System fixture."""
-    from infinity_matrix.core.config import Config
-    from infinity_matrix.core.system import InfinityMatrix
-    
-    config = Config()
-    sys = InfinityMatrix(config)
-    await sys.start()
-    yield sys
-    await sys.stop()
+def sample_financial_data():
+    """Sample financial data for testing."""
+    return {
+        "symbol": "AAPL",
+        "timeframe": "1d",
+        "analysis_type": "stock",
+    }

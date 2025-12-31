@@ -4,136 +4,155 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "infinity-matrix"
-version = "0.1.0"
-description = "A fully autonomous multi-agent system for enterprise automation"
+version = "1.0.0"
+description = "Enterprise intelligence platform with AI-powered analytics and autonomous lead generation"
 readme = "README.md"
-requires-python = ">=3.10"
+requires-python = ">=3.11"
 license = {text = "MIT"}
 authors = [
-    {name = "InfinityXOne Systems", email = "contact@infinityxone.com"}
+    {name = "InfinityXOneSystems", email = "contact@infinityxonesystems.com"}
 ]
 keywords = [
-    "ai",
-    "automation",
-    "agents",
-    "multi-agent",
-    "orchestration",
-    "cicd",
-    "etl"
+    "ai", "ml", "intelligence", "analytics", "crawler", "scraper",
+    "lead-generation", "real-estate", "finance", "prediction"
 ]
 classifiers = [
     "Development Status :: 4 - Beta",
     "Intended Audience :: Developers",
     "License :: OSI Approved :: MIT License",
-    "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
-    "Topic :: Software Development :: Libraries :: Python Modules",
-    "Topic :: System :: Distributed Computing",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
 ]
 
 dependencies = [
-    "pydantic>=2.0.0",
-    "pydantic-settings>=2.0.0",
-    "pyyaml>=6.0",
-    "aiohttp>=3.9.0",
-    "asyncio>=3.4.3",
-    "click>=8.1.0",
-    "rich>=13.0.0",
-    "httpx>=0.25.0",
-    "tenacity>=8.2.0",
+    # Core
+    "pydantic>=2.5.0",
+    "pydantic-settings>=2.1.0",
     "python-dotenv>=1.0.0",
-    "sqlalchemy>=2.0.0",
-    "alembic>=1.12.0",
-    "redis>=5.0.0",
-    "celery>=5.3.0",
-    "structlog>=23.0.0",
+    
+    # Web Framework & API
+    "fastapi>=0.109.0",
+    "uvicorn[standard]>=0.27.0",
+    "httpx>=0.26.0",
+    "aiohttp>=3.9.0",
+    
+    # Database
+    "sqlalchemy>=2.0.25",
+    "alembic>=1.13.0",
+    "psycopg2-binary>=2.9.9",
+    "asyncpg>=0.29.0",
+    "redis>=5.0.1",
+    "motor>=3.3.2",  # MongoDB async driver
+    
+    # Crawling & Scraping
+    "playwright>=1.41.0",
+    "selenium>=4.17.0",
+    "beautifulsoup4>=4.12.3",
+    "lxml>=5.1.0",
+    "scrapy>=2.11.0",
+    "pyppeteer>=2.0.0",
+    
+    # AI & ML
+    "openai>=1.10.0",
+    "anthropic>=0.18.0",
+    "google-cloud-aiplatform>=1.42.0",
+    "google-cloud-vision>=3.6.0",
+    "langchain>=0.1.4",
+    "langchain-openai>=0.0.5",
+    "langchain-google-vertexai>=0.1.0",
+    "transformers>=4.37.0",
+    "torch>=2.2.0",
+    "scikit-learn>=1.4.0",
+    "pandas>=2.2.0",
+    "numpy>=1.26.3",
+    
+    # NLP & Sentiment
+    "nltk>=3.8.1",
+    "spacy>=3.7.2",
+    "textblob>=0.18.0",
+    "vaderSentiment>=3.3.2",
+    
+    # Data Processing
+    "polars>=0.20.5",
+    "pyarrow>=15.0.0",
+    "openpyxl>=3.1.2",
+    "xlrd>=2.0.1",
+    
+    # Communication
+    "twilio>=8.13.0",
+    "sendgrid>=6.11.0",
+    "jinja2>=3.1.3",
+    
+    # Task Queue & Workers
+    "celery>=5.3.6",
+    "dramatiq>=1.15.0",
+    "arq>=0.25.0",
+    
+    # Crypto & Blockchain
+    "web3>=6.15.0",
+    "ccxt>=4.2.0",
+    
+    # Financial Data
+    "yfinance>=0.2.35",
+    "alpha-vantage>=2.3.1",
+    "fredapi>=0.5.1",
+    
+    # Monitoring & Logging
+    "structlog>=24.1.0",
+    "sentry-sdk>=1.40.0",
     "prometheus-client>=0.19.0",
+    
+    # Utilities
+    "tenacity>=8.2.3",
+    "ratelimit>=2.2.1",
+    "pyyaml>=6.0.1",
+    "click>=8.1.7",
+    "rich>=13.7.0",
+    "tqdm>=4.66.1",
 ]
 
 [project.optional-dependencies]
 dev = [
-    "pytest>=7.4.0",
-    "pytest-asyncio>=0.21.0",
+    "pytest>=8.0.0",
+    "pytest-asyncio>=0.23.4",
     "pytest-cov>=4.1.0",
     "pytest-mock>=3.12.0",
-    "mypy>=1.7.0",
-    "ruff>=0.1.0",
-    "black>=23.0.0",
-    "isort>=5.12.0",
-    "pre-commit>=3.5.0",
+    "black>=24.1.1",
+    "ruff>=0.2.0",
+    "mypy>=1.8.0",
+    "pre-commit>=3.6.0",
 ]
-vision = [
-    "pillow>=10.0.0",
-    "opencv-python>=4.8.0",
-    "pytesseract>=0.3.10",
-    "transformers>=4.35.0",
-    "torch>=2.1.0",
-]
-builder = [
-    "docker>=6.1.0",
-    "kubernetes>=28.0.0",
-    "ansible>=8.0.0",
-]
+
 docs = [
-    "mkdocs>=1.5.0",
-    "mkdocs-material>=9.4.0",
+    "mkdocs>=1.5.3",
+    "mkdocs-material>=9.5.6",
     "mkdocstrings[python]>=0.24.0",
 ]
-etl = [
-    "scrapy>=2.11.0",
-    "beautifulsoup4>=4.12.0",
-    "selenium>=4.15.0",
-    "pandas>=2.1.0",
-    "apache-airflow>=2.7.0",
-]
-cloud = [
-    "google-cloud-storage>=2.10.0",
-    "google-cloud-functions>=1.13.0",
-    "boto3>=1.29.0",
-]
-github = [
-    "pygithub>=2.1.0",
-    "githubkit>=0.11.0",
-]
+
+all = ["infinity-matrix[dev,docs]"]
+
+[project.urls]
+Homepage = "https://github.com/InfinityXOneSystems/infinity-matrix"
+Documentation = "https://docs.infinityxonesystems.com"
+Repository = "https://github.com/InfinityXOneSystems/infinity-matrix"
+Issues = "https://github.com/InfinityXOneSystems/infinity-matrix/issues"
 
 [project.scripts]
 infinity-matrix = "infinity_matrix.cli:main"
 
-[project.urls]
-Homepage = "https://github.com/InfinityXOneSystems/infinity-matrix"
-Documentation = "https://infinityxonesystems.github.io/infinity-matrix/"
-Repository = "https://github.com/InfinityXOneSystems/infinity-matrix"
-Issues = "https://github.com/InfinityXOneSystems/infinity-matrix/issues"
-
 [tool.setuptools.packages.find]
-where = ["src"]
+where = ["."]
 include = ["infinity_matrix*"]
 
-[tool.pytest.ini_options]
-testpaths = ["tests"]
-python_files = ["test_*.py", "*_test.py"]
-python_classes = ["Test*"]
-python_functions = ["test_*"]
-addopts = "-v --cov=infinity_matrix --cov-report=html --cov-report=term-missing"
-asyncio_mode = "auto"
-
-[tool.mypy]
-python_version = "3.10"
-warn_return_any = true
-warn_unused_configs = true
-disallow_untyped_defs = true
-disallow_incomplete_defs = true
-check_untyped_defs = true
-strict_optional = true
-warn_redundant_casts = true
-warn_unused_ignores = true
-warn_no_return = true
+[tool.black]
+line-length = 100
+target-version = ['py311']
+include = '\.pyi?$'
 
 [tool.ruff]
-target-version = "py310"
 line-length = 100
+target-version = "py311"
 select = [
     "E",  # pycodestyle errors
     "W",  # pycodestyle warnings
@@ -151,12 +170,36 @@ ignore = [
 [tool.ruff.per-file-ignores]
 "__init__.py" = ["F401"]
 
-[tool.black]
-line-length = 100
-target-version = ['py310', 'py311', 'py312']
-include = '\.pyi?$'
+[tool.mypy]
+python_version = "3.11"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true
+plugins = ["pydantic.mypy"]
 
-[tool.isort]
-profile = "black"
-line_length = 100
-multi_line_output = 3
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+asyncio_mode = "auto"
+addopts = "-v --tb=short --strict-markers"
+markers = [
+    "slow: marks tests as slow (deselect with '-m \"not slow\"')",
+    "integration: marks tests as integration tests",
+    "unit: marks tests as unit tests",
+]
+
+[tool.coverage.run]
+source = ["infinity_matrix"]
+omit = ["*/tests/*", "*/test_*.py"]
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "raise AssertionError",
+    "raise NotImplementedError",
+    "if __name__ == .__main__.:",
+    "if TYPE_CHECKING:",
+]

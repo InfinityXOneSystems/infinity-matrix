@@ -1,161 +1,105 @@
-# Contributing to Infinity Matrix Auto-Builder
+# Contributing to Infinity Matrix
 
-Thank you for your interest in contributing to the Infinity Matrix Auto-Builder! This document provides guidelines and instructions for contributing.
+Thank you for your interest in contributing to Infinity Matrix! This document provides guidelines and instructions for contributing.
 
-## Code of Conduct
-
-By participating in this project, you agree to maintain a respectful and inclusive environment for all contributors.
-
-## Getting Started
+## Development Setup
 
 1. Fork the repository
-2. Clone your fork: `git clone https://github.com/your-username/infinity-matrix.git`
-3. Create a virtual environment: `python -m venv .venv`
-4. Activate the environment: `source .venv/bin/activate` (or `.venv\Scripts\activate` on Windows)
-5. Install development dependencies: `pip install -e ".[dev]"`
-6. Create a branch for your changes: `git checkout -b feature/your-feature-name`
+2. Clone your fork:
+   ```bash
+   git clone https://github.com/YOUR_USERNAME/infinity-matrix.git
+   cd infinity-matrix
+   ```
+
+3. Create a virtual environment:
+   ```bash
+   python -m venv venv
+   source venv/bin/activate  # On Windows: venv\Scripts\activate
+   ```
+
+4. Install dependencies:
+   ```bash
+   pip install -r requirements.txt
+   pip install -e ".[dev]"
+   ```
+
+5. Install pre-commit hooks:
+   ```bash
+   pre-commit install
+   ```
 
 ## Development Workflow
 
-### Code Style
+1. Create a new branch:
+   ```bash
+   git checkout -b feature/your-feature-name
+   ```
 
-We follow PEP 8 and use automated tools to ensure code quality:
+2. Make your changes
+3. Run tests:
+   ```bash
+   pytest
+   ```
 
-- **Black**: Code formatting
-- **Ruff**: Linting
-- **Mypy**: Type checking
+4. Run linters:
+   ```bash
+   black infinity_matrix tests
+   ruff infinity_matrix tests
+   mypy infinity_matrix
+   ```
 
-Run these tools before committing:
+5. Commit your changes:
+   ```bash
+   git add .
+   git commit -m "feat: add your feature"
+   ```
 
-```bash
-# Format code
-black infinity_matrix/
+6. Push to your fork:
+   ```bash
+   git push origin feature/your-feature-name
+   ```
 
-# Lint code
-ruff check infinity_matrix/
+7. Create a Pull Request
 
-# Type check
-mypy infinity_matrix/
-```
+## Code Style
 
-### Testing
+- Follow PEP 8 guidelines
+- Use Black for code formatting (line length: 100)
+- Use type hints for all functions
+- Write docstrings for all public modules, classes, and functions
+- Keep functions focused and small
 
-We use pytest for testing. Write tests for all new features and bug fixes.
+## Testing
 
-```bash
-# Run all tests
-pytest
+- Write tests for all new features
+- Maintain test coverage above 80%
+- Use pytest for testing
+- Mark slow tests with `@pytest.mark.slow`
+- Mark integration tests with `@pytest.mark.integration`
 
-# Run with coverage
-pytest --cov=infinity_matrix
+## Commit Messages
 
-# Run specific test file
-pytest tests/test_core.py
-```
+Follow the Conventional Commits specification:
 
-### Commit Messages
+- `feat:` - New feature
+- `fix:` - Bug fix
+- `docs:` - Documentation changes
+- `style:` - Code style changes (formatting, etc.)
+- `refactor:` - Code refactoring
+- `test:` - Adding or updating tests
+- `chore:` - Maintenance tasks
 
-Follow conventional commit format:
+## Pull Request Guidelines
 
-- `feat:` New feature
-- `fix:` Bug fix
-- `docs:` Documentation changes
-- `test:` Test changes
-- `refactor:` Code refactoring
-- `style:` Code style changes
-- `chore:` Build/tooling changes
-
-Example: `feat: add support for GraphQL API generation`
-
-## Pull Request Process
-
-1. Ensure all tests pass
-2. Update documentation if needed
-3. Add an entry to CHANGELOG.md (if applicable)
-4. Submit a pull request with a clear description of changes
-5. Request review from maintainers
-6. Address any feedback
-
-## Areas for Contribution
-
-### High Priority
-
-- Additional agent implementations
-- More template types
-- Integration with external services
-- Performance optimizations
-- Documentation improvements
-
-### Agent Development
-
-When adding new agents:
-
-1. Inherit from `BaseAgent`
-2. Implement the `execute()` method
-3. Add agent type to `AgentType` enum
-4. Register agent in `VisionCortex`
-5. Add comprehensive tests
-6. Document capabilities
-
-Example:
-
-```python
-from infinity_matrix.agents.base import BaseAgent, AgentType, AgentTask, AgentResult
-
-class MyCustomAgent(BaseAgent):
-    def __init__(self, config=None):
-        super().__init__(AgentType.CUSTOM, config)
-    
-    async def execute(self, task: AgentTask) -> AgentResult:
-        # Implementation here
-        pass
-    
-    def get_capabilities(self):
-        return ["capability1", "capability2"]
-```
-
-### Template Development
-
-Add new templates to the `templates/` directory:
-
-```
-templates/
-  my-template/
-    README.md
-    pyproject.toml
-    src/
-      __init__.py
-      main.py
-```
-
-### Blueprint Examples
-
-Add blueprint examples to `blueprints/`:
-
-```yaml
-name: my-project
-version: 1.0.0
-type: microservice
-description: Description here
-requirements:
-  - requirement1
-  - requirement2
-# ... more configuration
-```
-
-## Documentation
-
-- Update README.md for user-facing changes
-- Add docstrings to all public functions/classes
-- Create examples in `examples/` directory
-- Update API documentation
+- Provide a clear description of the changes
+- Reference related issues
+- Ensure all tests pass
+- Update documentation if needed
+- Add tests for new features
+- Keep PRs focused and small
 
 ## Questions?
 
-- Open an issue for bug reports or feature requests
-- Use discussions for questions and general discussions
-- Contact maintainers for security issues
+Open an issue or join our community forum.
 
-## License
-
-By contributing, you agree that your contributions will be licensed under the MIT License.
+Thank you for contributing!
