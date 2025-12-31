@@ -1,229 +1,253 @@
 # Contributing to Infinity Matrix
 
-Thank you for your interest in contributing to Infinity Matrix! This document provides guidelines for contributing to the project.
+Thank you for considering contributing to Infinity Matrix! This document provides guidelines for contributing to the project.
 
 ## Code of Conduct
 
-We are committed to providing a welcoming and inclusive environment. Please be respectful and professional in all interactions.
+By participating in this project, you agree to maintain a respectful and inclusive environment.
 
 ## How to Contribute
 
-### Reporting Issues
+### Reporting Bugs
 
-Before creating an issue, please:
-1. Check if the issue already exists
-2. Collect relevant information (logs, screenshots, steps to reproduce)
-3. Use the issue template
+1. Check if the bug has already been reported in [Issues](https://github.com/InfinityXOneSystems/infinity-matrix/issues)
+2. If not, create a new issue with:
+   - Clear title and description
+   - Steps to reproduce
+   - Expected vs actual behavior
+   - System information (OS, Python version, etc.)
 
 ### Suggesting Features
 
-1. Check the [Feature Roadmap](docs/reports/ROADMAP.md)
-2. Create a feature request issue
-3. Describe the use case and expected behavior
-4. Discuss with maintainers before implementing
+1. Check existing [feature requests](https://github.com/InfinityXOneSystems/infinity-matrix/issues?q=is%3Aissue+is%3Aopen+label%3Aenhancement)
+2. Create a new issue with:
+   - Clear description of the feature
+   - Use cases and benefits
+   - Potential implementation approach
 
-### Contributing Code
+### Pull Requests
 
-#### 1. Fork and Clone
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Make your changes
+4. Write or update tests
+5. Ensure all tests pass (`pytest`)
+6. Format code (`black .`)
+7. Lint code (`ruff check .`)
+8. Commit your changes (`git commit -m 'Add amazing feature'`)
+9. Push to the branch (`git push origin feature/amazing-feature`)
+10. Open a Pull Request
+
+## Development Setup
 
 ```bash
-# Fork the repository on GitHub
 # Clone your fork
 git clone https://github.com/YOUR_USERNAME/infinity-matrix.git
 cd infinity-matrix
 
-# Add upstream remote
-git remote add upstream https://github.com/InfinityXOneSystems/infinity-matrix.git
-```
+# Create virtual environment
+python -m venv venv
+source venv/bin/activate  # or venv\Scripts\activate on Windows
 
-#### 2. Create a Branch
+# Install development dependencies
+pip install -e ".[dev]"
 
-```bash
-# Create a feature branch
-git checkout -b feature/your-feature-name
-
-# Or a bugfix branch
-git checkout -b bugfix/issue-description
-```
-
-#### 3. Make Changes
-
-Follow our coding standards:
-- Python: PEP 8, type hints, docstrings
-- TypeScript: Airbnb style guide, JSDoc comments
-- Keep changes focused and atomic
-- Write tests for new features
-
-#### 4. Test Your Changes
-
-```bash
 # Run tests
-pytest tests/
-
-# Run linters
-black .
-ruff check .
-
-# Run type checker
-mypy app/
-```
-
-#### 5. Commit Your Changes
-
-Follow conventional commits format:
-
-```bash
-git commit -m "feat: add new agent capability"
-git commit -m "fix: resolve workflow timeout issue"
-git commit -m "docs: update API documentation"
-```
-
-Types: `feat`, `fix`, `docs`, `style`, `refactor`, `test`, `chore`
-
-#### 6. Push and Create Pull Request
-
-```bash
-# Push to your fork
-git push origin feature/your-feature-name
-
-# Create pull request on GitHub
-```
-
-## Pull Request Process
-
-1. **Description**: Provide a clear description of changes
-2. **Link Issues**: Reference related issues
-3. **Tests**: Ensure all tests pass
-4. **Documentation**: Update relevant documentation
-5. **Review**: Address review comments
-6. **Merge**: Maintainer will merge when approved
-
-### PR Checklist
-
-- [ ] Code follows project style guidelines
-- [ ] Tests added/updated
-- [ ] Documentation updated
-- [ ] Commits follow conventional format
-- [ ] All CI checks pass
-- [ ] PR description is clear and complete
-
-## Development Setup
-
-See [Setup Guide](docs/guides/SETUP.md) for detailed instructions.
-
-Quick start:
-```bash
-docker-compose up -d
-docker-compose exec api pytest
+pytest
 ```
 
 ## Coding Standards
 
-### Python
+### Python Style
+
+- Follow PEP 8
+- Use type hints
+- Write docstrings for all public functions and classes
+- Maximum line length: 100 characters
+
+### Code Quality
+
+- Write tests for new features
+- Maintain test coverage above 80%
+- Use meaningful variable names
+- Keep functions small and focused
+- Document complex logic
+
+### Example
 
 ```python
-def process_workflow(workflow_id: str, config: Dict[str, Any]) -> WorkflowResult:
-    """
-    Process a workflow with given configuration.
+from typing import Dict, Any
+from infinity_matrix.agents import BaseAgent
+
+
+class MyAgent(BaseAgent):
+    """Agent for performing specific tasks.
     
-    Args:
-        workflow_id: Unique workflow identifier
-        config: Workflow configuration dictionary
-        
-    Returns:
-        WorkflowResult: Processing result with status and output
-        
-    Raises:
-        WorkflowError: If workflow processing fails
+    This agent provides functionality for...
+    
+    Attributes:
+        name: Agent identifier
+        agent_type: Type of agent
     """
-    # Implementation
-    pass
+    
+    def __init__(self, name: str) -> None:
+        """Initialize the agent.
+        
+        Args:
+            name: Unique identifier for the agent
+        """
+        super().__init__(
+            name=name,
+            agent_type="custom",
+            description="Performs custom tasks"
+        )
+    
+    async def _execute(self, task: Dict[str, Any]) -> Dict[str, Any]:
+        """Execute the agent's task.
+        
+        Args:
+            task: Task configuration and input data
+            
+        Returns:
+            Dict containing execution results
+            
+        Raises:
+            ValueError: If task is invalid
+        """
+        # Implementation here
+        return {"status": "success"}
+    
+    async def validate(self, task: Dict[str, Any]) -> bool:
+        """Validate task input.
+        
+        Args:
+            task: Task to validate
+            
+        Returns:
+            True if valid, False otherwise
+        """
+        return "action" in task
 ```
-
-### TypeScript
-
-```typescript
-/**
- * Execute a workflow with provided parameters
- * 
- * @param workflowId - Unique workflow identifier
- * @param params - Execution parameters
- * @returns Promise resolving to workflow result
- * @throws {WorkflowError} If execution fails
- */
-async function executeWorkflow(
-  workflowId: string,
-  params: WorkflowParams
-): Promise<WorkflowResult> {
-  // Implementation
-}
-```
-
-## Documentation
-
-### Update Documentation
-
-When making changes, update:
-- Code comments and docstrings
-- README if needed
-- API documentation
-- User guides if user-facing changes
-- Changelog
-
-### Documentation Style
-
-- Clear and concise
-- Include examples
-- Use proper formatting
-- Link to related docs
 
 ## Testing
 
-### Test Requirements
+### Writing Tests
 
-- Unit tests for all new code
-- Integration tests for API changes
-- E2E tests for critical flows
-- Maintain or improve coverage
+- Use pytest for all tests
+- Write unit tests for individual components
+- Write integration tests for component interactions
+- Use async test functions with `@pytest.mark.asyncio`
+
+### Test Structure
+
+```python
+import pytest
+from infinity_matrix.agents import AgentRegistry
+
+
+@pytest.mark.asyncio
+async def test_agent_registration():
+    """Test that agents can be registered successfully."""
+    registry = AgentRegistry()
+    await registry.initialize()
+    
+    # Test implementation
+    assert registry.is_initialized
+    
+    await registry.shutdown()
+```
 
 ### Running Tests
 
 ```bash
-# All tests
+# Run all tests
 pytest
 
-# Specific test file
-pytest tests/test_agents.py
+# Run specific test file
+pytest tests/unit/test_agents.py
 
-# With coverage
-pytest --cov=app tests/
+# Run with coverage
+pytest --cov=infinity_matrix --cov-report=html
+
+# Run specific test
+pytest -k test_agent_registration
 ```
 
-## Community
+## Documentation
 
-### Communication Channels
+### Code Documentation
 
-- **GitHub Issues**: Bug reports, feature requests
-- **GitHub Discussions**: Questions, ideas
-- **Email**: dev@infinityxone.systems
+- Write docstrings for all public APIs
+- Use Google-style docstrings
+- Include examples in docstrings when helpful
 
-### Getting Help
+### User Documentation
 
-- Check [documentation](docs/)
-- Search existing issues
-- Ask in discussions
-- Contact maintainers
+- Update README.md for user-facing changes
+- Update docs/ for detailed guides
+- Include code examples
 
-## Recognition
+## Commit Messages
 
-Contributors are recognized in:
-- CONTRIBUTORS.md
-- Release notes
-- Project README
+Follow conventional commits:
 
-Thank you for contributing to Infinity Matrix!
+```
+type(scope): short description
 
----
+Longer description if needed
 
-**Maintained By**: Maintainers Team  
-**Last Updated**: 2025-12-31
+Fixes #123
+```
+
+**Types:**
+- `feat`: New feature
+- `fix`: Bug fix
+- `docs`: Documentation changes
+- `style`: Code style changes
+- `refactor`: Code refactoring
+- `test`: Test additions or changes
+- `chore`: Maintenance tasks
+
+**Example:**
+```
+feat(agents): add custom agent support
+
+Add support for registering custom agents with dynamic capabilities.
+Includes new BaseAgent methods and registry integration.
+
+Fixes #42
+```
+
+## Pull Request Process
+
+1. Update documentation
+2. Add tests for new functionality
+3. Ensure all tests pass
+4. Update CHANGELOG.md
+5. Request review from maintainers
+
+### PR Checklist
+
+- [ ] Tests pass locally
+- [ ] Code is formatted with black
+- [ ] Code passes ruff linting
+- [ ] Documentation is updated
+- [ ] CHANGELOG.md is updated
+- [ ] Commit messages follow conventions
+
+## Release Process
+
+Releases are managed by maintainers:
+
+1. Update version in `pyproject.toml`
+2. Update CHANGELOG.md
+3. Create git tag
+4. Build and publish to PyPI
+
+## Questions?
+
+- Open an issue for questions
+- Join our Discord community
+- Email: dev@infinityxone.com
+
+Thank you for contributing! 🎉

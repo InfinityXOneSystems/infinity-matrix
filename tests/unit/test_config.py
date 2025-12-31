@@ -1,56 +1,56 @@
-"""Unit tests for core configuration."""
+"""Tests for core configuration."""
 
 import pytest
-from pathlib import Path
-
-from infinity_matrix.core.config import Config, load_config
+from infinity_matrix.core.config import Settings, get_settings
 
 
-def test_config_defaults():
-    """Test default configuration values."""
-    config = Config()
-    
-    assert config.debug is False
-    assert config.log_level == "INFO"
-    assert config.agents.max_concurrent == 10
-    assert config.vision.enabled is True
-    assert config.builder.enabled is True
+def test_settings_defaults():
+    """Test default settings values."""
+    settings = Settings()
+    assert settings.environment == "development"
+    assert settings.debug is False
+    assert settings.api_host == "0.0.0.0"
+    assert settings.api_port == 8000
 
 
-def test_config_from_env(monkeypatch):
-    """Test configuration from environment variables."""
-    monkeypatch.setenv("INFINITY_MATRIX_DEBUG", "true")
-    monkeypatch.setenv("INFINITY_MATRIX_LOG_LEVEL", "DEBUG")
-    
-    config = Config.from_env()
-    
-    assert config.debug is True
-    assert config.log_level == "DEBUG"
+def test_settings_validation():
+    """Test settings validation."""
+    # Valid environment
+    settings = Settings(environment="production")
+    assert settings.environment == "production"
+
+    # Invalid environment should raise error
+    with pytest.raises(ValueError):
+        Settings(environment="invalid")
 
 
-def test_config_save_load(tmp_path):
-    """Test saving and loading configuration."""
-    config = Config()
-    config.debug = True
-    config.log_level = "DEBUG"
-    
-    config_path = tmp_path / "config.yaml"
-    config.save(config_path)
-    
-    assert config_path.exists()
-    
-    loaded = Config.from_file(config_path)
-    assert loaded.debug is True
-    assert loaded.log_level == "DEBUG"
+def test_settings_log_level_validation():
+    """Test log level validation."""
+    # Valid log level
+    settings = Settings(log_level="DEBUG")
+    assert settings.log_level == "DEBUG"
+
+    # Invalid log level should raise error
+    with pytest.raises(ValueError):
+        Settings(log_level="INVALID")
 
 
-def test_ensure_directories(tmp_path):
-    """Test directory creation."""
-    config = Config()
-    config.data_dir = tmp_path / "data"
-    
-    config.ensure_directories()
-    
-    assert (config.data_dir / "logs").exists()
-    assert (config.data_dir / "cache").exists()
-    assert (config.data_dir / "agents").exists()
+def test_settings_is_production():
+    """Test production environment check."""
+    settings = Settings(environment="production")
+    assert settings.is_production is True
+    assert settings.is_development is False
+
+
+def test_settings_is_development():
+    """Test development environment check."""
+    settings = Settings(environment="development")
+    assert settings.is_development is True
+    assert settings.is_production is False
+
+
+def test_get_settings_cached():
+    """Test that get_settings returns cached instance."""
+    settings1 = get_settings()
+    settings2 = get_settings()
+    assert settings1 is settings2

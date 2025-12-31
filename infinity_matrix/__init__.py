@@ -1,18 +1,10 @@
-"""
-Infinity Matrix - Enterprise Intelligence Platform
-
-A state-of-the-art platform for autonomous data collection, AI-powered analysis,
-and real-time predictions across multiple industries.
-"""
+"""Infinity Matrix - FAANG-level autonomous AI system."""
 
 __version__ = "1.0.0"
-__author__ = "InfinityXOneSystems"
-__license__ = "MIT"
+__author__ = "InfinityXOne Systems"
+__email__ = "info@infinityxone.com"
 
-from infinity_matrix.core.config import settings
-from infinity_matrix.core.logging import setup_logging
+from infinity_matrix.core.config import get_settings
+from infinity_matrix.core.logging import get_logger
 
-# Initialize logging on import
-logger = setup_logging()
-
-__all__ = ["settings", "logger", "__version__"]
+__all__ = ["__version__", "get_settings", "get_logger"]

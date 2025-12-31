@@ -1,74 +1,67 @@
 version: '3.8'
 
 services:
-  api:
-    build:
-      context: .
-      dockerfile: docker/Dockerfile
+  app:
+    build: .
     ports:
       - "8000:8000"
+      - "9090:9090"
     environment:
-      - DATABASE_URL=postgresql+asyncpg://infinity_user:infinity_pass@postgres:5432/infinity_matrix
+      - ENVIRONMENT=development
+      - DATABASE_URL=postgresql://infinity:infinity@db:5432/infinity_matrix
       - REDIS_URL=redis://redis:6379/0
-      - MONGODB_URL=mongodb://mongodb:27017
-    depends_on:
-      - postgres
-      - redis
-      - mongodb
+      - LOG_LEVEL=INFO
     volumes:
       - ./infinity_matrix:/app/infinity_matrix
-    command: python -m infinity_matrix.api.server
-
-  worker:
-    build:
-      context: .
-      dockerfile: docker/Dockerfile
-    environment:
-      - DATABASE_URL=postgresql+asyncpg://infinity_user:infinity_pass@postgres:5432/infinity_matrix
-      - REDIS_URL=redis://redis:6379/0
-      - CELERY_BROKER_URL=redis://redis:6379/1
+      - ./logs:/app/logs
+      - ./workspace:/app/workspace
     depends_on:
-      - postgres
+      - db
       - redis
-    volumes:
-      - ./infinity_matrix:/app/infinity_matrix
-    command: celery -A infinity_matrix.workers.celery_app worker --loglevel=info
+    restart: unless-stopped
 
-  postgres:
-    image: postgres:16-alpine
+  db:
+    image: postgres:15-alpine
     environment:
-      - POSTGRES_USER=infinity_user
-      - POSTGRES_PASSWORD=infinity_pass
       - POSTGRES_DB=infinity_matrix
-    ports:
-      - "5432:5432"
+      - POSTGRES_USER=infinity
+      - POSTGRES_PASSWORD=infinity
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    restart: unless-stopped
 
   redis:
     image: redis:7-alpine
     ports:
       - "6379:6379"
-    volumes:
-      - redis_data:/data
-
-  mongodb:
-    image: mongo:7
-    ports:
-      - "27017:27017"
-    volumes:
-      - mongodb_data:/data/db
+    restart: unless-stopped
 
   prometheus:
     image: prom/prometheus:latest
     ports:
-      - "9090:9090"
+      - "9091:9090"
     volumes:
-      - ./config/prometheus.yml:/etc/prometheus/prometheus.yml
+      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml
       - prometheus_data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+    restart: unless-stopped
+
+  grafana:
+    image: grafana/grafana:latest
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./monitoring/grafana-dashboard.json:/etc/grafana/provisioning/dashboards/dashboard.json
+    restart: unless-stopped
 
 volumes:
   postgres_data:
-  redis_data:
-  mongodb_data:
   prometheus_data:
+  grafana_data:

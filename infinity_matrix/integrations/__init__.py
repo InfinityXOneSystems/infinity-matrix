@@ -1,5 +1,5 @@
-"""Integrations module initialization."""
+"""API integration module."""
 
-from infinity_matrix.integrations.orchestrator import CrossRepoOrchestrator
+from infinity_matrix.integrations.api.server import create_app
 
-__all__ = ["CrossRepoOrchestrator"]
+__all__ = ["create_app"]

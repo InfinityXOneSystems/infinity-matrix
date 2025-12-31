@@ -1,250 +1,78 @@
-# Deployment Guide
+# Deployment Guide - Infinity Matrix
 
-## Table of Contents
+This guide covers deploying Infinity Matrix to production environments.
 
-1. [Prerequisites](#prerequisites)
-2. [Local Development Setup](#local-development-setup)
-3. [Docker Deployment](#docker-deployment)
-4. [Production Deployment](#production-deployment)
-5. [Configuration](#configuration)
-6. [Monitoring](#monitoring)
+## Production Checklist
 
-## Prerequisites
+Before deploying to production:
 
-### Required
+- [ ] Change `SECRET_KEY` in environment variables
+- [ ] Set `ENVIRONMENT=production`
+- [ ] Configure production database (PostgreSQL)
+- [ ] Set up Redis for caching
+- [ ] Configure SSL/TLS certificates
+- [ ] Set up monitoring and alerting
+- [ ] Configure backup strategy
+- [ ] Review security settings
+- [ ] Set up CI/CD pipeline
+- [ ] Configure logging aggregation
 
-- Python 3.9+
-- pip or poetry for dependency management
-- Git
+## Deployment Options
 
-### Optional (for full functionality)
+### Option 1: Docker Compose
 
-- PostgreSQL 15+ (or use file-based storage)
-- Redis 7+ (for task queue)
-- Docker & Docker Compose (for containerized deployment)
-- Kubernetes cluster (for production scale)
+**Step 1: Create docker-compose.yml**
 
-### API Keys
+```yaml
+version: '3.8'
 
-Obtain API keys for LLM providers you plan to use:
+services:
+  app:
+    build: .
+    ports:
+      - "8000:8000"
+    environment:
+      - ENVIRONMENT=production
+      - DATABASE_URL=postgresql://user:pass@db:5432/infinity
+      - REDIS_URL=redis://redis:6379/0
+    depends_on:
+      - db
+      - redis
+    restart: unless-stopped
 
-- **OpenAI**: https://platform.openai.com/api-keys
-- **Anthropic**: https://console.anthropic.com/
-- **Google Vertex AI**: https://cloud.google.com/vertex-ai
-- **GitHub** (optional, for higher rate limits): https://github.com/settings/tokens
+  db:
+    image: postgres:15
+    environment:
+      - POSTGRES_DB=infinity
+      - POSTGRES_USER=user
+      - POSTGRES_PASSWORD=secure_password
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    restart: unless-stopped
 
-## Local Development Setup
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
 
-### 1. Clone Repository
-
-```bash
-git clone https://github.com/InfinityXOneSystems/infinity-matrix.git
-cd infinity-matrix
+volumes:
+  postgres_data:
 ```
 
-### 2. Create Virtual Environment
-
-```bash
-python -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
-```
-
-### 3. Install Dependencies
-
-```bash
-pip install -r requirements.txt
-pip install -e .
-```
-
-### 4. Configure Environment
-
-```bash
-cp .env.example .env
-# Edit .env with your API keys and settings
-```
-
-### 5. Configure System
-
-```bash
-cp config/config.example.yaml config/config.yaml
-# Edit config/config.yaml as needed
-```
-
-### 6. Initialize Data Directories
-
-```bash
-mkdir -p data/{raw,normalized,analyzed,tasks}
-```
-
-### 7. Verify Installation
-
-```bash
-infinity-matrix list-industries
-```
-
-## Docker Deployment
-
-### Using Docker Compose (Recommended)
-
-Docker Compose sets up the entire stack including PostgreSQL and Redis.
-
-#### 1. Configure Environment
-
-```bash
-cp .env.example .env
-# Edit .env with your API keys
-```
-
-#### 2. Build and Start Services
+**Step 2: Deploy**
 
 ```bash
 docker-compose up -d
 ```
 
-This starts:
-- PostgreSQL database
-- Redis cache
-- Infinity Matrix application
-- Celery worker (if configured)
+### Option 2: Kubernetes
 
-#### 3. Check Status
-
-```bash
-docker-compose ps
-docker-compose logs -f infinity-matrix
-```
-
-#### 4. Run Commands
-
-```bash
-docker-compose exec infinity-matrix infinity-matrix list-industries
-docker-compose exec infinity-matrix infinity-matrix ingest --industry technology
-```
-
-#### 5. Stop Services
-
-```bash
-docker-compose down
-# Keep data: docker-compose down (volumes persist)
-# Remove data: docker-compose down -v
-```
-
-### Using Docker Only
-
-#### 1. Build Image
-
-```bash
-docker build -t infinity-matrix:latest .
-```
-
-#### 2. Run Container
-
-```bash
-docker run -d \
-  --name infinity-matrix \
-  -v $(pwd)/data:/app/data \
-  -v $(pwd)/config:/app/config \
-  -e OPENAI_API_KEY=your-key \
-  infinity-matrix:latest
-```
-
-## Production Deployment
-
-### Architecture Overview
-
-```
-┌─────────────────┐
-│   Load Balancer │
-└────────┬────────┘
-         │
-    ┌────┴────┐
-    │         │
-┌───▼──┐  ┌──▼───┐
-│ API  │  │ API  │  (Multiple instances)
-└───┬──┘  └──┬───┘
-    │        │
-    └────┬───┘
-         │
-    ┌────▼─────┐
-    │  Redis   │  (Task Queue)
-    └────┬─────┘
-         │
-    ┌────▼─────────┐
-    │   Workers    │  (Celery workers)
-    └────┬─────────┘
-         │
-    ┌────▼─────────┐
-    │  PostgreSQL  │  (State management)
-    └──────────────┘
-```
-
-### Kubernetes Deployment
-
-#### 1. Create Namespace
-
-```bash
-kubectl create namespace infinity-matrix
-```
-
-#### 2. Create Secrets
-
-```bash
-kubectl create secret generic infinity-matrix-secrets \
-  --from-literal=openai-api-key=your-key \
-  --from-literal=db-password=your-password \
-  -n infinity-matrix
-```
-
-#### 3. Deploy PostgreSQL
+**Step 1: Create deployment.yaml**
 
 ```yaml
-# postgres-deployment.yaml
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: postgres
-  namespace: infinity-matrix
-spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      app: postgres
-  template:
-    metadata:
-      labels:
-        app: postgres
-    spec:
-      containers:
-      - name: postgres
-        image: postgres:15
-        env:
-        - name: POSTGRES_DB
-          value: infinity_matrix
-        - name: POSTGRES_PASSWORD
-          valueFrom:
-            secretKeyRef:
-              name: infinity-matrix-secrets
-              key: db-password
-        ports:
-        - containerPort: 5432
-        volumeMounts:
-        - name: postgres-storage
-          mountPath: /var/lib/postgresql/data
-      volumes:
-      - name: postgres-storage
-        persistentVolumeClaim:
-          claimName: postgres-pvc
-```
-
-#### 4. Deploy Application
-
-```yaml
-# app-deployment.yaml
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: infinity-matrix
-  namespace: infinity-matrix
 spec:
   replicas: 3
   selector:
@@ -257,235 +85,284 @@ spec:
     spec:
       containers:
       - name: infinity-matrix
-        image: infinity-matrix:latest
+        image: infinityxone/infinity-matrix:latest
+        ports:
+        - containerPort: 8000
         env:
-        - name: OPENAI_API_KEY
+        - name: ENVIRONMENT
+          value: "production"
+        - name: DATABASE_URL
           valueFrom:
             secretKeyRef:
-              name: infinity-matrix-secrets
-              key: openai-api-key
-        - name: DB_HOST
-          value: postgres
-        - name: DB_PASSWORD
-          valueFrom:
-            secretKeyRef:
-              name: infinity-matrix-secrets
-              key: db-password
-        volumeMounts:
-        - name: data-storage
-          mountPath: /app/data
-      volumes:
-      - name: data-storage
-        persistentVolumeClaim:
-          claimName: data-pvc
+              name: infinity-secrets
+              key: database-url
+        resources:
+          requests:
+            memory: "512Mi"
+            cpu: "500m"
+          limits:
+            memory: "1Gi"
+            cpu: "1000m"
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 8000
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /ready
+            port: 8000
+          initialDelaySeconds: 5
+          periodSeconds: 5
 ```
 
-#### 5. Apply Deployments
+**Step 2: Deploy**
 
 ```bash
-kubectl apply -f postgres-deployment.yaml
-kubectl apply -f app-deployment.yaml
+kubectl apply -f k8s/
 ```
 
-### AWS Deployment
+### Option 3: Traditional Server
 
-#### Using ECS/Fargate
+**Step 1: Install Dependencies**
 
-1. **Create ECR Repository**
 ```bash
-aws ecr create-repository --repository-name infinity-matrix
+# Install system dependencies
+sudo apt-get update
+sudo apt-get install -y python3.9 python3-pip redis-server postgresql
+
+# Create application user
+sudo useradd -m -s /bin/bash infinity
+
+# Switch to application user
+sudo su - infinity
 ```
 
-2. **Build and Push Image**
+**Step 2: Set Up Application**
+
 ```bash
-aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin <account-id>.dkr.ecr.us-east-1.amazonaws.com
-docker build -t infinity-matrix .
-docker tag infinity-matrix:latest <account-id>.dkr.ecr.us-east-1.amazonaws.com/infinity-matrix:latest
-docker push <account-id>.dkr.ecr.us-east-1.amazonaws.com/infinity-matrix:latest
+# Clone repository
+git clone https://github.com/InfinityXOneSystems/infinity-matrix.git
+cd infinity-matrix
+
+# Create virtual environment
+python3 -m venv venv
+source venv/bin/activate
+
+# Install dependencies
+pip install -e .
+
+# Configure environment
+cp .env.example .env
+nano .env  # Edit configuration
 ```
 
-3. **Create Task Definition**
-4. **Create ECS Service**
-5. **Configure RDS PostgreSQL**
-6. **Configure ElastiCache Redis**
+**Step 3: Set Up Systemd Service**
 
-## Configuration
+```ini
+# /etc/systemd/system/infinity-matrix.service
+[Unit]
+Description=Infinity Matrix AI System
+After=network.target
 
-### Environment Variables
+[Service]
+Type=notify
+User=infinity
+WorkingDirectory=/home/infinity/infinity-matrix
+Environment="PATH=/home/infinity/infinity-matrix/venv/bin"
+ExecStart=/home/infinity/infinity-matrix/venv/bin/python -m infinity_matrix.main
+Restart=always
+RestartSec=10
 
-See `.env.example` for all available environment variables.
-
-### Config File Structure
-
-```yaml
-# config/config.yaml
-database:
-  host: ${DB_HOST}
-  port: ${DB_PORT}
-  
-crawler:
-  max_concurrent_requests: 20  # Increase for production
-  
-llm:
-  providers:
-    openai:
-      api_key: ${OPENAI_API_KEY}
+[Install]
+WantedBy=multi-user.target
 ```
 
-### Industry Configuration
+**Step 4: Start Service**
 
-Add new industries in `config/industries/`:
+```bash
+sudo systemctl daemon-reload
+sudo systemctl enable infinity-matrix
+sudo systemctl start infinity-matrix
+sudo systemctl status infinity-matrix
+```
 
-```yaml
-# config/industries/my_industry.yaml
-id: my_industry
-name: My Industry
-type: technology
-description: Custom industry
-seeds:
-  - url: https://example.com
-    source_id: my_source
-    priority: 5
+## Nginx Reverse Proxy
+
+```nginx
+server {
+    listen 80;
+    server_name yourdomain.com;
+
+    location / {
+        proxy_pass http://localhost:8000;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+}
+```
+
+## SSL/TLS Configuration
+
+```bash
+# Install Certbot
+sudo apt-get install certbot python3-certbot-nginx
+
+# Obtain certificate
+sudo certbot --nginx -d yourdomain.com
+
+# Auto-renewal
+sudo certbot renew --dry-run
 ```
 
 ## Monitoring
 
-### Health Checks
+### Prometheus
 
-```bash
-# Check system status
-infinity-matrix status
-
-# Check specific industry
-infinity-matrix status --industry technology
-```
-
-### Logging
-
-Logs are written to stdout by default. Configure log aggregation:
-
-- **ELK Stack**: Elasticsearch, Logstash, Kibana
-- **CloudWatch**: AWS CloudWatch Logs
-- **Datadog**: Application monitoring
-
-### Metrics
-
-The system exposes metrics for:
-- Task completion rates
-- Data collection volume
-- API response times
-- LLM token usage
-- Error rates
-
-Configure Prometheus scraping:
+Add to `prometheus.yml`:
 
 ```yaml
-# prometheus.yml
 scrape_configs:
   - job_name: 'infinity-matrix'
     static_configs:
-      - targets: ['localhost:8000']
+      - targets: ['localhost:9090']
 ```
 
-### Alerts
+### Grafana Dashboard
 
-Set up alerts for:
-- High failure rates (>10%)
-- API rate limit approaching
-- Storage capacity warnings
-- Database connection issues
+Import the provided Grafana dashboard from `monitoring/grafana-dashboard.json`
 
-## Backup & Recovery
+## Backup Strategy
 
-### Data Backup
+### Database Backups
 
 ```bash
-# Backup data directory
-tar -czf backup-$(date +%Y%m%d).tar.gz data/
+# Automated backup script
+#!/bin/bash
+BACKUP_DIR="/backups/infinity-matrix"
+DATE=$(date +%Y%m%d_%H%M%S)
 
-# Backup database
-pg_dump infinity_matrix > backup-$(date +%Y%m%d).sql
+# Backup PostgreSQL
+pg_dump -U infinity infinity_db | gzip > $BACKUP_DIR/db_$DATE.sql.gz
+
+# Keep last 30 days
+find $BACKUP_DIR -name "db_*.sql.gz" -mtime +30 -delete
 ```
 
-### Recovery
+### Application State Backups
 
 ```bash
-# Restore data
-tar -xzf backup-20240101.tar.gz
-
-# Restore database
-psql infinity_matrix < backup-20240101.sql
+# Backup logs and data
+tar -czf /backups/infinity-matrix/data_$DATE.tar.gz \
+    /home/infinity/infinity-matrix/logs \
+    /home/infinity/infinity-matrix/workspace
 ```
 
 ## Scaling
 
 ### Horizontal Scaling
 
-- Deploy multiple worker instances
-- Use load balancer for API endpoints
-- Configure shared Redis for task queue
-- Use distributed storage (S3, GCS)
+```bash
+# Increase workers
+python -m infinity_matrix.main --workers 8
 
-### Vertical Scaling
+# Or use multiple instances with load balancer
+```
 
-- Increase worker memory/CPU
-- Optimize database queries
-- Use connection pooling
-- Enable caching
+### Load Balancing
+
+Use Nginx, HAProxy, or cloud load balancers to distribute traffic across multiple instances.
 
 ## Security
 
-### Best Practices
+### Firewall Configuration
 
-1. **Secrets Management**
-   - Use environment variables
-   - Never commit secrets to Git
-   - Use secret management tools (Vault, AWS Secrets Manager)
+```bash
+# Allow only necessary ports
+sudo ufw allow 22/tcp   # SSH
+sudo ufw allow 80/tcp   # HTTP
+sudo ufw allow 443/tcp  # HTTPS
+sudo ufw enable
+```
 
-2. **Network Security**
-   - Use VPC/private networks
-   - Enable SSL/TLS
-   - Restrict database access
-   - Use security groups/firewalls
+### Security Headers
 
-3. **Access Control**
-   - Implement authentication
-   - Use least privilege principle
-   - Regular key rotation
-   - Audit logging
+Add to Nginx configuration:
 
-4. **Data Protection**
-   - Encrypt data at rest
-   - Encrypt data in transit
-   - Regular backups
-   - Data retention policies
+```nginx
+add_header X-Frame-Options "SAMEORIGIN";
+add_header X-Content-Type-Options "nosniff";
+add_header X-XSS-Protection "1; mode=block";
+add_header Strict-Transport-Security "max-age=31536000";
+```
 
 ## Troubleshooting
 
+### Check Logs
+
+```bash
+# Application logs
+journalctl -u infinity-matrix -f
+
+# Nginx logs
+tail -f /var/log/nginx/error.log
+```
+
+### Performance Issues
+
+```bash
+# Check resource usage
+htop
+
+# Check database performance
+psql -U infinity -d infinity_db -c "SELECT * FROM pg_stat_activity;"
+```
+
 ### Common Issues
 
-1. **Import errors**
-   ```bash
-   pip install -e .
-   ```
+**Issue**: Service won't start
+```bash
+# Check service status
+systemctl status infinity-matrix
 
-2. **API rate limits**
-   - Add GitHub token
-   - Reduce concurrent requests
-   - Implement backoff
+# Check logs
+journalctl -u infinity-matrix -n 50
+```
 
-3. **Database connection**
-   - Check credentials
-   - Verify network connectivity
-   - Check PostgreSQL status
+**Issue**: High memory usage
+```bash
+# Reduce workers or optimize code
+# Monitor with: htop or ps aux --sort=-%mem
+```
 
-4. **LLM errors**
-   - Verify API keys
-   - Check quotas
-   - Review error logs
+## Maintenance
 
-### Getting Help
+### Updates
 
-- GitHub Issues: https://github.com/InfinityXOneSystems/infinity-matrix/issues
-- Documentation: See `docs/` directory
-- Examples: See examples in README.md
+```bash
+# Pull latest changes
+git pull origin main
+
+# Install dependencies
+pip install -e .
+
+# Restart service
+sudo systemctl restart infinity-matrix
+```
+
+### Database Migrations
+
+```bash
+# Run migrations
+alembic upgrade head
+```
+
+## Support
+
+For deployment support:
+- 📧 Email: ops@infinityxone.com
+- 💬 Discord: [Join our community](https://discord.gg/infinityxone)
+- 📖 Docs: [Full Documentation](https://github.com/InfinityXOneSystems/infinity-matrix/wiki)
