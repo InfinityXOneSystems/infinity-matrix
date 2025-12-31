@@ -5,7 +5,7 @@ from pathlib import Path
 from typing import Any, Dict, Optional
 
 import yaml
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 from pydantic_settings import BaseSettings
 
 
@@ -126,6 +126,12 @@ class IntegrationsConfig(BaseModel):
 class Config(BaseSettings):
     """Main configuration for Infinity Matrix system."""
     
+    model_config = ConfigDict(
+        env_prefix="INFINITY_MATRIX_",
+        env_nested_delimiter="__",
+        case_sensitive=False
+    )
+    
     # Core settings
     debug: bool = Field(default=False)
     log_level: str = Field(default="INFO")
@@ -141,12 +147,6 @@ class Config(BaseSettings):
     pr_engine: PREngineConfig = Field(default_factory=PREngineConfig)
     etl: ETLConfig = Field(default_factory=ETLConfig)
     integrations: IntegrationsConfig = Field(default_factory=IntegrationsConfig)
-    
-    class Config:
-        """Pydantic configuration."""
-        env_prefix = "INFINITY_MATRIX_"
-        env_nested_delimiter = "__"
-        case_sensitive = False
     
     @classmethod
     def from_file(cls, path: Path) -> "Config":
@@ -168,10 +168,13 @@ class Config(BaseSettings):
     def save(self, path: Path) -> None:
         """Save configuration to YAML file."""
         path.parent.mkdir(parents=True, exist_ok=True)
-        data = {"infinity_matrix": self.model_dump(exclude_none=True)}
+        
+        # Convert to dict and serialize Path objects
+        data = self.model_dump(exclude_none=True, mode='json')
+        wrapped_data = {"infinity_matrix": data}
         
         with open(path, "w") as f:
-            yaml.safe_dump(data, f, default_flow_style=False, indent=2)
+            yaml.safe_dump(wrapped_data, f, default_flow_style=False, indent=2)
     
     def ensure_directories(self) -> None:
         """Ensure all required directories exist."""

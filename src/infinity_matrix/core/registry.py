@@ -2,7 +2,7 @@
 
 import asyncio
 import uuid
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from enum import Enum
 from typing import Any, Callable, Dict, List, Optional, Set
 
@@ -35,8 +35,13 @@ class AgentCapability(str, Enum):
     ORCHESTRATION = "orchestration"
 
 
+from pydantic import BaseModel, ConfigDict, Field
+
+
 class AgentMetadata(BaseModel):
     """Agent metadata."""
+    
+    model_config = ConfigDict(use_enum_values=True)
     
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
     name: str
@@ -46,18 +51,14 @@ class AgentMetadata(BaseModel):
     version: str = Field(default="0.1.0")
     
     # Runtime information
-    created_at: datetime = Field(default_factory=datetime.utcnow)
-    last_heartbeat: datetime = Field(default_factory=datetime.utcnow)
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    last_heartbeat: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
     tasks_completed: int = Field(default=0)
     tasks_failed: int = Field(default=0)
     
     # Configuration
     config: Dict[str, Any] = Field(default_factory=dict)
     tags: List[str] = Field(default_factory=list)
-    
-    class Config:
-        """Pydantic configuration."""
-        use_enum_values = True
 
 
 class AgentRegistry:
@@ -115,7 +116,7 @@ class AgentRegistry:
             self._agents[agent_id] = metadata
             self._agent_instances[agent_id] = agent
             metadata.status = AgentStatus.IDLE
-            metadata.last_heartbeat = datetime.utcnow()
+            metadata.last_heartbeat = datetime.now(timezone.utc)
         
         return agent_id
     
@@ -165,7 +166,7 @@ class AgentRegistry:
         """
         if agent_id in self._agents:
             self._agents[agent_id].status = status
-            self._agents[agent_id].last_heartbeat = datetime.utcnow()
+            self._agents[agent_id].last_heartbeat = datetime.now(timezone.utc)
     
     async def heartbeat(self, agent_id: str) -> None:
         """Record agent heartbeat.
@@ -174,7 +175,7 @@ class AgentRegistry:
             agent_id: Agent identifier
         """
         if agent_id in self._agents:
-            self._agents[agent_id].last_heartbeat = datetime.utcnow()
+            self._agents[agent_id].last_heartbeat = datetime.now(timezone.utc)
     
     async def find_agents(
         self,
@@ -276,7 +277,7 @@ class AgentRegistry:
         
         while self._running:
             try:
-                now = datetime.utcnow()
+                now = datetime.now(timezone.utc)
                 
                 for agent_id, metadata in list(self._agents.items()):
                     if now - metadata.last_heartbeat > timeout:
