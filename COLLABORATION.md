@@ -1,714 +1,859 @@
-# Infinity-Matrix Collaboration Guide
+# Collaboration Guide - Infinity Matrix
 
 ## Overview
 
-This guide defines roles, responsibilities, agent handoff protocols, and human escalation procedures for the Infinity-Matrix autonomous development system. It ensures smooth collaboration between AI agents, human developers, and stakeholders.
-
----
+This document defines the collaboration protocols, onboarding procedures, and operational guidelines for all agents and contributors working within the Infinity Matrix ecosystem. It ensures seamless coordination, clear communication, and efficient collaboration across human and AI agents.
 
 ## Table of Contents
 
-1. [Roles & Responsibilities](#roles--responsibilities)
-2. [Agent Types & Specializations](#agent-types--specializations)
-3. [Agent Handoff Protocols](#agent-handoff-protocols)
-4. [Human Escalation](#human-escalation)
-5. [Communication Channels](#communication-channels)
-6. [Decision-Making Framework](#decision-making-framework)
-7. [Conflict Resolution](#conflict-resolution)
-8. [Quality Standards](#quality-standards)
+- [Agent Roles & Responsibilities](#agent-roles--responsibilities)
+- [Onboarding Process](#onboarding-process)
+- [Communication Protocols](#communication-protocols)
+- [Collaboration Workflows](#collaboration-workflows)
+- [Code Contribution Guidelines](#code-contribution-guidelines)
+- [Review & Approval Process](#review--approval-process)
+- [Conflict Resolution](#conflict-resolution)
+- [Best Practices](#best-practices)
 
----
+## Agent Roles & Responsibilities
 
-## Roles & Responsibilities
+### Overview of Agent Hierarchy
 
-### AI Agents
-
-#### Primary Responsibilities
-- Execute automated tasks from the task queue
-- Generate, review, and deploy code autonomously
-- Monitor system health and respond to alerts
-- Perform routine maintenance and updates
-- Generate reports and documentation
-- Learn from feedback and improve performance
-
-#### Operating Principles
-- **Autonomy First**: Operate without human intervention when possible
-- **Safety**: Never deploy changes that fail tests or security scans
-- **Transparency**: Log all actions and decisions
-- **Efficiency**: Optimize for speed while maintaining quality
-- **Learning**: Continuously improve from past experiences
-
-### Human Developers
-
-#### Primary Responsibilities
-- Review critical changes before production deployment
-- Handle complex architectural decisions
-- Resolve escalated issues from agents
-- Configure agent parameters and policies
-- Define new features and requirements
-- Train and improve agent capabilities
-
-#### Operating Principles
-- **Trust but Verify**: Review agent work periodically
-- **Provide Feedback**: Give clear feedback to improve agents
-- **Set Boundaries**: Define what agents can/cannot do autonomously
-- **Stay Informed**: Monitor agent activities and outcomes
-- **Intervene Sparingly**: Let agents handle routine tasks
-
-### System Administrators
-
-#### Primary Responsibilities
-- Manage infrastructure and cloud resources
-- Configure credentials and access controls
-- Monitor costs and optimize resources
-- Handle security incidents and audits
-- Ensure compliance with policies
-- Maintain disaster recovery plans
-
-### Product Owners/Stakeholders
-
-#### Primary Responsibilities
-- Define product vision and priorities
-- Review and approve major changes
-- Provide business requirements
-- Validate deployed features
-- Make strategic decisions
-
----
-
-## Agent Types & Specializations
-
-### 1. Orchestrator Agent
-
-**Purpose**: Coordinates all other agents and manages the task queue
-
-**Capabilities**:
-- Task scheduling and prioritization
-- Agent assignment and load balancing
-- Workflow coordination
-- Status tracking and reporting
-- Conflict resolution between agents
-- Resource allocation
-
-**Autonomy Level**: High - Can make most operational decisions
-
-**Escalation Triggers**:
-- Multiple agent failures
-- Conflicting agent decisions
-- Resource exhaustion
-- Critical system outage
-
-### 2. Code Agent
-
-**Purpose**: Handles all code generation, modification, and refactoring
-
-**Capabilities**:
-- Feature implementation
-- Bug fixing
-- Code refactoring
-- Documentation generation
-- Code style enforcement
-- Dependency updates
-
-**Autonomy Level**: Medium - Requires test passing before deployment
-
-**Escalation Triggers**:
-- Cannot fix failing tests after 3 attempts
-- Major architectural changes needed
-- Breaking changes to public APIs
-- Security vulnerabilities in proposed code
-
-### 3. Test Agent
-
-**Purpose**: Creates and executes tests, verifies code quality
-
-**Capabilities**:
-- Unit test generation
-- Integration test creation
-- E2E test automation
-- Test execution and reporting
-- Coverage analysis
-- Performance testing
-
-**Autonomy Level**: High - Can run tests freely
-
-**Escalation Triggers**:
-- Persistent test failures
-- Coverage drops below threshold (80%)
-- Performance regressions detected
-- Flaky tests identified
-
-### 4. Deploy Agent
-
-**Purpose**: Handles building, packaging, and deployment
-
-**Capabilities**:
-- Build execution
-- Container creation
-- Artifact management
-- Deployment to environments
-- Rollback execution
-- Health check verification
-
-**Autonomy Level**: Medium-High - Can deploy to staging automatically, production with approval
-
-**Escalation Triggers**:
-- Deployment failure
-- Health checks failing
-- Production deployment request
-- Rollback needed
-
-### 5. Monitor Agent
-
-**Purpose**: Observes system health and responds to incidents
-
-**Capabilities**:
-- Metrics collection
-- Log analysis
-- Anomaly detection
-- Alert generation
-- Incident response
-- Performance analysis
-
-**Autonomy Level**: Medium - Can auto-remediate known issues
-
-**Escalation Triggers**:
-- Critical alerts (system down)
-- Unknown error patterns
-- Performance degradation
-- Security incidents
-
-### 6. Security Agent
-
-**Purpose**: Ensures security and compliance
-
-**Capabilities**:
-- Vulnerability scanning
-- Secret detection
-- Dependency audit
-- Security patch application
-- Compliance checking
-- Access control review
-
-**Autonomy Level**: Low-Medium - Auto-applies non-breaking security patches
-
-**Escalation Triggers**:
-- Critical vulnerabilities found
-- Security breach detected
-- Compliance violations
-- Breaking security patches needed
-
-### 7. Optimization Agent
-
-**Purpose**: Improves performance and reduces costs
-
-**Capabilities**:
-- Performance profiling
-- Code optimization
-- Resource rightsizing
-- Cost analysis
-- Cache optimization
-- Query optimization
-
-**Autonomy Level**: Low - Recommends changes, requires approval
-
-**Escalation Triggers**:
-- Significant cost increases
-- Performance below SLA
-- Resource exhaustion
-- Optimization recommendations ready
-
----
-
-## Agent Handoff Protocols
-
-### Task Lifecycle
+The Infinity Matrix uses a hierarchical agent model with clear separation of concerns:
 
 ```
-1. Task Created → Orchestrator Agent
-2. Task Assigned → Specialized Agent
-3. Task Executed → Agent performs work
-4. Task Verified → Test Agent validates
-5. Task Deployed → Deploy Agent releases
-6. Task Monitored → Monitor Agent observes
-7. Task Completed → Orchestrator Agent closes
+┌─────────────────────────────────────┐
+│         User Agent (Level 0)         │  ← Ultimate Authority
+│     Human Decision Maker & Owner    │
+└────────────────┬────────────────────┘
+                 │
+        ┌────────┴────────┐
+        ↓                 ↓
+┌───────────────┐  ┌──────────────────┐
+│  VS Code      │  │  GitHub Copilot  │
+│  Copilot      │  │  (Remote/Arch)   │
+│  (Local/Dev)  │  │   (Level 2)      │
+│   (Level 1)   │  │                  │
+└───────┬───────┘  └────────┬─────────┘
+        │                   │
+        ↓                   ↓
+┌────────────────────────────────────┐
+│   Supporting Agents (Level 3)      │
+│  CI/CD, Monitoring, Security, etc. │
+└────────────────────────────────────┘
 ```
 
-### Handoff Scenarios
+### Detailed Role Descriptions
 
-#### Scenario 1: Feature Implementation
+#### User Agent
 
+**Authority**: Supreme (Level 0)  
+**Scope**: Global  
+**Identifier**: `agent:user`
+
+**Primary Responsibilities**:
+- Define business requirements and objectives
+- Approve or reject all critical changes
+- Override any automated decision
+- Set system-wide policies and configurations
+- Grant and revoke agent permissions
+- Escalate and resolve conflicts
+
+**Communication Style**:
+- Natural language instructions
+- Approval/rejection via UI, CLI, or PR reviews
+- Feedback on agent performance
+
+#### VS Code Copilot Agent
+
+**Authority**: Local (Level 1)  
+**Scope**: Workspace/Repository  
+**Identifier**: `agent:vscode-copilot`
+
+**Primary Responsibilities**:
+- Code generation and refactoring
+- Unit test creation and execution
+- Local Git operations (commit, branch, stash)
+- Development environment setup
+- Code formatting and linting
+- Local debugging assistance
+
+**Communication Style**:
+- Direct code suggestions in IDE
+- Inline comments and explanations
+- Test result summaries
+- Build/lint error reporting
+
+#### GitHub Copilot Agent
+
+**Authority**: Remote (Level 2)  
+**Scope**: Multi-repository/System-wide  
+**Identifier**: `agent:github-copilot`
+
+**Primary Responsibilities**:
+- Pull Request management
+- CI/CD pipeline orchestration
+- Multi-repository coordination
+- Production deployment management
+- Infrastructure as Code
+- System-wide monitoring
+- Automated incident response
+
+**Communication Style**:
+- PR comments and reviews
+- Issue creation and updates
+- Status checks and badges
+- Deployment notifications
+- Incident reports
+
+## Onboarding Process
+
+### New Human Contributor Onboarding
+
+**Timeline**: 1-2 weeks
+
+#### Week 1: Foundation
+
+**Day 1-2: Access & Setup**
+- [ ] GitHub repository access granted
+- [ ] Development environment setup
+- [ ] Credentials provisioned (GCP, etc.)
+- [ ] Slack/communication channels joined
+- [ ] Introduction to team
+
+**Day 3-4: Documentation Review**
+- [ ] Read [architecture.md](docs/architecture.md)
+- [ ] Review [agent-contract.md](docs/agent-contract.md)
+- [ ] Study [security.md](docs/security.md)
+- [ ] Understand [roadmap.md](docs/roadmap.md)
+
+**Day 5: Hands-on Exploration**
+- [ ] Clone repository and run locally
+- [ ] Execute test suite successfully
+- [ ] Make a small documentation improvement
+- [ ] Create first PR (documentation fix)
+
+#### Week 2: First Contribution
+
+**Day 6-8: Shadow Existing Work**
+- [ ] Review recent PRs and issues
+- [ ] Pair with senior developer
+- [ ] Understand CI/CD pipeline
+- [ ] Learn deployment process
+
+**Day 9-10: First Real Contribution**
+- [ ] Pick a "good first issue"
+- [ ] Implement solution with tests
+- [ ] Submit PR for review
+- [ ] Incorporate feedback
+
+**Onboarding Checklist Completion**
+- [ ] All access provisioned
+- [ ] Documentation reviewed
+- [ ] Local environment functional
+- [ ] First PR merged
+- [ ] Security training completed
+
+### New Agent Onboarding
+
+**Timeline**: 3-5 days
+
+#### Phase 1: Registration & Approval (Day 1)
+
+**Step 1: Agent Specification**
+
+Create an agent specification document:
+
+```yaml
+agent_specification:
+  name: "custom-agent-name"
+  version: "1.0.0"
+  type: "worker | orchestrator | monitor"
+  authority_level: "0-5"
+  scope: "local | remote | global"
+  
+  capabilities:
+    - capability_1
+    - capability_2
+  
+  boundaries:
+    workspace_access: "read | write"
+    network_access: "restricted | full"
+    secret_access: ["secret_scope_1", "secret_scope_2"]
+  
+  communication:
+    input_channels: ["api", "webhook", "queue"]
+    output_channels: ["api", "slack", "email"]
+  
+  dependencies:
+    required_services: ["service_1", "service_2"]
+    required_permissions: ["permission_1", "permission_2"]
+  
+  owner: "team@example.com"
+  support_contact: "support@example.com"
 ```
-Product Owner creates issue
-    ↓
-Orchestrator Agent: Prioritizes and assigns to Code Agent
-    ↓
-Code Agent: Implements feature and creates PR
-    ↓
-Test Agent: Runs all tests and quality checks
-    ↓ (if tests pass)
-Code Agent: Merges PR
-    ↓
-Deploy Agent: Builds and deploys to staging
-    ↓
-Test Agent: Runs E2E tests on staging
-    ↓ (if E2E pass)
-Deploy Agent: Deploys to production
-    ↓
-Monitor Agent: Watches for issues
-    ↓
-Orchestrator Agent: Marks task complete
+
+**Step 2: Security Review**
+- Architecture team reviews agent specification
+- Security team assesses risk and permissions
+- Approval/rejection with feedback
+
+#### Phase 2: Provisioning (Day 2-3)
+
+**Step 1: Service Account Creation**
+```bash
+# Create GCP service account
+gcloud iam service-accounts create custom-agent \
+  --display-name="Custom Agent" \
+  --description="Custom agent for X purpose"
+
+# Grant necessary permissions
+gcloud projects add-iam-policy-binding PROJECT_ID \
+  --member="serviceAccount:custom-agent@PROJECT_ID.iam.gserviceaccount.com" \
+  --role="roles/REQUIRED_ROLE"
 ```
 
-#### Scenario 2: Bug Fix
+**Step 2: Credential Management**
+- Generate and store API keys in Secret Manager
+- Configure authentication tokens
+- Set up credential rotation schedule
 
-```
-User reports bug OR Monitor Agent detects issue
-    ↓
-Orchestrator Agent: Creates bug ticket and assigns to Code Agent
-    ↓
-Code Agent: Analyzes and fixes bug
-    ↓
-Test Agent: Verifies fix and adds regression test
-    ↓
-Deploy Agent: Hot-fixes to production
-    ↓
-Monitor Agent: Confirms issue resolved
-    ↓
-Orchestrator Agent: Closes ticket and notifies user
-```
+**Step 3: Configuration**
+- Register agent in configuration database
+- Set resource quotas and rate limits
+- Configure monitoring and alerting
 
-#### Scenario 3: Performance Issue
+#### Phase 3: Testing & Validation (Day 4)
 
-```
-Monitor Agent: Detects performance degradation
-    ↓
-Orchestrator Agent: Assigns to Optimization Agent
-    ↓
-Optimization Agent: Profiles and identifies bottleneck
-    ↓
-Code Agent: Implements optimization
-    ↓
-Test Agent: Verifies no regressions
-    ↓
-Deploy Agent: Deploys optimization
-    ↓
-Monitor Agent: Confirms performance improved
-    ↓
-Orchestrator Agent: Documents optimization
+**Step 1: Staging Environment Testing**
+```bash
+# Deploy agent to staging
+./scripts/deploy-agent.sh --env=staging --agent=custom-agent
+
+# Run integration tests
+pytest tests/integration/test_custom_agent.py
+
+# Verify monitoring and logging
+./scripts/verify-agent-health.sh custom-agent
 ```
 
-#### Scenario 4: Security Vulnerability
+**Step 2: Validation Checklist**
+- [ ] Agent starts successfully
+- [ ] Authentication working
+- [ ] API endpoints responding
+- [ ] Logging properly configured
+- [ ] Metrics being collected
+- [ ] Error handling functional
+- [ ] Resource limits respected
 
-```
-Security Agent: Finds vulnerability (or external report)
-    ↓
-Orchestrator Agent: Creates high-priority ticket
-    ↓
-Security Agent: Assesses severity and impact
-    ↓ (if critical)
-ESCALATE TO HUMAN: Security team reviews
-    ↓ (after approval)
-Code Agent: Applies security patch
-    ↓
-Test Agent: Verifies fix doesn't break functionality
-    ↓
-Deploy Agent: Emergency deployment to all environments
-    ↓
-Security Agent: Confirms vulnerability patched
-    ↓
-Orchestrator Agent: Documents incident
+#### Phase 4: Production Deployment (Day 5)
+
+**Step 1: Production Deployment**
+```bash
+# Deploy to production with monitoring
+./scripts/deploy-agent.sh --env=production --agent=custom-agent --monitor
 ```
 
-### Handoff Communication Protocol
+**Step 2: Documentation Update**
+- Add agent to agent registry
+- Document capabilities and limitations
+- Update architecture diagrams
+- Create runbook for operations
 
-Agents communicate via structured messages in the task queue:
+**Step 3: Monitoring Setup**
+- Configure alerts for agent health
+- Set up SLO/SLA monitoring
+- Enable audit logging
+- Schedule regular reviews
+
+## Communication Protocols
+
+### Synchronous Communication
+
+**Use Cases**:
+- Immediate user input required
+- Critical incidents
+- Real-time collaboration
+- Interactive debugging
+
+**Channels**:
+- Slack (for team communication)
+- API calls (for agent-to-agent)
+- WebSocket (for real-time updates)
+
+**Response Time SLAs**:
+- User queries: <30 seconds
+- Agent requests: <500ms (p95)
+- Critical alerts: <2 minutes
+
+### Asynchronous Communication
+
+**Use Cases**:
+- Background processing
+- Batch operations
+- Non-urgent notifications
+- Scheduled tasks
+
+**Channels**:
+- Pull Request comments
+- GitHub Issues
+- Email notifications
+- Message queues (Pub/Sub)
+
+**Response Time SLAs**:
+- PR reviews: <4 hours (business hours)
+- Issue triage: <24 hours
+- Email responses: <48 hours
+
+### Communication Standards
+
+#### Message Format
+
+All structured messages must follow this format:
 
 ```json
 {
-  "task_id": "uuid",
-  "from_agent": "code_agent",
-  "to_agent": "test_agent",
-  "action": "handoff",
-  "status": "completed",
-  "message": "Feature implementation complete, ready for testing",
-  "artifacts": {
-    "pr_url": "https://github.com/...",
-    "branch": "feature/new-feature",
-    "files_changed": ["src/app.js", "src/utils.js"],
-    "tests_added": ["tests/app.test.js"]
+  "version": "1.0",
+  "timestamp": "2025-12-30T22:47:42.913Z",
+  "message_id": "uuid-v4",
+  "from": "agent:source",
+  "to": "agent:destination",
+  "type": "request | response | event | notification",
+  "priority": "critical | high | medium | low",
+  "subject": "Brief description",
+  "body": {
+    "content": "Detailed message content",
+    "data": { }
   },
-  "next_actions": ["run_unit_tests", "run_integration_tests"],
-  "timestamp": "2025-12-30T22:00:00Z"
+  "correlation_id": "uuid-v4",
+  "requires_response": true,
+  "deadline": "2025-12-30T23:47:42.913Z"
 }
 ```
 
----
+#### Status Reporting
 
-## Human Escalation
+Agents must report status using standard codes:
 
-### Escalation Levels
+| Code | Status | Meaning |
+|------|--------|---------|
+| 100 | Processing | Task in progress |
+| 200 | Success | Task completed successfully |
+| 201 | Created | Resource created |
+| 202 | Accepted | Request accepted, processing async |
+| 400 | BadRequest | Invalid request parameters |
+| 401 | Unauthorized | Authentication required |
+| 403 | Forbidden | Permission denied |
+| 404 | NotFound | Resource not found |
+| 429 | TooManyRequests | Rate limit exceeded |
+| 500 | InternalError | Internal agent error |
+| 503 | ServiceUnavailable | Agent temporarily unavailable |
 
-#### Level 1: Informational (No Action Required)
-- **Trigger**: Routine completions, minor issues resolved
-- **Notification**: Slack message, email digest
-- **Response Time**: None required
-- **Examples**:
-  - Dependency updates applied
-  - Tests passing after fixes
-  - Routine deployments successful
+## Collaboration Workflows
 
-#### Level 2: Awareness (Review Recommended)
-- **Trigger**: Non-critical issues, agent recommendations
-- **Notification**: Slack message, email
-- **Response Time**: Within 24 hours
-- **Examples**:
-  - Optimization opportunities identified
-  - Minor test failures resolved automatically
-  - Configuration changes suggested
+### Workflow 1: Feature Development
 
-#### Level 3: Action Required (Human Decision Needed)
-- **Trigger**: Agent cannot proceed, needs approval
-- **Notification**: Slack alert, email, SMS
-- **Response Time**: Within 4 hours
-- **Examples**:
-  - Production deployment ready for approval
-  - Breaking API changes proposed
-  - Major refactoring needed
-  - Cost increase detected
+**Participants**: User → VS Code Copilot → User → GitHub Copilot → User
 
-#### Level 4: Urgent (Immediate Attention)
-- **Trigger**: Critical system issues, security incidents
-- **Notification**: Phone call, SMS, Slack alert, email
-- **Response Time**: Within 30 minutes
-- **Examples**:
-  - Production system down
-  - Critical security vulnerability
-  - Data loss risk
-  - Major cost overrun
+**Steps**:
 
-### Escalation Process
+1. **User Defines Requirement** (User → VS Code Copilot)
+   ```
+   "Implement user authentication with OAuth 2.0"
+   ```
 
-```mermaid
-graph TD
-    A[Agent Encounters Issue] --> B{Can Agent Resolve?}
-    B -->|Yes| C[Agent Resolves]
-    B -->|No| D{Severity Level}
-    D -->|Level 1| E[Log & Continue]
-    D -->|Level 2| F[Notify Team]
-    D -->|Level 3| G[Request Approval]
-    D -->|Level 4| H[Emergency Escalation]
-    G --> I{Approved?}
-    I -->|Yes| J[Agent Proceeds]
-    I -->|No| K[Agent Stops]
-    H --> L[Human Intervention]
+2. **VS Code Copilot Plans** (VS Code Copilot → User)
+   ```
+   Implementation plan:
+   - Create /src/auth/oauth.py with OAuth flow
+   - Add authentication middleware
+   - Create tests in /tests/test_auth.py
+   - Update configuration
+   Estimated time: 30 minutes
+   Approve to proceed?
+   ```
+
+3. **User Approves** (User → VS Code Copilot)
+   ```
+   "Approved, proceed"
+   ```
+
+4. **VS Code Copilot Implements** (VS Code Copilot)
+   - Generates code
+   - Creates tests
+   - Runs local tests
+   - Commits locally
+
+5. **VS Code Copilot Reports** (VS Code Copilot → User)
+   ```
+   Implementation complete:
+   - 3 files changed, 250 lines added
+   - 12 tests added, all passing
+   - No linting errors
+   Ready to create PR?
+   ```
+
+6. **User Reviews & Approves** (User → VS Code Copilot)
+   ```
+   "Create PR"
+   ```
+
+7. **VS Code Copilot Creates PR** (VS Code Copilot → GitHub Copilot)
+   - Creates feature branch
+   - Pushes to remote
+   - Opens Pull Request
+
+8. **GitHub Copilot Reviews** (GitHub Copilot → User)
+   - Runs CI/CD pipeline
+   - Performs automated code review
+   - Reports results
+   ```
+   PR #123 "feat: add OAuth 2.0 authentication"
+   ✓ All tests passing (12/12)
+   ✓ Coverage: 95% (+5%)
+   ✓ No security vulnerabilities
+   ✓ No linting errors
+   
+   Code review: LGTM - follows best practices
+   Recommendation: Approve and merge
+   ```
+
+9. **User Approves Merge** (User → GitHub Copilot)
+   ```
+   "Merge to main"
+   ```
+
+10. **GitHub Copilot Deploys** (GitHub Copilot)
+    - Merges PR
+    - Deploys to staging
+    - Runs smoke tests
+    - Reports success
+
+### Workflow 2: Incident Response
+
+**Participants**: Monitoring → GitHub Copilot → User → VS Code Copilot
+
+**Steps**:
+
+1. **Monitoring Detects Issue** (Monitoring → GitHub Copilot)
+   ```json
+   {
+     "alert": "HighErrorRate",
+     "severity": "critical",
+     "service": "api-gateway",
+     "metric": "error_rate",
+     "current_value": "15%",
+     "threshold": "1%",
+     "started_at": "2025-12-30T22:45:00Z"
+   }
+   ```
+
+2. **GitHub Copilot Analyzes** (GitHub Copilot)
+   - Queries logs and metrics
+   - Identifies root cause
+   - Determines impact
+   - Proposes solution
+
+3. **GitHub Copilot Reports** (GitHub Copilot → User)
+   ```
+   INCIDENT: High error rate in API Gateway
+   
+   Root Cause: Database connection pool exhausted
+   Impact: 15% of API requests failing
+   Duration: 2 minutes
+   
+   Recommended Actions:
+   1. Immediate: Increase connection pool size (requires restart)
+   2. Rollback: Revert to v1.2.3 (stable)
+   3. Scale: Add 2 more replicas (temporary)
+   
+   Recommendation: Option 2 (Rollback) for fastest recovery
+   Approve?
+   ```
+
+4. **User Approves** (User → GitHub Copilot)
+   ```
+   "Approved: Execute rollback"
+   ```
+
+5. **GitHub Copilot Executes** (GitHub Copilot)
+   - Triggers rollback pipeline
+   - Reverts to previous version
+   - Monitors metrics
+   - Confirms recovery
+
+6. **GitHub Copilot Reports** (GitHub Copilot → User)
+   ```
+   Rollback complete:
+   - Reverted to v1.2.3
+   - Error rate: 0.2% (normal)
+   - Response time: 250ms (normal)
+   - All health checks passing
+   
+   Created issue #789 for permanent fix
+   ```
+
+7. **User Assigns Fix** (User → VS Code Copilot)
+   ```
+   "Investigate and fix issue #789"
+   ```
+
+### Workflow 3: Multi-Repository Change
+
+**Participants**: User → GitHub Copilot → Multiple VS Code Copilots → GitHub Copilot
+
+**Steps**:
+
+1. **User Defines Cross-Service Requirement** (User → GitHub Copilot)
+   ```
+   "Update API contract between api-gateway and user-service"
+   ```
+
+2. **GitHub Copilot Plans** (GitHub Copilot → User)
+   ```
+   Multi-repo coordination plan:
+   
+   Repository 1: api-gateway
+   - Update client code for new user-service API
+   - Update integration tests
+   
+   Repository 2: user-service
+   - Implement new API endpoints
+   - Update API documentation
+   - Add backward compatibility layer
+   
+   Deployment strategy:
+   1. Deploy user-service (backward compatible)
+   2. Deploy api-gateway (uses new API)
+   3. Remove compatibility layer after 1 week
+   
+   Approve plan?
+   ```
+
+3. **User Approves** (User → GitHub Copilot)
+   ```
+   "Approved"
+   ```
+
+4. **GitHub Copilot Coordinates** (GitHub Copilot → VS Code Copilots)
+   - Assigns tasks to repository-specific agents
+   - Provides context and specifications
+   - Sets coordination checkpoints
+
+5. **VS Code Copilots Implement** (Parallel execution)
+   - Each agent works in its repository
+   - Regular status updates to GitHub Copilot
+   - Coordination on shared interfaces
+
+6. **GitHub Copilot Manages PRs** (GitHub Copilot)
+   - Reviews both PRs
+   - Ensures consistency
+   - Coordinates merge timing
+   - Manages sequential deployment
+
+## Code Contribution Guidelines
+
+### Code Standards
+
+**Language**: Python 3.11+
+
+**Style Guide**: PEP 8
+- Maximum line length: 100 characters
+- 4 spaces for indentation (no tabs)
+- Black formatter for consistent formatting
+
+**Type Hints**: Required
+```python
+def process_user(user_id: str, options: dict[str, Any]) -> User:
+    """Process user with given options.
+    
+    Args:
+        user_id: Unique user identifier
+        options: Processing options
+        
+    Returns:
+        Processed user object
+        
+    Raises:
+        ValueError: If user_id is invalid
+    """
+    pass
 ```
 
-### Escalation Message Template
+**Documentation**: Google-style docstrings
+
+**Testing**: Minimum 80% coverage
+```python
+def test_process_user():
+    """Test user processing with valid input."""
+    user = process_user("user-123", {"validate": True})
+    assert user.id == "user-123"
+    assert user.validated is True
+```
+
+### Commit Message Format
+
+Follow Conventional Commits specification:
+
+```
+<type>(<scope>): <subject>
+
+<body>
+
+<footer>
+```
+
+**Types**:
+- `feat`: New feature
+- `fix`: Bug fix
+- `docs`: Documentation only
+- `style`: Code style changes (formatting)
+- `refactor`: Code refactoring
+- `test`: Adding or updating tests
+- `chore`: Maintenance tasks
+
+**Examples**:
+```
+feat(auth): add OAuth 2.0 authentication
+
+Implement OAuth 2.0 authentication flow with Google Identity.
+Includes token validation, refresh logic, and session management.
+
+Closes #123
+```
+
+```
+fix(api): resolve database connection leak
+
+Fixed connection pool exhaustion by properly closing connections
+in error handling paths.
+
+Fixes #456
+```
+
+### Branch Naming
+
+```
+<type>/<short-description>
+```
+
+**Examples**:
+- `feature/oauth-authentication`
+- `bugfix/connection-leak`
+- `docs/api-documentation`
+- `refactor/agent-interface`
+
+### Pull Request Template
 
 ```markdown
-🚨 **ESCALATION: Level {LEVEL}**
+## Description
+Brief description of changes
 
-**Task**: {TASK_DESCRIPTION}
-**Agent**: {AGENT_NAME}
-**Issue**: {ISSUE_DESCRIPTION}
+## Type of Change
+- [ ] New feature
+- [ ] Bug fix
+- [ ] Documentation update
+- [ ] Refactoring
+- [ ] Performance improvement
 
-**Context**:
-- Task ID: {TASK_ID}
-- Started: {START_TIME}
-- Attempts: {ATTEMPT_COUNT}
-- Last Error: {ERROR_MESSAGE}
+## Testing
+- [ ] Unit tests added/updated
+- [ ] Integration tests added/updated
+- [ ] Manual testing completed
 
-**Impact**:
-- Affected Users: {USER_COUNT}
-- Service Status: {STATUS}
-- Data Risk: {RISK_LEVEL}
+## Checklist
+- [ ] Code follows style guidelines
+- [ ] Self-review completed
+- [ ] Documentation updated
+- [ ] No new warnings
+- [ ] Tests pass locally
+- [ ] Security implications considered
 
-**Agent Recommendation**:
-{RECOMMENDATION}
-
-**Required Action**:
-{REQUIRED_ACTION}
-
-**Links**:
-- Task: {TASK_URL}
-- Logs: {LOG_URL}
-- Dashboard: {DASHBOARD_URL}
+## Related Issues
+Closes #123
 ```
 
----
+## Review & Approval Process
 
-## Communication Channels
+### Code Review Guidelines
 
-### Slack Channels
+**Review Checklist**:
+- [ ] Code follows style guidelines
+- [ ] Changes are well-documented
+- [ ] Tests are comprehensive
+- [ ] No security vulnerabilities
+- [ ] Performance impact considered
+- [ ] Error handling is robust
+- [ ] Logging is appropriate
+- [ ] No breaking changes (or properly versioned)
 
-- **#infinity-matrix-general**: General discussions and updates
-- **#infinity-matrix-agents**: Agent activity logs and status
-- **#infinity-matrix-alerts**: Automated alerts and notifications
-- **#infinity-matrix-deploys**: Deployment notifications
-- **#infinity-matrix-incidents**: Incident tracking and resolution
+**Review SLA**:
+- **Regular PRs**: 4 hours (business hours)
+- **Urgent/Hotfix**: 1 hour
+- **Documentation Only**: 24 hours
 
-### Email Lists
+**Approval Requirements**:
 
-- **team@infinityxai.com**: All team members
-- **on-call@infinityxai.com**: On-call rotation for urgent issues
-- **security@infinityxai.com**: Security-related notifications
+| Change Type | Approvals Required | Who Can Approve |
+|-------------|-------------------|-----------------|
+| Documentation | 1 | Any maintainer |
+| Feature | 2 | Maintainers |
+| Bug fix | 1 | Maintainer |
+| Hotfix | 1 | Senior maintainer |
+| Infrastructure | 2 | Infrastructure team |
+| Security | 2 | Security team + maintainer |
 
-### GitHub
+### Automated Checks
 
-- **Issues**: Task tracking, bugs, features
-- **Pull Requests**: Code review and discussion
-- **Discussions**: Architecture and design decisions
-- **Projects**: Project management and roadmaps
-
-### Supabase Dashboard
-
-- **Task Queue**: Real-time agent task status
-- **Metrics**: System performance and health
-- **Logs**: Agent execution logs and errors
-
----
-
-## Decision-Making Framework
-
-### Agent Autonomous Decisions
-
-Agents can make these decisions without human approval:
-
-✅ **Allowed**:
-- Apply dependency patch updates (non-breaking)
-- Fix linting/formatting issues
-- Add missing tests for existing code
-- Deploy to development/staging environments
-- Restart failed services (after analysis)
-- Apply known fixes for known issues
-- Update documentation
-- Optimize database queries (after testing)
-
-❌ **Not Allowed** (Requires Human Approval):
-- Production deployments
-- Breaking API changes
-- Major architectural changes
-- Delete/drop databases or tables
-- Modify security configurations
-- Change access controls
-- Major dependency upgrades
-- Changes affecting billing/costs
-
-### Human Decision Authority
-
-#### Individual Developer
-- Review and merge PRs
-- Approve staging deployments
-- Configure agent parameters
-- Debug complex issues
-
-#### Tech Lead
-- Approve production deployments
-- Approve architectural changes
-- Assign agent priorities
-- Override agent decisions
-
-#### Security Team
-- Approve security patches
-- Configure security policies
-- Handle security incidents
-- Audit access controls
-
-#### Management
-- Approve budget changes
-- Set strategic priorities
-- Define agent policies
-- Approve major changes
-
----
+All PRs must pass:
+- [ ] Linting (Ruff, Black)
+- [ ] Type checking (mypy)
+- [ ] Unit tests
+- [ ] Integration tests
+- [ ] Security scanning (CodeQL, Snyk)
+- [ ] Code coverage (≥80%)
 
 ## Conflict Resolution
 
-### Agent-Agent Conflicts
+### Agent Conflict Scenarios
 
-When two agents have conflicting decisions:
+#### Scenario 1: Concurrent Edits
 
-1. **Orchestrator Agent** mediates the conflict
-2. Evaluate based on:
-   - Task priority
-   - Risk assessment
-   - Historical success rate
-   - Resource availability
-3. If no clear resolution: **Escalate to Human (Level 3)**
+**Problem**: Two agents modify the same file
 
-### Agent-Human Conflicts
+**Resolution**:
+1. Git identifies merge conflict
+2. GitHub Copilot attempts auto-resolution
+3. If auto-resolution fails, escalate to User
+4. User reviews both changes and decides
+5. Winning agent updates code
 
-When an agent's decision conflicts with human judgment:
+#### Scenario 2: Permission Violation
 
-1. **Human decision takes precedence**
-2. Agent logs the conflict for learning
-3. Human provides feedback explaining the decision
-4. System updates agent decision-making parameters
+**Problem**: Agent attempts action outside its authority
 
-### Process Conflicts
+**Resolution**:
+1. System blocks action immediately
+2. Log violation with full context
+3. Notify User of attempt
+4. Suggest proper delegation path
+5. Review agent configuration if repeated
 
-When processes deadlock or compete for resources:
+#### Scenario 3: Resource Contention
 
-1. **Orchestrator Agent** applies priority rules
-2. Higher priority task proceeds
-3. Lower priority task is queued or rescheduled
-4. If critical: **Escalate to Human (Level 4)**
+**Problem**: Multiple agents need same exclusive resource
 
----
+**Resolution**:
+1. Implement queue with priority
+2. Higher authority level gets precedence
+3. Waiting agents receive ETA
+4. Timeout and retry logic
+5. Escalate if deadlock detected
 
-## Quality Standards
+### Human Conflict Resolution
 
-### Code Quality
+**Disagreement Between Contributors**:
+1. Discuss in PR comments
+2. Escalate to team lead if no consensus
+3. Team lead makes final decision
+4. Document decision rationale
 
-- **Test Coverage**: Minimum 80% for new code
-- **Linting**: Zero linting errors
-- **Security**: Zero critical vulnerabilities
-- **Performance**: No regressions
-- **Documentation**: All public APIs documented
+**Disagreement on Design**:
+1. Create RFC (Request for Comments) document
+2. Solicit feedback from stakeholders
+3. Schedule design review meeting
+4. Vote if necessary (maintainers)
+5. Document decision in ADR (Architecture Decision Record)
 
-### Agent Performance
+## Best Practices
 
-- **Task Success Rate**: >90%
-- **Response Time**: <1 hour for standard tasks
-- **Escalation Rate**: <10% of tasks
-- **False Positives**: <5% of alerts
-- **Cost Efficiency**: <$0.10 per task
+### For Human Contributors
 
-### Human Review
+1. **Communicate Early**: Share your plans before significant work
+2. **Test Thoroughly**: Write comprehensive tests
+3. **Document Well**: Update docs with your changes
+4. **Review Carefully**: Give thoughtful code reviews
+5. **Stay Updated**: Pull latest changes frequently
+6. **Ask Questions**: When in doubt, ask in Slack
 
-- **Production PRs**: 100% human reviewed
-- **Security Changes**: 100% security team reviewed
-- **Breaking Changes**: 100% tech lead approved
-- **Critical Incidents**: 100% post-mortem documented
+### For Agent Developers
 
----
+1. **Define Clear Boundaries**: Specify agent scope explicitly
+2. **Implement Graceful Failure**: Handle errors properly
+3. **Log Appropriately**: Structured logging with context
+4. **Monitor Performance**: Track metrics and optimize
+5. **Test Edge Cases**: Don't just test happy path
+6. **Document Behavior**: Clear documentation of capabilities
 
-## Standard Operating Procedures
+### For Everyone
 
-### Daily Operations
+1. **Security First**: Always consider security implications
+2. **User Experience**: Think about end-user impact
+3. **Performance Matters**: Consider scalability
+4. **Collaborate Openly**: Share knowledge and help others
+5. **Continuous Improvement**: Learn from mistakes
+6. **Respect Boundaries**: Follow agent contracts and permissions
 
-```
-00:00 UTC - Monitor Agent: Run daily health check
-01:00 UTC - Security Agent: Scan for vulnerabilities
-02:00 UTC - Optimization Agent: Analyze cost and performance
-06:00 UTC - Code Agent: Apply dependency updates
-08:00 UTC - Test Agent: Run full test suite
-12:00 UTC - Orchestrator Agent: Generate daily report
-18:00 UTC - Deploy Agent: Deploy approved changes to staging
-```
+## Tools & Resources
 
-### Weekly Operations
+### Development Tools
 
-```
-Monday - Planning: Review roadmap and priorities
-Tuesday - Security: Security audit and patch review
-Wednesday - Performance: Performance review and optimization
-Thursday - Cost: Cost review and optimization
-Friday - Retrospective: Review week's activities and improvements
-```
+- **IDE**: VS Code (recommended), PyCharm, or similar
+- **Git Client**: Command line or GitKraken
+- **API Testing**: Postman, Insomnia, or curl
+- **Database**: pgAdmin, DBeaver
 
-### Monthly Operations
+### Communication Channels
 
-```
-Week 1 - Major updates: Apply major dependency updates
-Week 2 - Optimization: Performance and cost optimization sprint
-Week 3 - Security: Comprehensive security audit
-Week 4 - Planning: Next month's roadmap and priorities
-```
+- **Slack**: #infinity-matrix-dev
+- **GitHub Discussions**: For design discussions
+- **GitHub Issues**: For bug reports and features
+- **Email**: dev@infinitymatrix.example.com
 
----
+### Learning Resources
 
-## Emergency Procedures
+- [Architecture Documentation](docs/architecture.md)
+- [Agent Contracts](docs/agent-contract.md)
+- [Security Policy](docs/security.md)
+- [API Documentation](http://localhost:8000/docs)
+- [Python Best Practices](https://docs.python-guide.org/)
+- [FastAPI Tutorial](https://fastapi.tiangolo.com/tutorial/)
 
-### System Down
+## FAQ
 
-1. **Monitor Agent** detects outage
-2. **Immediate Escalation** to on-call (Level 4)
-3. **Deploy Agent** attempts automatic rollback
-4. **Human** investigates root cause
-5. **Code Agent** implements fix
-6. **Deploy Agent** deploys fix
-7. **Monitor Agent** confirms resolution
-8. **Post-mortem** within 24 hours
+**Q: How do I get access to the repository?**  
+A: Request access from your team lead. Include your GitHub username and intended role.
 
-### Security Breach
+**Q: Which agent should I use for local development?**  
+A: Use VS Code Copilot for local development tasks. It's optimized for code generation and testing.
 
-1. **Security Agent** detects breach or receives report
-2. **Immediate Escalation** to security team (Level 4)
-3. **Security Agent** isolates affected systems
-4. **Human** assesses damage and scope
-5. **Security Agent** revokes compromised credentials
-6. **Code Agent** applies security patches
-7. **Deploy Agent** deploys fixes
-8. **Security Agent** confirms breach contained
-9. **Incident report** and lessons learned
+**Q: Can VS Code Copilot deploy to production?**  
+A: No, production deployments are handled exclusively by GitHub Copilot after proper approvals.
 
-### Data Loss
+**Q: How do I report a security vulnerability?**  
+A: Email security@infinitymatrix.example.com. Do NOT create public issues.
 
-1. **Monitor Agent** detects data loss
-2. **Immediate Escalation** (Level 4)
-3. **Deploy Agent** stops all deployments
-4. **Human** assesses scope and impact
-5. **System Administrator** restores from backup
-6. **Test Agent** verifies data integrity
-7. **Monitor Agent** confirms system healthy
-8. **Root cause analysis** and prevention measures
+**Q: What's the typical PR review time?**  
+A: Regular PRs: 4 hours (business hours). Urgent: 1 hour. Documentation: 24 hours.
 
----
+**Q: Do I need approval for documentation changes?**  
+A: Yes, at least 1 approval from a maintainer, but the process is usually faster.
 
-## Feedback and Improvement
+**Q: How do I add a new integration?**  
+A: Follow the integration adapter template in `/src/integrations/` and create an RFC for review.
 
-### Agent Performance Reviews
+**Q: What's the process for breaking changes?**  
+A: Create an RFC, get approval, increment major version, provide migration guide.
 
-- **Weekly**: Automated performance analysis
-- **Monthly**: Human review of agent decisions
-- **Quarterly**: Comprehensive agent optimization
+## Conclusion
 
-### Feedback Mechanism
+Effective collaboration in the Infinity Matrix requires understanding agent roles, following established protocols, and respecting boundaries. By adhering to these guidelines, we ensure a productive, secure, and efficient development environment.
 
-Humans can provide feedback on agent actions:
-
-```markdown
-## Agent Feedback
-
-**Task ID**: {TASK_ID}
-**Agent**: {AGENT_NAME}
-**Rating**: ⭐⭐⭐⭐☆ (4/5)
-
-**What went well**:
-- Quick response time
-- Correct implementation
-- Good test coverage
-
-**What could be improved**:
-- More detailed commit messages
-- Could have considered edge case X
-- Should have updated related documentation
-
-**Specific Feedback**:
-{DETAILED_FEEDBACK}
-```
-
-### Continuous Improvement
-
-- Agents learn from feedback and adjust behavior
-- Failed tasks are analyzed for root cause
-- Success patterns are reinforced
-- New capabilities are tested in staging first
-
----
-
-## References
-
-- [Blueprint](./docs/blueprint.md) - System architecture
-- [Roadmap](./docs/roadmap.md) - Implementation plan
-- [Prompt Suite](./docs/prompt_suite.md) - Agent prompts
-- [System Manifest](./docs/system_manifest.md) - System inventory
-- [Setup Instructions](./setup_instructions.md) - Onboarding guide
+For questions or suggestions about this guide, please open a GitHub Discussion or contact the team leads.
 
 ---
 
 **Document Version**: 1.0.0  
 **Last Updated**: 2025-12-30  
-**Maintained By**: Infinity-Matrix System
+**Next Review**: 2026-01-30  
+**Owner**: Engineering Team

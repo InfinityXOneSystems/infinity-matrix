@@ -1,0 +1,64 @@
+policy:
+  id: deployment-policy-001
+  name: Production Deployment Policy
+  version: 1.0.0
+  category: operational
+  enabled: true
+  
+  description: |
+    Defines requirements and procedures for deploying to production environment.
+    Ensures all deployments follow best practices and include necessary checks.
+  
+  rules:
+    - id: require-approval
+      description: Production deployments require approval from 2+ reviewers
+      condition: environment == 'production' AND approvals < 2
+      action: block_deployment
+      severity: critical
+    
+    - id: require-tests
+      description: All tests must pass before production deployment
+      condition: test_status != 'passed'
+      action: block_deployment
+      severity: critical
+    
+    - id: require-security-scan
+      description: Security scan must pass with no critical vulnerabilities
+      condition: security_scan_critical_count > 0
+      action: block_deployment
+      severity: critical
+    
+    - id: business-hours-only
+      description: Production deployments allowed only during business hours
+      condition: |
+        environment == 'production' AND 
+        (hour < 9 OR hour > 17 OR day in ['saturday', 'sunday'])
+      action: advisory
+      severity: medium
+      exceptions:
+        - hotfix deployments
+        - emergency incidents
+    
+    - id: blue-green-required
+      description: Use blue-green deployment strategy for production
+      condition: environment == 'production' AND deployment_strategy != 'blue-green'
+      action: advisory
+      severity: high
+    
+    - id: canary-validation
+      description: Canary deployment must run for at least 15 minutes
+      condition: deployment_strategy == 'canary' AND canary_duration < 900
+      action: block_deployment
+      severity: high
+  
+  enforcement:
+    mode: blocking
+    exceptions:
+      - Emergency hotfixes approved by on-call engineer
+      - Critical security patches
+  
+  metadata:
+    owner: platform-team
+    reviewers: [sre-team, security-team]
+    last_reviewed: 2025-12-30
+    next_review: 2026-03-30

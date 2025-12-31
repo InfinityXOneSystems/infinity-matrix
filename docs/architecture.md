@@ -1,380 +1,337 @@
-# Infinity Matrix Auto-Builder Architecture
+# Infinity Matrix - System Architecture
 
 ## Overview
 
-The Infinity Matrix Auto-Builder is a sophisticated autonomous code generation and deployment system that uses a multi-agent architecture orchestrated by Vision Cortex. This document describes the system architecture, components, and design patterns.
+The Infinity Matrix is an enterprise-grade, AI-powered orchestration platform designed to coordinate multiple AI agents, integrations, and workflows across distributed systems. This document outlines the system architecture, design patterns, and technical specifications.
 
-## High-Level Architecture
+## System Architecture
+
+### High-Level Architecture
 
 ```
-┌─────────────────────────────────────────────────────────────┐
-│                      External Interfaces                     │
-│  ┌──────────┐  ┌──────────┐  ┌──────────┐  ┌──────────┐   │
-│  │   CLI    │  │REST API  │  │WebSocket │  │  WebHook │   │
-│  └────┬─────┘  └────┬─────┘  └────┬─────┘  └────┬─────┘   │
-└───────┼─────────────┼─────────────┼─────────────┼──────────┘
-        │             │             │             │
-┌───────┴─────────────┴─────────────┴─────────────┴──────────┐
-│                      Auto-Builder Core                       │
-│  ┌───────────────────────────────────────────────────────┐  │
-│  │              Vision Cortex Orchestrator                │  │
-│  │    (High-level planning & agent coordination)          │  │
-│  └─────────────────────┬─────────────────────────────────┘  │
-│                        │                                     │
-│  ┌─────────────────────┴─────────────────────────────────┐  │
-│  │               Agent Management Layer                   │  │
-│  │  ┌──────┐ ┌────────┐ ┌──────────┐ ┌──────────────┐   │  │
-│  │  │Crawler│ │Ingestion│ │Predictor│ │     CEO      │   │  │
-│  │  └──────┘ └────────┘ └──────────┘ └──────────────┘   │  │
-│  │  ┌────────┐ ┌────────┐ ┌─────────┐ ┌────────────┐   │  │
-│  │  │Strategist│ │Organizer│ │Validator│ │Documentor│   │  │
-│  │  └────────┘ └────────┘ └─────────┘ └────────────┘   │  │
-│  └──────────────────────────────────────────────────────┘  │
-│                        │                                     │
-│  ┌─────────────────────┴─────────────────────────────────┐  │
-│  │              Code Generation Layer                     │  │
-│  │  ┌────────────┐ ┌────────────┐ ┌──────────────────┐  │  │
-│  │  │  Template  │ │    Code    │ │   Repository     │  │  │
-│  │  │  Manager   │ │  Generator │ │   Manager        │  │  │
-│  │  └────────────┘ └────────────┘ └──────────────────┘  │  │
-│  └──────────────────────────────────────────────────────┘  │
-└─────────────────────────────────────────────────────────────┘
-        │             │             │             │
-┌───────┴─────────────┴─────────────┴─────────────┴──────────┐
-│                    External Systems                          │
-│  ┌──────────┐  ┌──────────┐  ┌──────────┐  ┌──────────┐   │
-│  │  GitHub  │  │   CI/CD  │  │ Storage  │  │  Database│   │
-│  └──────────┘  └──────────┘  └──────────┘  └──────────┘   │
-└─────────────────────────────────────────────────────────────┘
+┌─────────────────────────────────────────────────────────────────┐
+│                        Client Layer                              │
+│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐          │
+│  │   Web UI     │  │  Mobile App  │  │   CLI Tool   │          │
+│  └──────────────┘  └──────────────┘  └──────────────┘          │
+└─────────────────────────────────────────────────────────────────┘
+                              ↓
+┌─────────────────────────────────────────────────────────────────┐
+│                     API Gateway Layer                            │
+│  ┌──────────────────────────────────────────────────────────┐  │
+│  │  FastAPI Gateway (Authentication, Rate Limiting, Routing) │  │
+│  └──────────────────────────────────────────────────────────┘  │
+└─────────────────────────────────────────────────────────────────┘
+                              ↓
+┌─────────────────────────────────────────────────────────────────┐
+│                   Orchestration Layer                            │
+│  ┌──────────────────────────────────────────────────────────┐  │
+│  │           Matrix Orchestrator                             │  │
+│  │  • Task Distribution    • Load Balancing                  │  │
+│  │  • Agent Lifecycle      • State Management                │  │
+│  │  • Event Bus            • Message Queue                   │  │
+│  └──────────────────────────────────────────────────────────┘  │
+└─────────────────────────────────────────────────────────────────┘
+                              ↓
+┌─────────────────────────────────────────────────────────────────┐
+│                      Agent Layer                                 │
+│  ┌────────────┐  ┌────────────┐  ┌──────────────────────┐     │
+│  │   User     │  │  VS Code   │  │  GitHub Copilot      │     │
+│  │   Agent    │  │  Copilot   │  │  (Remote/Orchestrator)│     │
+│  └────────────┘  └────────────┘  └──────────────────────┘     │
+└─────────────────────────────────────────────────────────────────┘
+                              ↓
+┌─────────────────────────────────────────────────────────────────┐
+│                   Integration Layer                              │
+│  ┌──────────┐  ┌──────────┐  ┌───────────┐  ┌──────────┐      │
+│  │ Vertex   │  │ Firebase │  │ Hostinger │  │ Workspace │      │
+│  │   AI     │  │          │  │           │  │           │      │
+│  └──────────┘  └──────────┘  └───────────┘  └──────────┘      │
+└─────────────────────────────────────────────────────────────────┘
+                              ↓
+┌─────────────────────────────────────────────────────────────────┐
+│                  Infrastructure Layer                            │
+│  ┌──────────┐  ┌──────────┐  ┌───────────┐  ┌──────────┐      │
+│  │ Database │  │  Cache   │  │  Storage  │  │  Queue   │      │
+│  │ (Cloud)  │  │  (Redis) │  │  (GCS)    │  │ (PubSub) │      │
+│  └──────────┘  └──────────┘  └───────────┘  └──────────┘      │
+└─────────────────────────────────────────────────────────────────┘
 ```
 
 ## Core Components
 
-### 1. Vision Cortex
+### 1. API Gateway
 
-**Purpose**: Central orchestrator that coordinates all agents and manages the build lifecycle.
+**Technology Stack**: FastAPI (Python 3.11+)
 
 **Responsibilities**:
-- Build plan creation and execution
-- Agent task scheduling and distribution
-- Inter-agent communication management
-- Build state tracking and monitoring
-- Error handling and recovery
+- Request routing and load balancing
+- Authentication and authorization (JWT, OAuth 2.0)
+- Rate limiting and throttling
+- Request/response transformation
+- API versioning
+- Comprehensive logging and metrics
 
 **Key Features**:
-- Asynchronous task execution
-- Phase-based build orchestration
-- Agent capability matching
-- Build status aggregation
+- OpenAPI/Swagger documentation auto-generation
+- Async/await for high concurrency
+- WebSocket support for real-time communication
+- GraphQL endpoint support
+- CORS and security headers
 
-### 2. Agent System
+### 2. Matrix Orchestrator
 
-The system includes eight specialized agents, each responsible for specific aspects of the build process:
+**Purpose**: Central coordination hub for all agent activities
 
-#### Crawler Agent
-- **Purpose**: Analyze existing codebases, documentation, and templates
-- **Actions**: 
-  - `analyze_repo`: Scan repository structure and patterns
-  - `scan_templates`: Discover available templates
-  - `analyze_docs`: Process documentation
-- **Use Cases**: Finding best practices, extracting patterns, template discovery
+**Core Capabilities**:
+- **Task Distribution**: Intelligent routing of tasks to appropriate agents
+- **Load Balancing**: Dynamic resource allocation based on agent capacity
+- **State Management**: Distributed state tracking with consistency guarantees
+- **Event Bus**: Pub/Sub architecture for decoupled communication
+- **Fault Tolerance**: Circuit breakers, retries, and graceful degradation
 
-#### Ingestion Agent
-- **Purpose**: Process and structure input data
-- **Actions**:
-  - `parse_blueprint`: Convert blueprint YAML to internal format
-  - `process_prompt`: Parse natural language requirements
-  - `extract_requirements`: Structure requirement lists
-- **Use Cases**: Blueprint parsing, requirement analysis, data normalization
+**Design Patterns**:
+- Command Pattern for task execution
+- Observer Pattern for event handling
+- Strategy Pattern for agent selection
+- Circuit Breaker for fault tolerance
 
-#### Predictor Agent
-- **Purpose**: Make predictions about optimal architectures and technologies
-- **Actions**:
-  - `predict_architecture`: Suggest system architecture
-  - `recommend_technologies`: Propose tech stack
-  - `estimate_complexity`: Calculate build complexity
-- **Use Cases**: Architecture design, technology selection, effort estimation
+### 3. Agent System
 
-#### CEO Agent
-- **Purpose**: High-level decision making and approval
-- **Actions**:
-  - `approve_architecture`: Validate architectural decisions
-  - `select_technologies`: Choose final tech stack
-  - `make_decision`: General decision making
-- **Use Cases**: Final approvals, strategic decisions, conflict resolution
+#### User Agent
+- **Role**: Human interface and decision-maker
+- **Capabilities**: 
+  - Issue directives and requirements
+  - Review and approve changes
+  - Override automated decisions
+  - Access all system functions
 
-#### Strategist Agent
-- **Purpose**: Create implementation strategies and plans
-- **Actions**:
-  - `create_strategy`: Develop implementation approach
-  - `plan_phases`: Break down into phases
-  - `optimize_workflow`: Improve build process
-- **Use Cases**: Implementation planning, milestone definition, optimization
+#### VS Code Copilot (Local/DevOps)
+- **Role**: Local development and operations
+- **Capabilities**:
+  - Code generation and refactoring
+  - Local testing and validation
+  - Development environment management
+  - DevOps automation
 
-#### Organizer Agent
-- **Purpose**: Manage project structure and organization
-- **Actions**:
-  - `organize_structure`: Define file/folder layout
-  - `manage_dependencies`: Handle dependency management
-  - `create_layout`: Generate project skeleton
-- **Use Cases**: Project structure, dependency management, file organization
+#### GitHub Copilot (Remote/Orchestrator)
+- **Role**: Remote orchestration and coordination
+- **Capabilities**:
+  - Cross-repository operations
+  - CI/CD pipeline management
+  - Matrix-wide coordination
+  - Remote deployment and monitoring
 
-#### Validator Agent
-- **Purpose**: Validate generated code and configurations
-- **Actions**:
-  - `validate_code`: Check code quality
-  - `run_tests`: Execute test suites
-  - `check_security`: Scan for vulnerabilities
-- **Use Cases**: Quality assurance, testing, security validation
+### 4. Integration Adapters
 
-#### Documentor Agent
-- **Purpose**: Generate documentation
-- **Actions**:
-  - `generate_readme`: Create README files
-  - `generate_api_docs`: Generate API documentation
-  - `create_guides`: Write user guides
-- **Use Cases**: Documentation generation, onboarding materials, guides
+#### Vertex AI Integration
+- **Purpose**: Advanced AI/ML capabilities
+- **Features**:
+  - Model training and deployment
+  - Prediction endpoints
+  - AutoML capabilities
+  - Model monitoring and versioning
 
-### 3. Auto-Builder Core
+#### Firebase Integration
+- **Purpose**: Real-time data and authentication
+- **Features**:
+  - Realtime Database
+  - Firestore for document storage
+  - Authentication services
+  - Cloud Functions integration
 
-**Purpose**: Main interface for building projects.
+#### Hostinger Integration
+- **Purpose**: Web hosting and deployment
+- **Features**:
+  - Automated deployments
+  - SSL certificate management
+  - DNS configuration
+  - Performance monitoring
 
-**Features**:
-- Blueprint-based builds
-- Prompt-based builds
-- Build status tracking
-- Artifact generation
-- Asynchronous execution
+#### Workspace Integration
+- **Purpose**: Collaboration and productivity
+- **Features**:
+  - Google Drive integration
+  - Gmail automation
+  - Calendar management
+  - Document collaboration
 
-**Build Process**:
-1. Input processing (blueprint/prompt)
-2. Build plan creation via Vision Cortex
-3. Phase execution (Analysis → Decision → Organization → Validation → Documentation)
-4. Artifact generation
-5. Status reporting
+## Data Architecture
 
-### 4. Blueprint System
-
-**Purpose**: Define project specifications in a structured format.
-
-**Structure**:
-```yaml
-name: project-name
-version: 1.0.0
-type: microservice|web-app|cli-tool|library|api
-description: Project description
-requirements: [list of requirements]
-components: [list of components]
-deployment: deployment configuration
-testing: testing configuration
-documentation: documentation configuration
-```
-
-**Supported Project Types**:
-- Microservices
-- Web Applications
-- CLI Tools
-- Libraries
-- REST/GraphQL APIs
-- Mobile Apps
-- Data Pipelines
-- ML Models
-- Infrastructure
-
-### 5. Code Generation Layer
-
-#### Template Manager
-- Template discovery and loading
-- Template validation
-- Template caching
-
-#### Code Generator
-- Jinja2-based code generation
-- Python module generation
-- API endpoint generation
-- Test file generation
-
-#### Repository Manager
-- Git operations (init, clone, commit, push)
-- Branch management
-- Tag creation
-- Status tracking
-
-## Build Phases
-
-### Phase 1: Analysis & Planning
-- Crawler scans for templates and patterns
-- Ingestion processes blueprint/prompt
-- Predictor suggests architecture
-
-### Phase 2: Decision Making
-- CEO approves architecture
-- Strategist creates implementation strategy
-
-### Phase 3: Organization
-- Organizer defines project structure
-- Organizer manages dependencies
-
-### Phase 4: Validation
-- Validator checks generated code
-- Validator runs security scans
-
-### Phase 5: Documentation
-- Documentor generates README
-- Documentor creates API documentation
-
-## Integration Points
-
-### API Layer
-- FastAPI-based REST API
-- JWT authentication
-- WebSocket support for real-time updates
-- OpenAPI documentation
-
-### CLI
-- Typer-based CLI
-- Rich formatting
-- Progress tracking
-- Interactive features
-
-### External Services
-- **GitHub**: Repository management, PR creation, CI/CD triggers
-- **CI/CD**: Build automation, testing, deployment
-- **Storage**: Artifact storage, template storage
-- **Database**: Build history, metrics (future)
-
-## Data Flow
+### Data Flow
 
 ```
-User Input (Prompt/Blueprint)
-    ↓
-Auto-Builder.build()
-    ↓
-Vision Cortex.orchestrate_build()
-    ↓
-Build Plan Creation
-    ↓
-Phase Execution (Sequential)
-    ↓
-Agent Task Execution (Parallel within phase)
-    ↓
-Artifact Generation
-    ↓
-Build Completion
-    ↓
-Status Reporting
+User Request → API Gateway → Orchestrator → Agent Selection →
+Task Execution → Integration Adapters → Result Aggregation →
+Response Formatting → API Gateway → User
 ```
 
-## Design Patterns
+### Data Storage
 
-### 1. Multi-Agent Pattern
-- Specialized agents for specific tasks
-- Agent coordination via orchestrator
-- Capability-based task assignment
+**Primary Database**: Cloud SQL (PostgreSQL)
+- Agent configurations
+- Task history
+- Audit logs
+- System metadata
 
-### 2. Pipeline Pattern
-- Sequential phase execution
-- Phase dependencies
-- Progress tracking
+**Cache Layer**: Redis
+- Session management
+- Frequently accessed data
+- Rate limiting counters
+- Distributed locks
 
-### 3. Observer Pattern
-- Build status monitoring
-- Event-based notifications
-- Real-time updates
+**Object Storage**: Google Cloud Storage
+- Log files
+- Model artifacts
+- Backup data
+- Static assets
 
-### 4. Template Method Pattern
-- Base agent interface
-- Concrete agent implementations
-- Consistent execution flow
+**Message Queue**: Cloud Pub/Sub
+- Asynchronous task processing
+- Event-driven workflows
+- Inter-service communication
 
-### 5. Strategy Pattern
-- Multiple build strategies
-- Pluggable agents
-- Configurable behavior
-
-## Scalability Considerations
-
-### Horizontal Scaling
-- Stateless API servers
-- Distributed agent execution
-- Load balancing
-
-### Vertical Scaling
-- Async/await for I/O operations
-- Parallel agent execution
-- Resource pooling
-
-### Performance Optimizations
-- Template caching
-- Blueprint validation caching
-- Lazy loading
-- Connection pooling
-
-## Security
+## Security Architecture
 
 ### Authentication & Authorization
-- JWT-based API authentication
-- Role-based access control
-- Secret management
 
-### Code Security
-- Input validation
-- Code scanning
-- Dependency vulnerability checks
-- Secure defaults
+- **OAuth 2.0 / OpenID Connect**: User authentication
+- **JWT Tokens**: Stateless session management
+- **API Keys**: Service-to-service authentication
+- **RBAC**: Role-based access control
+- **Mutual TLS**: Encrypted service communication
 
 ### Network Security
-- HTTPS enforcement
-- CORS configuration
-- Rate limiting
-- Request validation
 
-## Monitoring & Observability
+- **VPC**: Isolated network environment
+- **Cloud Armor**: DDoS protection and WAF
+- **Private Service Connect**: Secure service access
+- **Load Balancers**: SSL/TLS termination
 
-### Metrics
-- Build success/failure rates
-- Build duration
-- Agent execution times
-- API latency
+### Data Security
 
-### Logging
-- Structured logging
-- Log levels (DEBUG, INFO, WARNING, ERROR)
-- Correlation IDs
-- Audit trails
+- **Encryption at Rest**: All data encrypted using AES-256
+- **Encryption in Transit**: TLS 1.3 for all connections
+- **Key Management**: Cloud KMS for key rotation
+- **Data Classification**: Automated PII detection and handling
 
-### Tracing
-- Request tracing
-- Build lifecycle tracing
-- Agent execution tracing
+## Scalability & Performance
 
-## Future Enhancements
+### Horizontal Scaling
 
-1. **Machine Learning Integration**
-   - Pattern recognition
-   - Architecture prediction
-   - Complexity estimation
+- **Auto-scaling Groups**: Dynamic resource allocation
+- **Container Orchestration**: Kubernetes for workload management
+- **Stateless Services**: Enable seamless scaling
+- **Database Sharding**: Horizontal data partitioning
 
-2. **Advanced Agent Capabilities**
-   - Natural language understanding
-   - Code refactoring
-   - Performance optimization
+### Performance Optimization
 
-3. **Enhanced Orchestration**
-   - Dynamic agent selection
-   - Adaptive strategies
-   - Self-healing builds
+- **CDN**: Global content delivery
+- **Caching Strategy**: Multi-layer caching (L1/L2/L3)
+- **Connection Pooling**: Efficient resource utilization
+- **Async Processing**: Non-blocking I/O operations
+- **Query Optimization**: Indexed queries and materialized views
 
-4. **Extended Integrations**
-   - More CI/CD platforms
-   - Cloud providers
-   - IDEs and editors
+### Monitoring & Observability
 
-5. **Collaborative Features**
-   - Multi-user builds
-   - Team workflows
-   - Review systems
+- **Metrics**: Prometheus + Grafana
+- **Logging**: Structured logging with ELK stack
+- **Tracing**: OpenTelemetry for distributed tracing
+- **APM**: Application Performance Monitoring
+- **Alerting**: PagerDuty integration for critical issues
 
-## Conclusion
+## Deployment Architecture
 
-The Infinity Matrix Auto-Builder architecture is designed for extensibility, scalability, and maintainability. The multi-agent approach provides flexibility and specialization, while the Vision Cortex orchestrator ensures coordinated execution. The system adheres to enterprise standards and best practices, making it suitable for production use in demanding environments.
+### Environments
+
+1. **Development**: Feature development and testing
+2. **Staging**: Pre-production validation
+3. **Production**: Live customer-facing environment
+4. **DR (Disaster Recovery)**: Hot standby for failover
+
+### Deployment Strategy
+
+- **Blue-Green Deployments**: Zero-downtime releases
+- **Canary Releases**: Gradual rollout with monitoring
+- **Feature Flags**: Runtime feature toggling
+- **Automated Rollback**: Instant reversion on failure
+
+### Infrastructure as Code
+
+- **Terraform**: Cloud resource provisioning
+- **Helm Charts**: Kubernetes application deployment
+- **Ansible**: Configuration management
+- **GitHub Actions**: CI/CD pipeline automation
+
+## Technical Standards
+
+### Code Quality
+
+- **Language**: Python 3.11+ (type hints required)
+- **Style Guide**: PEP 8, Black formatter
+- **Linting**: Ruff, Pylint, mypy
+- **Testing**: pytest (minimum 80% coverage)
+- **Documentation**: Google-style docstrings
+
+### API Standards
+
+- **REST**: RESTful API design principles
+- **OpenAPI 3.0**: API specification
+- **Versioning**: URI versioning (e.g., /api/v1/)
+- **HTTP Status Codes**: Proper semantic usage
+- **HATEOAS**: Hypermedia as the Engine of Application State
+
+### Database Standards
+
+- **Normalization**: At least 3NF
+- **Indexing**: Strategic index placement
+- **Migrations**: Version-controlled schema changes
+- **Backups**: Daily automated backups with PITR
+- **Connection Limits**: Pooling with circuit breakers
+
+## Technology Stack Summary
+
+| Layer | Technology | Purpose |
+|-------|-----------|---------|
+| API Gateway | FastAPI | High-performance async API |
+| Orchestrator | Python + Celery | Task distribution |
+| Agents | Python SDK | Agent framework |
+| Database | Cloud SQL (PostgreSQL) | Primary data store |
+| Cache | Redis | Session & caching |
+| Queue | Cloud Pub/Sub | Message broker |
+| Storage | Google Cloud Storage | Object storage |
+| Container | Docker + Kubernetes | Containerization |
+| Monitoring | Prometheus + Grafana | Metrics & dashboards |
+| Logging | Cloud Logging + ELK | Centralized logs |
+| CI/CD | GitHub Actions | Automation |
+| IaC | Terraform | Infrastructure |
+
+## Design Principles
+
+1. **Separation of Concerns**: Each component has a single, well-defined purpose
+2. **Loose Coupling**: Minimize dependencies between components
+3. **High Cohesion**: Related functionality grouped together
+4. **Fail-Fast**: Early detection and handling of errors
+5. **Idempotency**: Operations can be safely retried
+6. **Backward Compatibility**: API versioning for smooth evolution
+7. **Security by Design**: Security considerations at every layer
+8. **Observability**: Comprehensive monitoring and logging
+9. **Scalability**: Designed for horizontal scaling
+10. **Resilience**: Graceful degradation and self-healing
+
+## Future Roadmap
+
+- **Multi-Cloud Support**: AWS and Azure integration
+- **Edge Computing**: Edge node deployment for reduced latency
+- **Advanced AI**: Custom model training pipeline
+- **Real-time Analytics**: Stream processing with Apache Flink
+- **GraphQL Federation**: Unified data graph across services
+- **Service Mesh**: Istio for advanced traffic management
+
+## References
+
+- [Google Cloud Architecture Framework](https://cloud.google.com/architecture/framework)
+- [12-Factor App Methodology](https://12factor.net/)
+- [Microservices Patterns](https://microservices.io/patterns/index.html)
+- [REST API Best Practices](https://restfulapi.net/)
+- [FastAPI Documentation](https://fastapi.tiangolo.com/)

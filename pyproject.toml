@@ -1,90 +1,79 @@
-[build-system]
-requires = ["setuptools>=65.0", "wheel"]
-build-backend = "setuptools.build_meta"
-
 [project]
 name = "infinity-matrix"
-version = "1.0.0"
-description = "FAANG-level production-grade autonomous AI system with Vision Cortex, Auto-Builder, and Agent Registry"
-readme = "README.md"
-requires-python = ">=3.9"
-license = {text = "MIT"}
+version = "0.1.0"
+description = "Enterprise-grade AI agent orchestration platform"
 authors = [
-    {name = "InfinityXOne Systems", email = "info@infinityxone.com"}
+    {name = "Infinity Matrix Team", email = "dev@infinitymatrix.example.com"}
 ]
-keywords = ["ai", "agents", "autonomous", "vision", "automation"]
+readme = "README.md"
+requires-python = ">=3.11"
+license = {text = "MIT"}
+keywords = ["ai", "agent", "orchestration", "automation", "enterprise"]
 classifiers = [
-    "Development Status :: 4 - Beta",
+    "Development Status :: 3 - Alpha",
     "Intended Audience :: Developers",
     "License :: OSI Approved :: MIT License",
     "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.9",
-    "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
+    "Topic :: Software Development :: Libraries :: Application Frameworks",
 ]
 
 dependencies = [
-    "fastapi>=0.110.0",
+    "fastapi>=0.109.0",
     "uvicorn[standard]>=0.27.0",
-    "pydantic>=2.6.0",
-    "pydantic-settings>=2.1.0",
-    "sqlalchemy>=2.0.0",
-    "alembic>=1.13.0",
-    "redis>=5.0.0",
+    "pydantic>=2.5.3",
+    "python-jose[cryptography]>=3.3.0",
+    "passlib[bcrypt]>=1.7.4",
+    "python-dotenv>=1.0.0",
+    "sqlalchemy>=2.0.25",
+    "alembic>=1.13.1",
+    "psycopg2-binary>=2.9.9",
+    "redis>=5.0.1",
+    "google-cloud-aiplatform>=1.39.0",
+    "google-cloud-storage>=2.14.0",
+    "google-cloud-logging>=3.9.0",
+    "google-cloud-pubsub>=2.19.0",
+    "firebase-admin>=6.3.0",
+    "google-api-python-client>=2.111.0",
     "httpx>=0.26.0",
-    "opencv-python>=4.9.0",
-    "pillow>=10.2.0",
-    "numpy>=1.26.0",
-    "torch>=2.2.0",
-    "transformers>=4.38.0",
-    "langchain>=0.1.0",
-    "chromadb>=0.4.0",
-    "pytest>=8.0.0",
-    "pytest-asyncio>=0.23.0",
-    "pytest-cov>=4.1.0",
-    "black>=24.0.0",
-    "ruff>=0.2.0",
-    "mypy>=1.8.0",
-    "structlog>=24.1.0",
+    "celery>=5.3.4",
     "prometheus-client>=0.19.0",
-    "opentelemetry-api>=1.22.0",
-    "opentelemetry-sdk>=1.22.0",
-    "tenacity>=8.2.0",
-    "aiofiles>=23.2.0",
 ]
 
 [project.optional-dependencies]
 dev = [
-    "ipython>=8.20.0",
-    "ipdb>=0.13.0",
-    "pytest-watch>=4.2.0",
+    "pytest>=7.4.3",
+    "pytest-asyncio>=0.23.2",
+    "pytest-cov>=4.1.0",
+    "black>=23.12.1",
+    "ruff>=0.1.9",
+    "mypy>=1.8.0",
+    "pre-commit>=3.6.0",
 ]
 
 [project.urls]
-Homepage = "https://github.com/InfinityXOneSystems/infinity-matrix"
-Documentation = "https://github.com/InfinityXOneSystems/infinity-matrix/wiki"
+Homepage = "https://infinitymatrix.example.com"
+Documentation = "https://docs.infinitymatrix.example.com"
 Repository = "https://github.com/InfinityXOneSystems/infinity-matrix"
+Issues = "https://github.com/InfinityXOneSystems/infinity-matrix/issues"
 
-[tool.setuptools.packages.find]
-where = ["."]
-include = ["infinity_matrix*"]
-exclude = ["tests*", "docs*"]
-
-[tool.pytest.ini_options]
-minversion = "8.0"
-addopts = "-ra -q --strict-markers --cov=infinity_matrix --cov-report=term-missing --cov-report=html"
-testpaths = ["tests"]
-pythonpath = ["."]
-asyncio_mode = "auto"
+[build-system]
+requires = ["setuptools>=68.0", "wheel"]
+build-backend = "setuptools.build_meta"
 
 [tool.black]
 line-length = 100
-target-version = ['py39', 'py310', 'py311', 'py312']
+target-version = ["py311"]
 include = '\.pyi?$'
 extend-exclude = '''
 /(
-  \.git
+  # directories
+  \.eggs
+  | \.git
+  | \.hg
+  | \.mypy_cache
+  | \.tox
   | \.venv
   | build
   | dist
@@ -93,27 +82,26 @@ extend-exclude = '''
 
 [tool.ruff]
 line-length = 100
-target-version = "py39"
+target-version = "py311"
 select = [
     "E",   # pycodestyle errors
     "W",   # pycodestyle warnings
     "F",   # pyflakes
     "I",   # isort
-    "C",   # flake8-comprehensions
     "B",   # flake8-bugbear
+    "C4",  # flake8-comprehensions
     "UP",  # pyupgrade
 ]
 ignore = [
     "E501",  # line too long (handled by black)
     "B008",  # do not perform function calls in argument defaults
-    "C901",  # too complex
 ]
 
 [tool.ruff.per-file-ignores]
 "__init__.py" = ["F401"]
 
 [tool.mypy]
-python_version = "3.9"
+python_version = "3.11"
 warn_return_any = true
 warn_unused_configs = true
 disallow_untyped_defs = true
@@ -123,21 +111,36 @@ no_implicit_optional = true
 warn_redundant_casts = true
 warn_unused_ignores = true
 warn_no_return = true
-strict_equality = true
 
 [[tool.mypy.overrides]]
 module = [
-    "cv2.*",
-    "torch.*",
-    "transformers.*",
-    "langchain.*",
-    "chromadb.*",
+    "google.*",
+    "firebase_admin.*",
+    "celery.*",
+    "redis.*",
 ]
 ignore_missing_imports = true
 
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+addopts = [
+    "--verbose",
+    "--color=yes",
+    "--cov=src",
+    "--cov-report=term-missing",
+    "--cov-report=html",
+]
+asyncio_mode = "auto"
+
 [tool.coverage.run]
-source = ["infinity_matrix"]
-omit = ["tests/*", "*/migrations/*"]
+source = ["src"]
+omit = [
+    "*/tests/*",
+    "*/test_*.py",
+]
 
 [tool.coverage.report]
 exclude_lines = [
@@ -147,6 +150,4 @@ exclude_lines = [
     "raise NotImplementedError",
     "if __name__ == .__main__.:",
     "if TYPE_CHECKING:",
-    "class .*\\bProtocol\\):",
-    "@(abc\\.)?abstractmethod",
 ]

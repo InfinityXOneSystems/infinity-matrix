@@ -1,404 +1,393 @@
-# Infinity Matrix - FAANG-Level Autonomous AI System
+# Infinity Matrix 🌌
 
-[![Python 3.9+](https://img.shields.io/badge/python-3.9+-blue.svg)](https://www.python.org/downloads/)
+> Enterprise-grade AI agent orchestration platform for seamless human-AI collaboration
+
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Python 3.11+](https://img.shields.io/badge/python-3.11+-blue.svg)](https://www.python.org/downloads/)
+[![FastAPI](https://img.shields.io/badge/FastAPI-0.109+-green.svg)](https://fastapi.tiangolo.com/)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 
-A production-grade, fully autonomous AI system with Vision Cortex, Auto-Builder, Agent Registry, and comprehensive integrations. Built to FAANG-level standards with enterprise-ready features.
+## Overview
 
-## 🚀 Features
+The **Infinity Matrix** is an advanced AI agent orchestration platform designed to coordinate multiple AI agents, integrations, and workflows across distributed systems. Built with enterprise-grade reliability, security, and scalability in mind, it enables organizations to harness the full potential of AI agents through intelligent orchestration and clear role separation.
 
-### Core Components
+### Key Features
 
-- **Vision Cortex**: Advanced multimodal vision processing with OCR, object detection, and image analysis
-- **Auto-Builder**: Automated build, deployment, and CI/CD pipeline management
-- **Agent Registry**: Dynamic agent registration, discovery, and lifecycle management
-- **Proof Logs**: Comprehensive audit trails, verification, and performance tracking
-- **Working Agents**: Pre-built specialized agents for code analysis, documentation, testing, and review
+- 🤖 **Multi-Agent Orchestration**: Coordinate User, VS Code Copilot, and GitHub Copilot agents
+- 🔐 **Enterprise Security**: OAuth 2.0, JWT, RBAC, encryption at rest and in transit
+- 🚀 **High Performance**: FastAPI-based async API with <500ms response times
+- 🔄 **Self-Healing**: Automated failure detection, recovery, and rollback
+- 📊 **Real-Time Monitoring**: Comprehensive observability with metrics, logs, and traces
+- 🌐 **Multi-Cloud**: Support for Google Cloud, AWS, Azure integrations
+- 🔌 **Extensible**: Plugin architecture for custom agents and integrations
+- 📚 **Well-Documented**: Comprehensive API docs, guides, and examples
 
-### Enterprise Features
-
-- 🔒 **Production-Ready Security**: Rate limiting, authentication, and security scanning
-- 📊 **Observability**: Structured logging, metrics, and distributed tracing
-- 🔄 **Resilience**: Error handling, retries, circuit breakers, and health checks
-- 🎯 **Scalability**: Horizontal scaling, load balancing, and resource optimization
-- 🧪 **Quality Assurance**: Comprehensive test suite with unit, integration, and e2e tests
-
-## 📋 Table of Contents
-
-- [Quick Start](#quick-start)
-- [Architecture](#architecture)
-- [Installation](#installation)
-- [Configuration](#configuration)
-- [Usage](#usage)
-- [API Documentation](#api-documentation)
-- [Agent Development](#agent-development)
-- [Deployment](#deployment)
-- [Contributing](#contributing)
-- [License](#license)
-
-## ⚡ Quick Start
-
-```bash
-# Clone the repository
-git clone https://github.com/InfinityXOneSystems/infinity-matrix.git
-cd infinity-matrix
-
-# Install dependencies
-pip install -e .
-
-# Set up environment
-cp .env.example .env
-# Edit .env with your configuration
-
-# Run the system
-python -m infinity_matrix.main
-
-# Or use the CLI
-infinity-matrix start --config config.yaml
-```
-
-## 🏗️ Architecture
+## Architecture
 
 ```
-infinity-matrix/
-├── infinity_matrix/
-│   ├── core/                 # Core system components
-│   │   ├── config.py         # Configuration management
-│   │   ├── logging.py        # Structured logging
-│   │   ├── metrics.py        # Performance metrics
-│   │   └── base.py           # Base classes
-│   ├── vision/               # Vision Cortex
-│   │   ├── processor.py      # Image/video processing
-│   │   ├── ocr.py            # OCR capabilities
-│   │   └── detection.py      # Object detection
-│   ├── builder/              # Auto-Builder
-│   │   ├── pipeline.py       # Build pipeline
-│   │   ├── deployer.py       # Deployment automation
-│   │   └── ci_cd.py          # CI/CD integration
-│   ├── agents/               # Agent Registry & Agents
-│   │   ├── registry.py       # Agent registration/discovery
-│   │   ├── base_agent.py     # Base agent class
-│   │   ├── code_agent.py     # Code analysis agent
-│   │   ├── doc_agent.py      # Documentation agent
-│   │   ├── test_agent.py     # Testing agent
-│   │   └── review_agent.py   # Review agent
-│   ├── integrations/         # External integrations
-│   │   ├── api/              # REST API gateway
-│   │   ├── database.py       # Database integration
-│   │   └── services.py       # External services
-│   ├── logs/                 # Proof Logs system
-│   │   ├── audit.py          # Audit trails
-│   │   ├── verification.py   # Verification system
-│   │   └── storage.py        # Log storage
-│   └── main.py               # Application entry point
-├── tests/                    # Comprehensive test suite
-├── docs/                     # Documentation
-├── config/                   # Configuration files
-└── scripts/                  # Utility scripts
+┌─────────────┐
+│   Clients   │  ← Web, Mobile, CLI
+└──────┬──────┘
+       ↓
+┌──────────────────┐
+│   API Gateway    │  ← FastAPI, Auth, Rate Limiting
+└──────┬───────────┘
+       ↓
+┌───────────────────────┐
+│ Matrix Orchestrator   │  ← Task Distribution, Load Balancing
+└──────┬────────────────┘
+       ↓
+┌────────────────────────────────┐
+│  Agents: User | VSCode | GitHub │  ← AI Agent Layer
+└──────┬─────────────────────────┘
+       ↓
+┌──────────────────────────────────┐
+│  Integrations: Vertex AI,        │  ← External Services
+│  Firebase, Hostinger, Workspace  │
+└──────────────────────────────────┘
 ```
 
-### System Flow
+See [docs/architecture.md](docs/architecture.md) for detailed architecture documentation.
 
-```
-┌─────────────┐     ┌──────────────┐     ┌──────────────┐
-│   Vision    │────▶│    Agent     │────▶│ Auto-Builder │
-│   Cortex    │     │   Registry   │     │              │
-└─────────────┘     └──────────────┘     └──────────────┘
-      │                    │                     │
-      │                    ▼                     ▼
-      │             ┌──────────────┐     ┌──────────────┐
-      │             │   Working    │     │  Proof Logs  │
-      └────────────▶│   Agents     │────▶│   System     │
-                    └──────────────┘     └──────────────┘
-```
-
-## 💿 Installation
+## Quick Start
 
 ### Prerequisites
 
-- Python 3.9 or higher
-- Redis (for caching and message queue)
-- PostgreSQL (optional, for persistent storage)
+- Python 3.11 or higher
+- Docker and Docker Compose (optional, for containerized deployment)
+- Google Cloud account (for integrations)
+- Git
 
-### Standard Installation
+### Installation
 
-```bash
-pip install -e .
-```
-
-### Development Installation
+1. **Clone the repository**
 
 ```bash
-pip install -e ".[dev]"
+git clone https://github.com/InfinityXOneSystems/infinity-matrix.git
+cd infinity-matrix
 ```
 
-### Docker Installation
+2. **Create virtual environment**
+
+```bash
+python -m venv venv
+source venv/bin/activate  # On Windows: venv\Scripts\activate
+```
+
+3. **Install dependencies**
+
+```bash
+pip install -r requirements.txt
+```
+
+4. **Configure environment**
+
+```bash
+cp .env.example .env
+# Edit .env with your configuration
+```
+
+5. **Run database migrations**
+
+```bash
+alembic upgrade head
+```
+
+6. **Start the API gateway**
+
+```bash
+uvicorn src.gateway.main:app --reload
+```
+
+The API will be available at `http://localhost:8000`. Visit `http://localhost:8000/docs` for interactive API documentation.
+
+### Docker Deployment
 
 ```bash
 docker-compose up -d
 ```
 
-## ⚙️ Configuration
+## Documentation
 
-### Environment Variables
+### Core Documentation
 
-Create a `.env` file in the root directory:
+- **[Architecture Guide](docs/architecture.md)**: System design, components, and patterns
+- **[Agent Contracts](docs/agent-contract.md)**: Agent roles, responsibilities, and boundaries
+- **[Security Policy](docs/security.md)**: Security practices, compliance, and guidelines
+- **[Product Roadmap](docs/roadmap.md)**: Feature roadmap and strategic goals
+- **[Collaboration Guide](COLLABORATION.md)**: Agent onboarding and collaboration protocols
 
-```env
-# System Configuration
-ENVIRONMENT=production
-DEBUG=false
-LOG_LEVEL=INFO
+### API Documentation
 
-# API Configuration
-API_HOST=0.0.0.0
-API_PORT=8000
-API_WORKERS=4
+- **OpenAPI/Swagger**: `http://localhost:8000/docs` (when server is running)
+- **ReDoc**: `http://localhost:8000/redoc` (alternative API documentation)
 
-# Database
-DATABASE_URL=postgresql://user:pass@localhost:5432/infinity_matrix
-REDIS_URL=redis://localhost:6379/0
+### Developer Guides
 
-# Vision Cortex
-VISION_MODEL=openai/clip-vit-base-patch32
-VISION_BATCH_SIZE=32
+Coming soon:
+- Python SDK documentation
+- CLI tool reference
+- Custom agent development guide
+- Integration adapter development
 
-# Agent Registry
-AGENT_POOL_SIZE=10
-AGENT_TIMEOUT=300
+## Agent System
 
-# Security
-SECRET_KEY=your-secret-key-here
-API_KEY_HEADER=X-API-Key
+The Infinity Matrix uses a three-tier agent architecture:
 
-# Monitoring
-PROMETHEUS_PORT=9090
-ENABLE_TRACING=true
+### 1. User Agent
+
+**Role**: Human operator and decision-maker
+
+**Capabilities**:
+- Define requirements and objectives
+- Approve or reject changes
+- Override automated decisions
+- Configure system policies
+
+### 2. VS Code Copilot
+
+**Role**: Local development assistant (local/devops)
+
+**Capabilities**:
+- Generate and refactor code
+- Create and run tests
+- Local Git operations
+- Development environment management
+
+### 3. GitHub Copilot
+
+**Role**: Remote orchestrator (remote/architect)
+
+**Capabilities**:
+- Manage Pull Requests
+- CI/CD orchestration
+- Multi-repository coordination
+- Production deployments
+
+See [docs/agent-contract.md](docs/agent-contract.md) for detailed agent specifications.
+
+## Project Structure
+
+```
+infinity-matrix/
+├── .github/
+│   └── workflows/          # CI/CD workflows
+├── docs/                   # Documentation
+│   ├── architecture.md
+│   ├── agent-contract.md
+│   ├── security.md
+│   └── roadmap.md
+├── src/
+│   ├── gateway/           # API Gateway (FastAPI)
+│   ├── orchestrator/      # Matrix orchestrator
+│   ├── agents/            # Agent implementations
+│   ├── integrations/      # Integration adapters
+│   │   ├── vertex_ai/
+│   │   ├── firebase/
+│   │   ├── hostinger/
+│   │   └── workspace/
+│   ├── monitoring/        # Monitoring and observability
+│   ├── logging/           # Logging infrastructure
+│   └── audit/             # Audit trail
+├── tests/                 # Test suite
+├── policies/              # Policy-as-code
+├── scripts/               # Utility scripts
+├── .env.example          # Environment template
+├── requirements.txt      # Python dependencies
+├── pyproject.toml        # Project configuration
+├── docker-compose.yml    # Docker composition
+├── Dockerfile            # Container image
+└── README.md             # This file
 ```
 
-### Configuration File
+## Development
 
-See `config/config.yaml` for detailed configuration options.
-
-## 🎯 Usage
-
-### Starting the System
+### Setup Development Environment
 
 ```bash
-# Start the main application
-python -m infinity_matrix.main
-
-# Start with custom config
-python -m infinity_matrix.main --config /path/to/config.yaml
-
-# Start in development mode
-python -m infinity_matrix.main --dev
-```
-
-### Using the API
-
-```python
-import httpx
-
-# Initialize client
-client = httpx.Client(base_url="http://localhost:8000")
-
-# Process image with Vision Cortex
-response = client.post(
-    "/api/v1/vision/analyze",
-    files={"image": open("image.jpg", "rb")},
-    data={"task": "ocr"}
-)
-result = response.json()
-
-# Register an agent
-response = client.post(
-    "/api/v1/agents/register",
-    json={
-        "name": "my-agent",
-        "type": "code_analysis",
-        "capabilities": ["python", "javascript"]
-    }
-)
-
-# Execute agent task
-response = client.post(
-    "/api/v1/agents/execute",
-    json={
-        "agent_id": "my-agent",
-        "task": "analyze",
-        "input": {"code": "def hello(): print('world')"}
-    }
-)
-```
-
-### Using Agents Programmatically
-
-```python
-from infinity_matrix.agents import AgentRegistry, CodeAgent
-
-# Initialize registry
-registry = AgentRegistry()
-
-# Create and register agent
-agent = CodeAgent(name="code-analyzer")
-registry.register(agent)
-
-# Execute agent task
-result = await agent.execute({
-    "action": "analyze",
-    "code": "your code here"
-})
-```
-
-## 📚 API Documentation
-
-Once running, access the interactive API documentation at:
-
-- Swagger UI: `http://localhost:8000/docs`
-- ReDoc: `http://localhost:8000/redoc`
-- OpenAPI Schema: `http://localhost:8000/openapi.json`
-
-## 🤖 Agent Development
-
-### Creating Custom Agents
-
-```python
-from infinity_matrix.agents import BaseAgent
-from typing import Dict, Any
-
-class CustomAgent(BaseAgent):
-    """Custom agent implementation."""
-    
-    def __init__(self, name: str):
-        super().__init__(name=name, agent_type="custom")
-    
-    async def execute(self, task: Dict[str, Any]) -> Dict[str, Any]:
-        """Execute agent task."""
-        # Your implementation here
-        return {"status": "success", "result": "..."}
-    
-    async def validate(self, task: Dict[str, Any]) -> bool:
-        """Validate task input."""
-        return "action" in task
-
-# Register your agent
-from infinity_matrix.agents import get_registry
-registry = get_registry()
-registry.register(CustomAgent(name="my-custom-agent"))
-```
-
-See [docs/AGENT_DEVELOPMENT.md](docs/AGENT_DEVELOPMENT.md) for detailed guide.
-
-## 🚀 Deployment
-
-### Production Deployment
-
-```bash
-# Using Docker Compose
-docker-compose -f docker-compose.prod.yml up -d
-
-# Using Kubernetes
-kubectl apply -f k8s/
-
-# Using systemd
-sudo systemctl enable infinity-matrix
-sudo systemctl start infinity-matrix
-```
-
-### Health Checks
-
-```bash
-# System health
-curl http://localhost:8000/health
-
-# Readiness check
-curl http://localhost:8000/ready
-
-# Metrics
-curl http://localhost:9090/metrics
-```
-
-See [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md) for comprehensive deployment guide.
-
-## 🧪 Testing
-
-```bash
-# Run all tests
-pytest
-
-# Run with coverage
-pytest --cov=infinity_matrix --cov-report=html
-
-# Run specific test suite
-pytest tests/test_agents/
-
-# Run integration tests
-pytest tests/integration/
-
-# Run e2e tests
-pytest tests/e2e/
-```
-
-## 📊 Monitoring
-
-The system includes built-in monitoring and observability:
-
-- **Metrics**: Prometheus-compatible metrics endpoint
-- **Logging**: Structured JSON logging with correlation IDs
-- **Tracing**: OpenTelemetry distributed tracing
-- **Health Checks**: Liveness and readiness probes
-
-## 🔐 Security
-
-- API key authentication
-- Rate limiting per endpoint
-- Input validation and sanitization
-- Security headers (CORS, CSP, etc.)
-- Regular security scanning
-- Audit logging for all operations
-
-## 🤝 Contributing
-
-We welcome contributions! Please see [CONTRIBUTING.md](docs/CONTRIBUTING.md) for guidelines.
-
-### Development Setup
-
-```bash
-# Clone the repository
-git clone https://github.com/InfinityXOneSystems/infinity-matrix.git
-cd infinity-matrix
-
-# Create virtual environment
-python -m venv venv
-source venv/bin/activate  # or `venv\Scripts\activate` on Windows
-
 # Install development dependencies
-pip install -e ".[dev]"
+pip install -r requirements-dev.txt
 
 # Install pre-commit hooks
 pre-commit install
 
 # Run tests
 pytest
+
+# Run linters
+ruff check .
+mypy src/
+
+# Format code
+black src/ tests/
 ```
 
-## 📄 License
+### Running Tests
+
+```bash
+# Run all tests
+pytest
+
+# Run with coverage
+pytest --cov=src --cov-report=html
+
+# Run specific test file
+pytest tests/test_gateway.py
+
+# Run with verbose output
+pytest -v
+```
+
+### Code Quality
+
+We maintain high code quality standards:
+
+- **Style Guide**: PEP 8, enforced with Black and Ruff
+- **Type Hints**: Required for all functions (checked with mypy)
+- **Test Coverage**: Minimum 80% (target 90%+)
+- **Documentation**: Google-style docstrings
+
+## Contributing
+
+We welcome contributions! Please see [COLLABORATION.md](COLLABORATION.md) for guidelines on:
+
+- Agent collaboration protocols
+- Code contribution process
+- Testing requirements
+- Documentation standards
+- Security practices
+
+### Contribution Process
+
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Make your changes with tests
+4. Ensure all tests pass and linting succeeds
+5. Commit with descriptive messages
+6. Push to your fork
+7. Open a Pull Request
+
+## Deployment
+
+### Staging Deployment
+
+```bash
+# Deploy to staging
+./scripts/deploy-staging.sh
+
+# Verify deployment
+curl https://staging.infinitymatrix.example.com/health
+```
+
+### Production Deployment
+
+Production deployments require approval and are automated via GitHub Actions:
+
+1. Create a release PR
+2. Get approval from 2+ reviewers
+3. Merge to `main` branch
+4. GitHub Copilot orchestrates deployment
+5. Automated health checks and monitoring
+
+See [.github/workflows/cd.yml](.github/workflows/cd.yml) for deployment pipeline details.
+
+## Monitoring & Observability
+
+### Metrics
+
+- **Prometheus**: `http://localhost:9090`
+- **Grafana**: `http://localhost:3000`
+
+### Logging
+
+- **Cloud Logging**: Centralized log aggregation
+- **Log Level**: INFO (production), DEBUG (development)
+
+### Tracing
+
+- **OpenTelemetry**: Distributed tracing
+- **Jaeger UI**: `http://localhost:16686`
+
+### Health Checks
+
+- **API Health**: `GET /health`
+- **Readiness**: `GET /ready`
+- **Liveness**: `GET /alive`
+
+## Security
+
+Security is a top priority. We implement:
+
+- 🔐 OAuth 2.0 / OpenID Connect authentication
+- 🔑 JWT-based session management
+- 🛡️ Role-Based Access Control (RBAC)
+- 🔒 Encryption at rest (AES-256) and in transit (TLS 1.3)
+- 📝 Comprehensive audit logging
+- 🚨 Automated vulnerability scanning
+- ⚠️ Security incident response procedures
+
+See [docs/security.md](docs/security.md) for complete security documentation.
+
+### Reporting Security Issues
+
+**DO NOT** create public GitHub issues for security vulnerabilities.
+
+Email: security@infinitymatrix.example.com  
+PGP Key: Available at keybase.io/infinitymatrix
+
+## Support
+
+### Community Support
+
+- **GitHub Issues**: [Report bugs or request features](https://github.com/InfinityXOneSystems/infinity-matrix/issues)
+- **Discussions**: [Ask questions and share ideas](https://github.com/InfinityXOneSystems/infinity-matrix/discussions)
+- **Stack Overflow**: Tag questions with `infinity-matrix`
+
+### Enterprise Support
+
+For enterprise support, SLA guarantees, and custom development:
+- Email: enterprise@infinitymatrix.example.com
+- Website: https://infinitymatrix.example.com/enterprise
+
+## Roadmap
+
+Current focus areas (Q1 2025):
+
+- ✅ Core infrastructure and agent framework
+- 🔄 Integration adapters (Vertex AI, Firebase, Hostinger, Workspace)
+- 🔄 CI/CD pipeline automation
+- ⏳ Python SDK and CLI tool
+- ⏳ Production hardening and monitoring
+
+See [docs/roadmap.md](docs/roadmap.md) for the complete roadmap.
+
+## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-## 🙏 Acknowledgments
+## Acknowledgments
 
-Built with modern Python best practices and inspired by FAANG-level system design principles.
+- FastAPI for the excellent async web framework
+- Google Cloud for infrastructure and AI services
+- The open-source community for invaluable tools and libraries
+- All contributors who help improve the Infinity Matrix
 
-## 📞 Support
+## Links
 
-- 📧 Email: support@infinityxone.com
-- 💬 Discord: [Join our community](https://discord.gg/infinityxone)
-- 🐛 Issues: [GitHub Issues](https://github.com/InfinityXOneSystems/infinity-matrix/issues)
-- 📖 Documentation: [Full Documentation](https://github.com/InfinityXOneSystems/infinity-matrix/wiki)
+- **Website**: https://infinitymatrix.example.com
+- **Documentation**: https://docs.infinitymatrix.example.com
+- **API Reference**: https://api.infinitymatrix.example.com/docs
+- **Status Page**: https://status.infinitymatrix.example.com
+- **Blog**: https://blog.infinitymatrix.example.com
 
 ---
 
-Made with ❤️ by InfinityXOne Systems
+<p align="center">
+  <strong>Built with ❤️ by the Infinity Matrix team</strong>
+</p>
+
+<p align="center">
+  <a href="https://github.com/InfinityXOneSystems/infinity-matrix/stargazers">⭐ Star us on GitHub</a> •
+  <a href="https://twitter.com/infinitymatrix">🐦 Follow on Twitter</a> •
+  <a href="https://infinitymatrix.example.com">🌐 Visit Website</a>
+</p>
