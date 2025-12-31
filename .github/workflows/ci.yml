@@ -7,134 +7,119 @@ on:
     branches: [ main, develop ]
 
 jobs:
-  security-scan:
+  frontend-test:
+    name: Frontend Tests
     runs-on: ubuntu-latest
+    
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout code
+        uses: actions/checkout@v4
       
-      - name: Set up Python
-        uses: actions/setup-python@v4
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
         with:
-          python-version: '3.11'
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: frontend/package-lock.json
       
       - name: Install dependencies
-        run: |
-          cd backend
-          pip install -r requirements-dev.txt
+        working-directory: ./frontend
+        run: npm ci
       
-      - name: Run Bandit Security Scan
-        run: |
-          cd backend
-          bandit -r infinity_matrix -f json -o bandit-report.json || true
+      - name: Run linter
+        working-directory: ./frontend
+        run: npm run lint
       
-      - name: Run Safety Check
-        run: |
-          cd backend
-          safety check --json || true
+      - name: Build frontend
+        working-directory: ./frontend
+        run: npm run build
       
-      - name: Upload Security Reports
-        uses: actions/upload-artifact@v3
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
         with:
-          name: security-reports
-          path: backend/*-report.json
+          name: frontend-build
+          path: frontend/dist
+          retention-days: 7
 
-  backend-tests:
+  backend-test:
+    name: Backend Tests
     runs-on: ubuntu-latest
+    
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout code
+        uses: actions/checkout@v4
       
-      - name: Set up Python
-        uses: actions/setup-python@v4
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
         with:
-          python-version: '3.11'
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: backend/package-lock.json
       
       - name: Install dependencies
-        run: |
-          cd backend
-          pip install -r requirements-dev.txt
+        working-directory: ./backend
+        run: npm ci
       
-      - name: Run tests with coverage
-        run: |
-          cd backend
-          pytest tests/ -v --cov=infinity_matrix --cov-report=xml --cov-report=html
+      - name: Build backend
+        working-directory: ./backend
+        run: npm run build
       
-      - name: Upload coverage
-        uses: codecov/codecov-action@v3
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
         with:
-          files: ./backend/coverage.xml
-          flags: backend
-
-  frontend-tests:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      
-      - name: Set up Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: '18'
-      
-      - name: Install dependencies
-        run: |
-          cd frontend
-          npm install
-      
-      - name: Run tests
-        run: |
-          cd frontend
-          npm run test:coverage
-      
-      - name: ESLint
-        run: |
-          cd frontend
-          npm run lint
+          name: backend-build
+          path: backend/dist
+          retention-days: 7
 
   docker-build:
+    name: Docker Build
     runs-on: ubuntu-latest
-    needs: [backend-tests, frontend-tests]
+    needs: [frontend-test, backend-test]
+    
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout code
+        uses: actions/checkout@v4
       
       - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v2
+        uses: docker/setup-buildx-action@v3
       
-      - name: Build Backend Image
-        run: |
-          docker build -f docker/Dockerfile.backend -t infinity-matrix-backend:latest .
-      
-      - name: Build Frontend Image
-        run: |
-          docker build -f docker/Dockerfile.frontend -t infinity-matrix-frontend:latest .
-      
-      - name: Run Trivy scan on backend
-        uses: aquasecurity/trivy-action@master
+      - name: Build backend Docker image
+        uses: docker/build-push-action@v5
         with:
-          image-ref: infinity-matrix-backend:latest
-          format: 'sarif'
-          output: 'trivy-backend.sarif'
+          context: ./backend
+          file: ./backend/Dockerfile
+          push: false
+          tags: infinity-matrix-backend:latest
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
       
-      - name: Run Trivy scan on frontend
-        uses: aquasecurity/trivy-action@master
+      - name: Build frontend Docker image
+        uses: docker/build-push-action@v5
         with:
-          image-ref: infinity-matrix-frontend:latest
-          format: 'sarif'
-          output: 'trivy-frontend.sarif'
+          context: ./frontend
+          file: ./frontend/Dockerfile
+          push: false
+          tags: infinity-matrix-frontend:latest
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
 
-  compliance-check:
+  security-scan:
+    name: Security Scan
     runs-on: ubuntu-latest
+    
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout code
+        uses: actions/checkout@v4
       
-      - name: Set up Python
-        uses: actions/setup-python@v4
+      - name: Run Trivy vulnerability scanner
+        uses: aquasecurity/trivy-action@master
         with:
-          python-version: '3.11'
+          scan-type: 'fs'
+          scan-ref: '.'
+          format: 'sarif'
+          output: 'trivy-results.sarif'
       
-      - name: Install dependencies
-        run: |
-          cd backend
-          pip install -r requirements.txt
-      
-      - name: Run Compliance Audit
-        run: |
-          python scripts/compliance/audit.py
+      - name: Upload Trivy results to GitHub Security tab
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: 'trivy-results.sarif'

@@ -1,40 +1,52 @@
-import React from 'react';
-import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
-import './App.css';
-import DiscoveryDashboard from './components/DiscoveryDashboard';
-import VisionCortex from './vision-cortex/VisionCortex';
+import { useEffect } from 'react';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { MainLayout } from './components/layout/MainLayout';
+import { DashboardPage } from './pages/DashboardPage';
+import { AgentsPage } from './pages/AgentsPage';
+import { ChatPage } from './pages/ChatPage';
+import { wsService } from './services/websocket';
+import { useAuthStore } from './store/authStore';
+
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      refetchOnWindowFocus: false,
+      retry: 1,
+    },
+  },
+});
 
 function App() {
+  const { token } = useAuthStore();
+
+  useEffect(() => {
+    // Connect to WebSocket
+    wsService.connect(token || undefined);
+
+    return () => {
+      wsService.disconnect();
+    };
+  }, [token]);
+
   return (
-    <Router>
-      <div className="App">
-        <header className="App-header">
-          <div className="container">
-            <div className="header-content">
-              <h1>🔮 Infinity Matrix</h1>
-              <p className="tagline">Intelligence Discovery System</p>
-            </div>
-            <nav className="nav">
-              <Link to="/" className="nav-link">Discovery</Link>
-              <Link to="/vision-cortex" className="nav-link">Vision Cortex</Link>
-            </nav>
-          </div>
-        </header>
-        
-        <main className="container">
-          <Routes>
-            <Route path="/" element={<DiscoveryDashboard />} />
-            <Route path="/vision-cortex" element={<VisionCortex />} />
-          </Routes>
-        </main>
-        
-        <footer className="App-footer">
-          <div className="container">
-            <p>&copy; 2025 Infinity Matrix. Enterprise-Grade Intelligence Discovery Platform.</p>
-          </div>
-        </footer>
-      </div>
-    </Router>
+    <QueryClientProvider client={queryClient}>
+      <BrowserRouter>
+        <Routes>
+          <Route path="/" element={<MainLayout />}>
+            <Route index element={<DashboardPage />} />
+            <Route path="agents" element={<AgentsPage />} />
+            <Route path="chat" element={<ChatPage />} />
+            <Route path="data-sources" element={<DashboardPage />} />
+            <Route path="monitor" element={<DashboardPage />} />
+            <Route path="github" element={<DashboardPage />} />
+            <Route path="users" element={<DashboardPage />} />
+            <Route path="settings" element={<DashboardPage />} />
+            <Route path="*" element={<Navigate to="/" replace />} />
+          </Route>
+        </Routes>
+      </BrowserRouter>
+    </QueryClientProvider>
   );
 }
 

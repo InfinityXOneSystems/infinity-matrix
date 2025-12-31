@@ -1,27 +1,36 @@
-FROM python:3.11-slim
+# Backend Dockerfile
+FROM node:20-alpine AS builder
 
 WORKDIR /app
 
-# Install system dependencies
-RUN apt-get update && apt-get install -y \
-    gcc \
-    postgresql-client \
-    && rm -rf /var/lib/apt/lists/*
+# Copy package files
+COPY package*.json ./
 
-# Copy requirements first for better caching
-COPY requirements.txt .
+# Install dependencies
+RUN npm ci
 
-# Install Python dependencies
-RUN pip install --no-cache-dir -r requirements.txt
-
-# Copy application code
+# Copy source
 COPY . .
 
-# Create necessary directories
-RUN mkdir -p /tmp/uploads /tmp/reports
+# Build TypeScript
+RUN npm run build
+
+# Production stage
+FROM node:20-alpine
+
+WORKDIR /app
+
+# Copy package files
+COPY package*.json ./
+
+# Install production dependencies only
+RUN npm ci --only=production
+
+# Copy built files
+COPY --from=builder /app/dist ./dist
 
 # Expose port
-EXPOSE 8000
+EXPOSE 3000
 
-# Run the application
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
+# Start server
+CMD ["node", "dist/index.js"]
