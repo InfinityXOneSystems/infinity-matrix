@@ -1,0 +1,64 @@
+infinity_matrix:
+  agents:
+    heartbeat_interval: 30
+    max_concurrent: 10
+    registry_backend: memory
+    timeout: 300
+  builder:
+    cache_enabled: true
+    enabled: true
+    parallel_builds: 4
+    platforms:
+    - python
+    - node
+    - go
+  data_dir: /home/runner/.infinity-matrix
+  debug: false
+  docs:
+    auto_generate: true
+    enabled: true
+    formats:
+    - markdown
+    - html
+    - pdf
+    update_on_commit: true
+  etl:
+    enabled: true
+    max_workers: 10
+    rate_limit: 100
+    retry_attempts: 3
+  index:
+    backend: elasticsearch
+    embedding_model: text-embedding-ada-002
+    enabled: true
+    semantic_search: true
+  integrations:
+    gcp:
+      enabled: false
+    github:
+      api_url: https://api.github.com
+      enabled: true
+    hostinger:
+      api_url: https://api.hostinger.com
+      enabled: false
+    vscode:
+      enabled: true
+      extension_id: infinityxone.infinity-matrix
+      lsp_enabled: true
+  log_level: INFO
+  pr_engine:
+    auto_merge: false
+    auto_review: true
+    conflict_resolution: manual
+    enabled: true
+    required_approvals: 1
+  taxonomy:
+    auto_classify: true
+    categories: []
+    enabled: true
+  vision:
+    enabled: true
+    max_image_size: 20000000
+    models:
+    - gpt-4-vision
+    ocr_enabled: true

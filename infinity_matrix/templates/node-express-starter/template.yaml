@@ -1,0 +1,52 @@
+name: node-express-starter
+description: Express.js-based Node.js REST API with TypeScript
+category: node
+language: javascript
+version: 1.0.0
+
+modules:
+  - api
+  - database
+  - auth
+  - logging
+  - testing
+
+parameters:
+  - name: app_name
+    type: string
+    default: my-api
+    description: Application name
+  
+  - name: use_typescript
+    type: boolean
+    default: true
+    description: Use TypeScript
+  
+  - name: include_auth
+    type: boolean
+    default: true
+    description: Include authentication module
+  
+  - name: database
+    type: choice
+    choices: [postgresql, mysql, mongodb]
+    default: postgresql
+    description: Database to use
+
+features:
+  - Express.js framework
+  - TypeScript support
+  - Prisma ORM or Mongoose
+  - JWT authentication
+  - Comprehensive logging with Winston
+  - Docker containerization
+  - Testing with Jest
+
+requirements:
+  node: ">=18.0.0"
+  
+stack:
+  - Express.js
+  - TypeScript
+  - Prisma/Mongoose
+  - Jest

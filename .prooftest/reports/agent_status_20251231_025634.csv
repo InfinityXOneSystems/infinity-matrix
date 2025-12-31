@@ -1,0 +1,2 @@
+agent_id,type,status,success_count,error_count,registered_at,last_heartbeat
+cd_orchestrator,orchestrator,healthy,1,0,2025-12-31T02:56:34.225068,2025-12-31T02:56:34.225446
