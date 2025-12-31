@@ -1,0 +1,80 @@
+{
+  "generated_at": "2025-12-31T02:56:34.242998",
+  "total_features": 14,
+  "operational_count": 14,
+  "missing_count": 0,
+  "compliance_percentage": 100.0,
+  "operational_features": [
+    {
+      "feature": "agent_health_monitoring",
+      "description": "Monitor health status of all agents",
+      "status": "operational"
+    },
+    {
+      "feature": "stub_todo_scanning",
+      "description": "Scan codebase for TODOs and stubs",
+      "status": "operational"
+    },
+    {
+      "feature": "pr_automation",
+      "description": "Automate PR creation, review, and merge",
+      "status": "operational"
+    },
+    {
+      "feature": "self_healing",
+      "description": "Automatic issue detection and resolution",
+      "status": "operational"
+    },
+    {
+      "feature": "zero_intervention",
+      "description": "Trigger automated actions without manual intervention",
+      "status": "operational"
+    },
+    {
+      "feature": "audit_logging",
+      "description": "Persistent audit trail of all operations",
+      "status": "operational"
+    },
+    {
+      "feature": "dashboard_web",
+      "description": "Web-based real-time dashboard",
+      "status": "operational"
+    },
+    {
+      "feature": "dashboard_cli",
+      "description": "CLI-based dashboard",
+      "status": "operational"
+    },
+    {
+      "feature": "export_markdown",
+      "description": "Export reports in Markdown format",
+      "status": "operational"
+    },
+    {
+      "feature": "export_csv",
+      "description": "Export data in CSV format",
+      "status": "operational"
+    },
+    {
+      "feature": "export_json",
+      "description": "Export data in JSON format",
+      "status": "operational"
+    },
+    {
+      "feature": "workflow_tracking",
+      "description": "Track workflow completions and metrics",
+      "status": "operational"
+    },
+    {
+      "feature": "proof_artifacts",
+      "description": "Persistent proof/audit artifacts",
+      "status": "operational"
+    },
+    {
+      "feature": "gap_analysis",
+      "description": "Compliance and gap tracking",
+      "status": "operational"
+    }
+  ],
+  "missing_features": []
+}
