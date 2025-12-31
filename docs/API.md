@@ -1,424 +1,444 @@
-# API Documentation
+# API Reference
 
-## Base URL
-- Development: `http://localhost:8000`
-- Production: `https://your-domain.com`
+## Command-Line Interface
 
-## Authentication
-Currently, the API does not require authentication. For production, implement JWT or OAuth2.
+### Global Options
 
-## WebSocket Connection
-
-### Connect to WebSocket
-```javascript
-const ws = new WebSocket('ws://localhost:8000/ws?client_id=demo-client');
-
-ws.onopen = () => console.log('Connected');
-ws.onmessage = (event) => {
-    const message = JSON.parse(event.data);
-    console.log('Received:', message);
-};
+```bash
+infinity-matrix --config <path> <command>
 ```
 
-### Message Types
-All WebSocket messages follow this structure:
-```json
-{
-  "type": "message_type",
-  "data": {},
-  "timestamp": "2025-12-31T12:00:00Z"
-}
+**Options:**
+- `--config`: Path to configuration file (default: config/config.yaml)
+
+### Commands
+
+#### `ingest`
+
+Start data ingestion for specified industry or source.
+
+```bash
+infinity-matrix ingest [--industry INDUSTRY] [--source SOURCE]
 ```
 
-#### Message Types:
-- `connection_established` - Initial connection confirmation
-- `lead_created` - New lead added
-- `call_started` - Voice call initiated
-- `call_updated` - Call status or information updated
-- `data_enriched` - Lead data enrichment completed
-- `calendar_updated` - Calendar event modified
-- `crm_updated` - CRM data changed
+**Options:**
+- `--industry`: Industry ID to ingest (e.g., technology, finance)
+- `--source`: Specific source ID to ingest
 
-## REST API Endpoints
+**Examples:**
+```bash
+# Ingest all industries
+infinity-matrix ingest
 
-### Health Check
+# Ingest specific industry
+infinity-matrix ingest --industry technology
 
-#### GET /health
-Check API health status.
-
-**Response:**
-```json
-{
-  "status": "healthy",
-  "timestamp": "2025-12-31T12:00:00Z",
-  "connected_clients": 3
-}
+# Ingest specific source
+infinity-matrix ingest --industry technology --source github_tech
 ```
 
----
+#### `normalize`
 
-### Lead Management
+Normalize raw data into structured format.
 
-#### POST /api/leads
-Create a new lead.
-
-**Request Body:**
-```json
-{
-  "phone_number": "+15551234567",
-  "name": "John Doe",
-  "email": "john@example.com",
-  "company": "Acme Corp"
-}
+```bash
+infinity-matrix normalize [--industry INDUSTRY] [--limit LIMIT]
 ```
 
-**Response:** `201 Created`
-```json
-{
-  "id": 1,
-  "phone_number": "+15551234567",
-  "name": "John Doe",
-  "email": "john@example.com",
-  "company": "Acme Corp",
-  "status": "new",
-  "priority": "medium",
-  "created_at": "2025-12-31T12:00:00Z"
-}
+**Options:**
+- `--industry`: Industry ID to normalize
+- `--limit`: Maximum number of items to normalize (default: 100)
+
+**Examples:**
+```bash
+# Normalize all raw data
+infinity-matrix normalize
+
+# Normalize specific industry
+infinity-matrix normalize --industry technology --limit 50
 ```
 
-#### GET /api/leads
-List all leads with optional filtering.
+#### `analyze`
 
-**Query Parameters:**
-- `skip` (int): Number of records to skip (default: 0)
-- `limit` (int): Maximum records to return (default: 100)
-- `status` (string): Filter by status (new, contacted, qualified, converted)
+Analyze normalized data using LLM.
 
-**Response:** `200 OK`
-```json
-[
-  {
-    "id": 1,
-    "phone_number": "+15551234567",
-    "name": "John Doe",
-    "status": "qualified",
-    "ai_score": 85.5,
-    "enrichment_data": {...},
-    "created_at": "2025-12-31T12:00:00Z"
-  }
-]
+```bash
+infinity-matrix analyze [--industry INDUSTRY] [--provider PROVIDER] [--prompt-type TYPE] [--limit LIMIT]
 ```
 
-#### GET /api/leads/{lead_id}
-Get a specific lead by ID.
+**Options:**
+- `--industry`: Industry ID to analyze
+- `--provider`: LLM provider (openai, ollama, anthropic) (default: openai)
+- `--prompt-type`: Prompt template type (insights, summary, categorization) (default: insights)
+- `--limit`: Maximum number of items to analyze (default: 50)
 
-**Response:** `200 OK`
+**Examples:**
+```bash
+# Analyze with OpenAI
+infinity-matrix analyze --industry technology --provider openai
 
-#### PATCH /api/leads/{lead_id}
-Update a lead.
+# Analyze with Ollama
+infinity-matrix analyze --industry finance --provider ollama --limit 25
 
-**Request Body:**
-```json
-{
-  "status": "qualified",
-  "priority": "high",
-  "callback_scheduled": "2025-12-31T14:00:00Z"
-}
+# Use summary prompt
+infinity-matrix analyze --prompt-type summary
 ```
 
-**Response:** `200 OK`
+#### `status`
 
-#### DELETE /api/leads/{lead_id}
-Delete a lead.
+Show ingestion status and statistics.
 
-**Response:** `204 No Content`
-
----
-
-### Voice & Call Management
-
-#### POST /api/voice/initiate-call
-Initiate an AI voice call to a lead.
-
-**Request Body:**
-```json
-{
-  "phone_number": "+15551234567"
-}
+```bash
+infinity-matrix status [--industry INDUSTRY]
 ```
 
-**Response:** `200 OK`
-```json
-{
-  "call_sid": "CA1234567890abcdef",
-  "status": "initiated",
-  "phone_number": "+15551234567",
-  "started_at": "2025-12-31T12:00:00Z"
-}
+**Options:**
+- `--industry`: Filter status by industry
+
+**Examples:**
+```bash
+# Overall status
+infinity-matrix status
+
+# Industry-specific status
+infinity-matrix status --industry technology
 ```
 
-**Possible Errors:**
-- `400 Bad Request` - Invalid phone number
-- `500 Internal Server Error` - Twilio API error
+#### `list-industries`
 
-#### POST /api/voice/twiml
-Twilio webhook endpoint for call initiation. Returns TwiML.
+List all configured industries.
 
-#### POST /api/voice/process
-Twilio webhook endpoint for processing voice input. Returns TwiML.
-
-#### POST /api/voice/status
-Twilio webhook endpoint for call status updates.
-
----
-
-### Calendar Management
-
-#### POST /api/calendar/events
-Create a new calendar event.
-
-**Request Body:**
-```json
-{
-  "lead_id": 1,
-  "sales_rep_id": 1,
-  "title": "Follow-up Call",
-  "description": "Discuss pricing and implementation",
-  "start_time": "2025-12-31T14:00:00Z",
-  "end_time": "2025-12-31T14:30:00Z",
-  "event_type": "callback"
-}
+```bash
+infinity-matrix list-industries
 ```
 
-**Response:** `201 Created`
-
-#### GET /api/calendar/events
-List calendar events.
-
-**Query Parameters:**
-- `start_date` (datetime): Filter events after this date
-- `end_date` (datetime): Filter events before this date
-
-**Response:** `200 OK`
-
-#### PATCH /api/calendar/events/{event_id}
-Update a calendar event (including drag-drop position).
-
-**Request Body:**
-```json
-{
-  "start_time": "2025-12-31T15:00:00Z",
-  "end_time": "2025-12-31T15:30:00Z",
-  "position_x": 150.5,
-  "position_y": 200.0
-}
+**Output:**
+```
+=== Configured Industries ===
+✓ technology: Technology & Software (Priority: 10)
+   Software development, cloud computing, AI/ML...
+✓ finance: Finance & Banking (Priority: 9)
+   Financial services, banking, fintech...
 ```
 
-**Response:** `200 OK`
+#### `list-sources`
 
-#### DELETE /api/calendar/events/{event_id}
-Delete a calendar event.
+List all sources for an industry.
 
-**Response:** `204 No Content`
-
----
-
-### Interactions & Notes
-
-#### POST /api/interactions
-Log an interaction with a lead.
-
-**Request Body:**
-```json
-{
-  "lead_id": 1,
-  "interaction_type": "call",
-  "content": "Discussed product features",
-  "duration": 300,
-  "outcome": "Interested",
-  "created_by": "sales_rep_1"
-}
+```bash
+infinity-matrix list-sources INDUSTRY_ID
 ```
 
-**Response:** `201 Created`
+**Arguments:**
+- `INDUSTRY_ID`: The industry identifier
 
-#### GET /api/leads/{lead_id}/interactions
-Get all interactions for a specific lead.
-
-**Response:** `200 OK`
-
-#### POST /api/notes
-Add a note to a lead.
-
-**Request Body:**
-```json
-{
-  "lead_id": 1,
-  "content": "Very interested in enterprise plan",
-  "created_by": "sales_rep_1"
-}
+**Examples:**
+```bash
+infinity-matrix list-sources technology
 ```
 
-**Response:** `201 Created`
+#### `list-seeds`
 
-#### GET /api/leads/{lead_id}/notes
-Get all notes for a specific lead.
+List all seed URLs for an industry.
 
-**Response:** `200 OK`
-
----
-
-### Sales Representatives
-
-#### GET /api/sales-reps
-List all active sales representatives.
-
-**Response:** `200 OK`
-```json
-[
-  {
-    "id": 1,
-    "name": "Jane Smith",
-    "email": "jane@company.com",
-    "leads_assigned": 15,
-    "leads_converted": 8,
-    "active": true
-  }
-]
+```bash
+infinity-matrix list-seeds INDUSTRY_ID
 ```
 
----
+**Arguments:**
+- `INDUSTRY_ID`: The industry identifier
 
-## Error Responses
-
-All error responses follow this structure:
-
-```json
-{
-  "detail": "Error message description"
-}
+**Examples:**
+```bash
+infinity-matrix list-seeds technology
 ```
 
-### HTTP Status Codes
-- `200 OK` - Successful request
-- `201 Created` - Resource created successfully
-- `204 No Content` - Successful deletion
-- `400 Bad Request` - Invalid request parameters
-- `404 Not Found` - Resource not found
-- `500 Internal Server Error` - Server error
+## Python API
 
----
+### Core Components
 
-## Rate Limiting
+#### Config
 
-Currently not implemented. For production:
-- Implement rate limiting per IP/user
-- Recommended: 100 requests per minute per IP
-- Use Redis for distributed rate limiting
+```python
+from infinity_matrix.core import Config, get_config, set_config
 
----
+# Load configuration
+config = Config.load("config/config.yaml")
 
-## CORS
+# Access settings
+db_config = config.database
+llm_config = config.llm
 
-Configure allowed origins in `.env`:
-```
-ALLOWED_ORIGINS=http://localhost:3000,https://your-domain.com
+# Get global config
+config = get_config()
+
+# Set global config
+set_config(config)
 ```
 
----
+#### SeedManager
+
+```python
+from infinity_matrix.core import SeedManager
+
+# Initialize
+seed_manager = SeedManager(config_dir="config")
+
+# Get industries
+all_industries = seed_manager.get_all_industries()
+enabled_industries = seed_manager.get_enabled_industries()
+specific_industry = seed_manager.get_industry("technology")
+
+# Get sources
+sources = seed_manager.get_sources_by_industry("technology")
+source = seed_manager.get_source("github_tech")
+
+# Get seeds
+seeds = seed_manager.get_seeds_by_industry("technology")
+all_seeds = seed_manager.get_all_seeds()
+```
+
+#### IngestionEngine
+
+```python
+from infinity_matrix.core import IngestionEngine, SeedManager, StateManager
+from infinity_matrix.connectors import ConnectorFactory
+
+# Initialize
+seed_manager = SeedManager()
+state_manager = StateManager()
+connector_factory = ConnectorFactory()
+
+engine = IngestionEngine(
+    seed_manager=seed_manager,
+    state_manager=state_manager,
+    connector_factory=connector_factory
+)
+
+# Run ingestion
+import asyncio
+stats = asyncio.run(engine.start_ingestion(industry_id="technology"))
+
+print(f"Completed: {stats.completed_tasks}/{stats.total_tasks}")
+print(f"Data collected: {stats.total_data_collected}")
+```
+
+#### StateManager
+
+```python
+from infinity_matrix.core import StateManager
+
+# Initialize
+state_manager = StateManager(storage_path="data")
+
+# Save/load tasks
+await state_manager.save_task(task)
+task = await state_manager.get_task(task_id)
+all_tasks = await state_manager.get_all_tasks()
+
+# Save/load data
+await state_manager.save_raw_data(raw_data)
+await state_manager.save_normalized_data(normalized_data)
+await state_manager.save_analysis_result(analysis)
+```
+
+### Connectors
+
+#### Creating Custom Connector
+
+```python
+from infinity_matrix.connectors.base import BaseConnector
+from infinity_matrix.models import DataSource, RawData
+
+class MyConnector(BaseConnector):
+    def can_handle(self, source_type: str) -> bool:
+        return source_type == "my_source_type"
+    
+    async def fetch(self, url: str, source: DataSource) -> List[RawData]:
+        # Implement fetching logic
+        raw_data_list = []
+        # ... fetch and parse data ...
+        return raw_data_list
+```
+
+#### Using ConnectorFactory
+
+```python
+from infinity_matrix.connectors import ConnectorFactory
+
+factory = ConnectorFactory()
+
+# Get connector
+connector = factory.get_connector("github")
+
+# Register custom connector
+factory.register_connector(MyConnector())
+
+# List supported types
+types = factory.list_supported_types()
+```
+
+### Pipelines
+
+#### NormalizationPipeline
+
+```python
+from infinity_matrix.pipelines import NormalizationPipeline
+
+pipeline = NormalizationPipeline()
+
+# Normalize data
+normalized = await pipeline.normalize(raw_data)
+
+print(f"Title: {normalized.title}")
+print(f"Quality: {normalized.quality_score}")
+print(f"Keywords: {normalized.keywords}")
+```
+
+### LLM Framework
+
+#### AnalysisFramework
+
+```python
+from infinity_matrix.llm import AnalysisFramework
+from infinity_matrix.core import StateManager
+
+state_manager = StateManager()
+framework = AnalysisFramework(state_manager, provider_name="openai")
+
+# Analyze single item
+result = await framework.analyze_data(
+    normalized_data,
+    prompt_type="insights"
+)
+
+# Batch analyze
+results = await framework.batch_analyze(
+    data_list,
+    prompt_type="summary"
+)
+
+# Custom prompt
+framework.add_custom_prompt("my_prompt", "Analyze: {content}")
+result = await framework.analyze_data(data, custom_prompt="my_prompt")
+```
+
+#### LLM Providers
+
+```python
+from infinity_matrix.llm import LLMFactory, OpenAIProvider, OllamaProvider
+
+# Create provider
+provider = LLMFactory.create_provider("openai", {
+    "api_key": "sk-...",
+    "model": "gpt-4o-mini",
+    "temperature": 0.7
+})
+
+# Use provider
+result = await provider.analyze(normalized_data, prompt_template)
+
+# Register custom provider
+LLMFactory.register_provider("my_llm", MyLLMProvider)
+```
 
 ## Data Models
 
-### Lead
-```typescript
-interface Lead {
-  id: number;
-  phone_number: string;
-  name?: string;
-  email?: string;
-  company?: string;
-  status: 'new' | 'contacted' | 'qualified' | 'converted';
-  call_sid?: string;
-  call_duration?: number;
-  conversation_summary?: string;
-  ai_sentiment?: string;
-  ai_score?: number;
-  enrichment_data?: object;
-  social_profiles?: object;
-  company_info?: object;
-  callback_scheduled?: string;
-  assigned_to?: string;
-  priority: 'low' | 'medium' | 'high';
-  created_at: string;
-  updated_at?: string;
-}
+### Industry
+
+```python
+from infinity_matrix.models import Industry, IndustryType
+
+industry = Industry(
+    id="technology",
+    name="Technology & Software",
+    type=IndustryType.TECHNOLOGY,
+    description="Software development...",
+    keywords=["software", "cloud", "AI"],
+    priority=10,
+    enabled=True
+)
 ```
 
-### CalendarEvent
-```typescript
-interface CalendarEvent {
-  id: number;
-  lead_id: number;
-  sales_rep_id: number;
-  title: string;
-  description?: string;
-  start_time: string;
-  end_time: string;
-  event_type: 'callback' | 'meeting' | 'follow-up';
-  status: 'scheduled' | 'completed' | 'cancelled';
-  position_x?: number;
-  position_y?: number;
-  created_at: string;
-  updated_at?: string;
-}
+### DataSource
+
+```python
+from infinity_matrix.models import DataSource, SourceType
+
+source = DataSource(
+    id="github_tech",
+    name="GitHub Technology",
+    type=SourceType.GITHUB,
+    base_url="https://api.github.com",
+    industry_id="technology",
+    rate_limit=60,
+    authentication_required=False
+)
 ```
 
----
+### CrawlTask
 
-## Example Usage
+```python
+from infinity_matrix.models import CrawlTask, CrawlStatus
 
-### Complete Lead Flow
+task = CrawlTask(
+    id="task-123",
+    url="https://github.com/tensorflow/tensorflow",
+    source_id="github_tech",
+    industry_id="technology",
+    status=CrawlStatus.PENDING,
+    max_attempts=3
+)
+```
 
-```javascript
-// 1. Create a lead and initiate call
-const lead = await fetch('http://localhost:8000/api/leads', {
-  method: 'POST',
-  headers: { 'Content-Type': 'application/json' },
-  body: JSON.stringify({
-    phone_number: '+15551234567',
-    name: 'John Doe',
-    company: 'Acme Corp'
-  })
-}).then(r => r.json());
+### RawData / NormalizedData / AnalysisResult
 
-// 2. Initiate AI call
-const call = await fetch('http://localhost:8000/api/voice/initiate-call', {
-  method: 'POST',
-  headers: { 'Content-Type': 'application/json' },
-  body: JSON.stringify({
-    phone_number: lead.phone_number
-  })
-}).then(r => r.json());
+See model definitions in `infinity_matrix/models/__init__.py`
 
-// 3. Listen for real-time updates
-ws.onmessage = (event) => {
-  const message = JSON.parse(event.data);
-  if (message.type === 'data_enriched') {
-    console.log('Lead enriched:', message.data);
-  }
-};
+## Configuration
 
-// 4. Schedule callback
-const event = await fetch('http://localhost:8000/api/calendar/events', {
-  method: 'POST',
-  headers: { 'Content-Type': 'application/json' },
-  body: JSON.stringify({
-    lead_id: lead.id,
-    sales_rep_id: 1,
-    title: 'Follow-up Call',
-    start_time: '2025-12-31T14:00:00Z',
-    end_time: '2025-12-31T14:30:00Z',
-    event_type: 'callback'
-  })
-}).then(r => r.json());
+### config.yaml Structure
+
+```yaml
+database:
+  type: postgresql
+  host: localhost
+  port: 5432
+  database: infinity_matrix
+
+redis:
+  host: localhost
+  port: 6379
+
+crawler:
+  max_concurrent_requests: 10
+  download_delay: 1.0
+  respect_robots_txt: true
+
+llm:
+  default_provider: openai
+  providers:
+    openai:
+      api_key: ${OPENAI_API_KEY}
+      model: gpt-4o-mini
+```
+
+### Environment Variables
+
+```bash
+# Database
+DB_HOST=localhost
+DB_PORT=5432
+DB_NAME=infinity_matrix
+DB_USER=postgres
+DB_PASSWORD=secret
+
+# Redis
+REDIS_HOST=localhost
+REDIS_PORT=6379
+
+# LLM
+OPENAI_API_KEY=sk-...
+ANTHROPIC_API_KEY=sk-ant-...
+OLLAMA_BASE_URL=http://localhost:11434
 ```

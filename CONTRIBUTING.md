@@ -1,428 +1,362 @@
 # Contributing to Infinity Matrix
 
-Thank you for your interest in contributing to Infinity Matrix! This document provides guidelines for working with our automated PR system.
+Thank you for your interest in contributing to Infinity Matrix! This document provides guidelines and instructions for contributing.
 
 ## Table of Contents
-- [Getting Started](#getting-started)
-- [Development Workflow](#development-workflow)
-- [Pull Request Process](#pull-request-process)
-- [Automation Guidelines](#automation-guidelines)
-- [Code Standards](#code-standards)
-- [Testing](#testing)
-- [Getting Help](#getting-help)
+
+1. [Code of Conduct](#code-of-conduct)
+2. [Getting Started](#getting-started)
+3. [Development Setup](#development-setup)
+4. [Making Contributions](#making-contributions)
+5. [Coding Standards](#coding-standards)
+6. [Testing](#testing)
+7. [Documentation](#documentation)
+8. [Pull Request Process](#pull-request-process)
+
+## Code of Conduct
+
+- Be respectful and inclusive
+- Focus on constructive feedback
+- Help others learn and grow
+- Follow professional standards
 
 ## Getting Started
 
 ### Prerequisites
-- Git installed on your local machine
-- GitHub account
-- Understanding of Git workflow
 
-### Fork and Clone
+- Python 3.9 or higher
+- Git
+- Basic understanding of async/await
+- Familiarity with web scraping and APIs
 
-1. Fork the repository on GitHub
-2. Clone your fork locally:
-   ```bash
-   git clone https://github.com/YOUR-USERNAME/infinity-matrix.git
-   cd infinity-matrix
-   ```
+### Areas for Contribution
 
-3. Add upstream remote:
-   ```bash
-   git remote add upstream https://github.com/InfinityXOneSystems/infinity-matrix.git
-   ```
+We welcome contributions in these areas:
 
-4. Keep your fork updated:
-   ```bash
-   git fetch upstream
-   git checkout main
-   git merge upstream/main
-   ```
+1. **New Connectors**: Add support for more data sources
+2. **LLM Providers**: Integrate additional LLM services
+3. **Industries**: Add new industry configurations
+4. **Documentation**: Improve guides and examples
+5. **Testing**: Add test coverage
+6. **Performance**: Optimize existing code
+7. **Bug Fixes**: Fix reported issues
 
-## Development Workflow
+## Development Setup
 
-### Creating a Branch
+### 1. Fork and Clone
 
-Always create a new branch for your work:
+```bash
+git clone https://github.com/YOUR-USERNAME/infinity-matrix.git
+cd infinity-matrix
+```
+
+### 2. Create Virtual Environment
+
+```bash
+python -m venv venv
+source venv/bin/activate  # On Windows: venv\Scripts\activate
+```
+
+### 3. Install Development Dependencies
+
+```bash
+pip install -r requirements.txt
+pip install -e .
+pip install pytest pytest-asyncio black ruff mypy
+```
+
+### 4. Create Feature Branch
 
 ```bash
 git checkout -b feature/your-feature-name
-# or
-git checkout -b bugfix/issue-description
-# or
-git checkout -b docs/documentation-update
 ```
 
-Branch naming conventions:
-- `feature/` - New features
-- `bugfix/` - Bug fixes
-- `hotfix/` - Urgent fixes
-- `docs/` - Documentation updates
-- `refactor/` - Code refactoring
-- `test/` - Test additions or modifications
+## Making Contributions
 
-### Making Changes
+### Adding a New Connector
 
-1. Make your changes following our [code standards](#code-standards)
-2. Test your changes locally
-3. Commit with clear, descriptive messages:
-   ```bash
-   git add .
-   git commit -m "Brief description of changes"
-   ```
+1. Create a new file in `infinity_matrix/connectors/`
+2. Inherit from `BaseConnector`
+3. Implement required methods:
+   - `can_handle(source_type: str) -> bool`
+   - `fetch(url: str, source: DataSource) -> List[RawData]`
+4. Register in `ConnectorFactory`
+5. Add tests in `tests/test_connectors.py`
+6. Update documentation
 
-### Commit Message Guidelines
+**Example:**
 
-Good commit messages help automation and reviewers:
+```python
+from infinity_matrix.connectors.base import BaseConnector
+from infinity_matrix.models import DataSource, RawData
 
-```
-Format: <type>: <subject>
-
-Types:
-- feat: New feature
-- fix: Bug fix
-- docs: Documentation changes
-- style: Formatting, missing semicolons, etc.
-- refactor: Code restructuring
-- test: Adding tests
-- chore: Maintenance tasks
-
-Example:
-feat: Add user authentication
-fix: Resolve login timeout issue
-docs: Update installation guide
+class NewConnector(BaseConnector):
+    def can_handle(self, source_type: str) -> bool:
+        return source_type == "new_source_type"
+    
+    async def fetch(self, url: str, source: DataSource) -> List[RawData]:
+        # Implementation
+        pass
 ```
 
-## Pull Request Process
+### Adding a New LLM Provider
 
-### Opening a Pull Request
+1. Create a new file in `infinity_matrix/llm/`
+2. Inherit from `BaseLLMProvider`
+3. Implement:
+   - `get_provider_name() -> str`
+   - `analyze(data, prompt_template) -> AnalysisResult`
+   - `validate_config() -> bool`
+4. Register in `LLMFactory`
+5. Add configuration example
+6. Add tests
 
-1. Push your branch to your fork:
-   ```bash
-   git push origin your-branch-name
-   ```
+### Adding a New Industry
 
-2. Open a PR on GitHub with:
-   - Clear title describing the change
-   - Detailed description of what and why
-   - Reference to related issues (if any)
+1. Create YAML file in `config/industries/`
+2. Define industry metadata
+3. Add seed URLs
+4. Document in README
 
-3. Choose the appropriate PR type:
-   - **Regular PR**: For features requiring review
-   - **Draft PR**: For work in progress (prevents auto-merge)
+**Template:**
 
-### What Happens Next
+```yaml
+id: new_industry
+name: New Industry Name
+type: technology  # or appropriate type
+description: Industry description
+keywords:
+  - keyword1
+  - keyword2
+priority: 7
+enabled: true
 
-Our automated system will:
+seeds:
+  - url: https://example.com
+    source_id: source_name
+    priority: 8
+    depth: 2
+```
 
-1. **Auto-Fix** (1-2 minutes)
-   - Applies code formatting
-   - Fixes linting issues
-   - Commits fixes to your PR
-   - Comments on PR with results
+## Coding Standards
 
-2. **Auto-Resolve** (2-3 minutes)
-   - Checks for merge conflicts
-   - Attempts automatic resolution
-   - Validates changes
-   - Adds labels
+### Style Guide
 
-3. **CI Checks** (timing varies)
-   - Runs automated tests
-   - Checks code quality
-   - Validates builds
+We follow PEP 8 with some modifications:
 
-4. **Auto-Merge** (when criteria met)
-   - Evaluates all conditions
-   - Merges if approved
-   - Notifies contributors
+- Line length: 100 characters
+- Use type hints
+- Use async/await for I/O operations
+- Use descriptive variable names
 
-### Controlling Automation
+### Code Formatting
 
-You have full control over the automation:
+Use Black for formatting:
 
-#### Prevent Auto-Merge
+```bash
+black infinity_matrix/
+```
 
-Use any of these methods:
+Use Ruff for linting:
 
-1. **Mark as Draft**
-   ```bash
-   gh pr create --draft
-   ```
+```bash
+ruff check infinity_matrix/
+```
 
-2. **Add Blocking Label**
-   ```bash
-   gh pr edit --add-label "do-not-merge"
-   gh pr edit --add-label "wip"
-   gh pr edit --add-label "needs-review"
-   ```
+### Type Checking
 
-3. **Keep as Draft in UI**
-   - Click "Still in progress? Convert to draft"
+Use mypy for type checking:
 
-#### Enable Auto-Merge
-
-1. **Mark as Ready**
-   ```bash
-   gh pr ready
-   ```
-
-2. **Remove Blocking Labels**
-   ```bash
-   gh pr edit --remove-label "wip"
-   ```
-
-3. **Ensure Checks Pass**
-   - Wait for CI to complete
-   - Fix any failures
-
-## Automation Guidelines
-
-### When to Use Auto-Merge
-
-✅ **Good candidates:**
-- Documentation updates
-- Dependency updates (Dependabot/Renovate)
-- Minor bug fixes with tests
-- Small refactorings
-- Configuration changes
-
-⚠️ **Use caution:**
-- Breaking changes
-- Major features
-- Security-related changes
-- Database migrations
-- API changes
-
-❌ **Avoid:**
-- Complex architectural changes
-- Changes without tests
-- Experimental features
-- Emergency hotfixes (review first)
+```bash
+mypy infinity_matrix/
+```
 
 ### Best Practices
 
-1. **Keep PRs Small**
-   - Easier to review
-   - Faster CI times
-   - Lower risk
-   - Better for auto-merge
+1. **Error Handling**
+   - Use try-except blocks
+   - Log errors with context
+   - Don't silence exceptions
 
-2. **Write Tests**
-   - Automated tests increase confidence
-   - CI validates changes
-   - Safer for auto-merge
+2. **Async/Await**
+   - Use async for I/O operations
+   - Don't block the event loop
+   - Use asyncio.gather for concurrent tasks
 
-3. **Update Documentation**
-   - Keep docs in sync with code
-   - Auto-fix will format them
+3. **Logging**
+   - Use module-level loggers
+   - Use appropriate log levels
+   - Include context in log messages
 
-4. **Respond to Auto-Fix**
-   - Review automated commits
-   - Ensure they're correct
-   - Address any issues
+4. **Documentation**
+   - Add docstrings to all public methods
+   - Use Google-style docstrings
+   - Include examples where helpful
 
-5. **Monitor Your PRs**
-   - Check notifications
-   - Review workflow results
-   - Fix failures promptly
+**Example:**
 
-## Code Standards
-
-### Python Code
-
-Our auto-fix workflow enforces:
-
-- **Black** for formatting
-- **isort** for import sorting
-- **PEP 8** compliance via autopep8
-
-You can run these locally:
-
-```bash
-# Install tools
-pip install black isort autopep8 flake8
-
-# Format code
-black .
-isort .
-autopep8 --in-place --aggressive --aggressive --recursive .
-
-# Check code
-flake8 .
+```python
+async def fetch_data(self, url: str) -> List[RawData]:
+    """Fetch data from the specified URL.
+    
+    Args:
+        url: The URL to fetch from
+        
+    Returns:
+        List of RawData objects
+        
+    Raises:
+        ValueError: If URL is invalid
+        HTTPError: If request fails
+        
+    Example:
+        >>> data = await connector.fetch_data("https://api.example.com")
+        >>> len(data)
+        5
+    """
+    pass
 ```
-
-### General Guidelines
-
-- Write clear, readable code
-- Add comments for complex logic
-- Follow existing patterns
-- Keep functions focused and small
-- Use meaningful variable names
 
 ## Testing
 
-### Running Tests Locally
+### Running Tests
+
+Run all tests:
 
 ```bash
-# Python
-pytest tests/
+pytest
+```
 
-# With coverage
-pytest --cov=. tests/
+Run with coverage:
+
+```bash
+pytest --cov=infinity_matrix --cov-report=html
+```
+
+Run specific test:
+
+```bash
+pytest tests/test_connectors.py::test_github_connector
 ```
 
 ### Writing Tests
 
-- Add tests for new features
-- Update tests for bug fixes
-- Ensure tests pass locally before pushing
-- Aim for high code coverage
+1. Create test files in `tests/`
+2. Name test functions with `test_` prefix
+3. Use fixtures from `conftest.py`
+4. Test both success and failure cases
+5. Mock external API calls
 
-### Test Standards
+**Example:**
 
-- Tests should be fast
-- Tests should be independent
-- Tests should be deterministic
-- Use clear test names
-- Add docstrings to test functions
+```python
+import pytest
+from infinity_matrix.connectors import MyConnector
+
+def test_connector_can_handle():
+    """Test connector source type detection."""
+    connector = MyConnector()
+    assert connector.can_handle("my_type") is True
+    assert connector.can_handle("other_type") is False
+
+@pytest.mark.asyncio
+async def test_connector_fetch():
+    """Test data fetching."""
+    connector = MyConnector()
+    # Implementation
+```
+
+## Documentation
+
+### Types of Documentation
+
+1. **Code Documentation**: Docstrings in code
+2. **API Documentation**: `docs/API.md`
+3. **Architecture Documentation**: `docs/ARCHITECTURE.md`
+4. **User Guides**: `README.md`, `docs/DEPLOYMENT.md`
+5. **Examples**: `examples/` directory
+
+### Documentation Standards
+
+- Use Markdown format
+- Include code examples
+- Keep up to date with code changes
+- Add diagrams where helpful
+- Link related documents
+
+## Pull Request Process
+
+### Before Submitting
+
+1. ✅ Run tests: `pytest`
+2. ✅ Format code: `black .`
+3. ✅ Check linting: `ruff check .`
+4. ✅ Update documentation
+5. ✅ Add tests for new features
+6. ✅ Update CHANGELOG (if exists)
+
+### Submitting a PR
+
+1. Push to your fork
+2. Create pull request
+3. Fill out PR template
+4. Link related issues
+5. Wait for review
+
+### PR Title Format
+
+Use conventional commits:
+
+- `feat: Add new connector for X`
+- `fix: Resolve issue with Y`
+- `docs: Update API documentation`
+- `test: Add tests for Z`
+- `refactor: Improve performance of W`
+
+### PR Description Template
+
+```markdown
+## Description
+Brief description of changes
+
+## Type of Change
+- [ ] Bug fix
+- [ ] New feature
+- [ ] Breaking change
+- [ ] Documentation update
+
+## Testing
+- [ ] Unit tests added
+- [ ] Integration tests added
+- [ ] Manual testing performed
+
+## Checklist
+- [ ] Code follows style guidelines
+- [ ] Documentation updated
+- [ ] Tests pass
+- [ ] No breaking changes (or documented)
+```
+
+### Review Process
+
+1. Maintainer reviews code
+2. Automated tests run
+3. Changes requested or approved
+4. Contributor addresses feedback
+5. PR merged when approved
 
 ## Getting Help
 
-### Resources
-
-- **README.md** - Setup and overview
-- **CONFIGURATION.md** - Detailed configuration
-- **EXAMPLES.md** - Usage examples
-- **Workflow Logs** - Check Actions tab
-
-### Asking Questions
-
-1. **Check Documentation First**
-   - Review README and guides
-   - Check existing issues
-   - Search discussions
-
-2. **Open an Issue**
-   - Use issue templates
-   - Provide context
-   - Include relevant logs
-
-3. **Discussion Topics**
-   - Questions about automation
-   - Feature requests
-   - Improvement suggestions
-
-### Reporting Issues
-
-When reporting issues with automation:
-
-1. Include PR number
-2. Share workflow logs
-3. Describe expected vs actual behavior
-4. Note any error messages
-
-Example:
-```markdown
-**PR**: #123
-**Workflow**: auto-merge
-**Issue**: PR not auto-merging despite passing checks
-
-**Logs**:
-```
-[workflow log excerpt]
-```
-
-**Expected**: PR should auto-merge
-**Actual**: PR stuck in "ready" state
-```
-
-## Advanced Topics
-
-### Working with Auto-Fix
-
-If auto-fix makes changes you disagree with:
-
-1. Discuss in PR comments
-2. Open issue to adjust configuration
-3. Add exceptions to workflow
-4. Override locally and commit
-
-### Customizing for Your PRs
-
-You can customize behavior per PR:
-
-```yaml
-# Add to PR description
-automation:
-  auto-fix: false      # Skip auto-fix
-  auto-merge: false    # Skip auto-merge
-  merge-method: rebase # Use rebase instead of squash
-```
-
-*(Note: This requires workflow updates)*
-
-### Debugging Workflow Issues
-
-```bash
-# View workflow runs
-gh run list
-
-# View specific run
-gh run view RUN_ID --log
-
-# Rerun workflow
-gh run rerun RUN_ID
-
-# Watch workflow
-gh run watch
-```
-
-## Code Review
-
-### For Contributors
-
-- Respond to review comments promptly
-- Address all feedback
-- Ask for clarification if needed
-- Mark conversations as resolved
-
-### For Reviewers
-
-- Be constructive and respectful
-- Explain reasoning
-- Suggest alternatives
-- Approve when satisfied
-
-## Release Process
-
-*(To be defined based on project needs)*
-
-Releases typically follow:
-1. Feature freeze
-2. Testing period
-3. Version tagging
-4. Release notes
-5. Deployment
+- GitHub Issues: Report bugs or request features
+- GitHub Discussions: Ask questions
+- Documentation: Check docs/ directory
+- Examples: See examples/ directory
 
 ## Recognition
 
-Contributors are recognized through:
-- Commit history
-- Release notes
-- Contributors file
-- GitHub insights
+Contributors will be:
+- Listed in CONTRIBUTORS.md
+- Credited in release notes
+- Acknowledged in documentation
 
 Thank you for contributing to Infinity Matrix! 🚀
-
-## Questions?
-
-If you have questions not covered here:
-- Open an issue
-- Check discussions
-- Review documentation
-- Contact maintainers
-
----
-
-**Remember**: The automated system is here to help, not hinder. Use it as a tool to streamline your workflow, but always prioritize code quality and safety.

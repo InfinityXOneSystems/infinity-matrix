@@ -1,15 +1,20 @@
+"""Infinity Matrix - Universal Seed & Ingestion System.
+
+Enterprise-grade data collection, normalization, and AI-powered analysis
+across multiple business verticals.
 """
-Infinity Matrix - Master Universal System/App Builder
 
-An AI-powered universal application builder and orchestrator that transforms
-natural language prompts into production-ready applications across any stack.
-"""
+__version__ = "1.0.0"
+__author__ = "InfinityXOneSystems"
 
-__version__ = "0.1.0"
-__author__ = "InfinityXOne Systems"
-__license__ = "MIT"
+from infinity_matrix.core.config import Config
+from infinity_matrix.core.ingestion_engine import IngestionEngine
+from infinity_matrix.core.seed_manager import SeedManager
 
-from infinity_matrix.core.engine.builder import UniversalBuilder
-from infinity_matrix.core.ai.cortex import VisionCortex
-
-__all__ = ["UniversalBuilder", "VisionCortex"]
+__all__ = [
+    "Config",
+    "IngestionEngine",
+    "SeedManager",
+    "__version__",
+    "__author__",
+]

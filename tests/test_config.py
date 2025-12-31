@@ -1,70 +1,77 @@
 """Tests for core configuration."""
 
+import os
+import tempfile
 import pytest
 from pathlib import Path
-from infinity_matrix.core.config import Config, AIConfig, SecurityConfig, AgentConfig
+
+from infinity_matrix.core.config import Config
 
 
-def test_default_config():
+def test_config_defaults():
     """Test default configuration values."""
     config = Config()
     
-    assert config.version == "0.1.0"
-    assert config.ai.provider == "openai"
-    assert config.security.encryption_enabled is True
-    assert config.agents.enabled is True
-
-
-def test_ai_config():
-    """Test AI configuration."""
-    ai_config = AIConfig(
-        provider="anthropic",
-        model="claude-3",
-        max_tokens=8000
-    )
+    assert config.database.type == "postgresql"
+    assert config.database.host == "localhost"
+    assert config.database.port == 5432
     
-    assert ai_config.provider == "anthropic"
-    assert ai_config.model == "claude-3"
-    assert ai_config.max_tokens == 8000
-
-
-def test_security_config():
-    """Test security configuration."""
-    security_config = SecurityConfig(
-        encryption_enabled=True,
-        rbac_enabled=True,
-        audit_logging=True
-    )
+    assert config.redis.host == "localhost"
+    assert config.redis.port == 6379
     
-    assert security_config.encryption_enabled is True
-    assert security_config.rbac_enabled is True
-    assert security_config.audit_logging is True
+    assert config.crawler.max_concurrent_requests == 10
+    assert config.crawler.respect_robots_txt is True
 
 
-def test_agent_config():
-    """Test agent configuration."""
-    agent_config = AgentConfig(
-        enabled=True,
-        auto_heal=True,
-        frameworks=["langchain", "autogpt"]
-    )
+def test_config_load_from_file():
+    """Test loading configuration from file."""
+    with tempfile.NamedTemporaryFile(mode='w', suffix='.yaml', delete=False) as f:
+        f.write("""
+database:
+  host: testhost
+  port: 9999
+  
+crawler:
+  max_concurrent_requests: 5
+""")
+        config_path = f.name
     
-    assert agent_config.enabled is True
-    assert agent_config.auto_heal is True
-    assert "langchain" in agent_config.frameworks
+    try:
+        config = Config.load(config_path)
+        
+        assert config.database.host == "testhost"
+        assert config.database.port == 9999
+        assert config.crawler.max_concurrent_requests == 5
+    finally:
+        os.unlink(config_path)
 
 
-def test_config_load_and_save(tmp_path):
-    """Test configuration load and save."""
-    config_path = tmp_path / "config.yaml"
+def test_config_env_override():
+    """Test environment variable overrides."""
+    os.environ['DB_HOST'] = 'envhost'
+    os.environ['DB_PORT'] = '7777'
     
-    # Create and save config
+    try:
+        config = Config.load()
+        
+        assert config.database.host == 'envhost'
+        assert config.database.port == 7777
+    finally:
+        del os.environ['DB_HOST']
+        del os.environ['DB_PORT']
+
+
+def test_config_save():
+    """Test saving configuration to file."""
     config = Config()
-    config.save(config_path)
+    config.database.host = "savetest"
     
-    assert config_path.exists()
-    
-    # Load config
-    loaded_config = Config.load(config_path)
-    assert loaded_config.version == config.version
-    assert loaded_config.ai.provider == config.ai.provider
+    with tempfile.TemporaryDirectory() as tmpdir:
+        config_path = os.path.join(tmpdir, "test_config.yaml")
+        config.save(config_path)
+        
+        assert os.path.exists(config_path)
+        
+        # Load it back
+        loaded = Config.load(config_path)
+        assert loaded.database.host == "savetest"

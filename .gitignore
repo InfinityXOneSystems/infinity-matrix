@@ -176,28 +176,11 @@ marimo/_static/
 marimo/_lsp/
 __marimo__/
 
-# Node.js
-node_modules/
+# Infinity Matrix - Data directories
+data/raw/
+data/normalized/
+data/analyzed/
+data/tasks/
 
-# Build artifacts
-dist/
-build/
-
-# macOS
-.DS_Store
-
-# Logs
-*.log
-logs/
-
-# IDE
-.idea/
-.vscode/
-*.swp
-*.swo
-*~
-
-# Temporary files
-*.tmp
-.tmp/
-
+# Configuration
+config/config.yaml

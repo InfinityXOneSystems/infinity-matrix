@@ -1,341 +1,149 @@
-# Infinity Matrix Admin System
+# Infinity Matrix - Universal Seed & Ingestion System
 
-> Enterprise-grade React/Vite admin system with comprehensive AI Vision Cortex, intelligent agent mesh, and 24/7 operational capabilities
+## Overview
 
-[![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
-[![Docker](https://img.shields.io/badge/docker-ready-brightgreen.svg)](docker-compose.yml)
-[![Node](https://img.shields.io/badge/node-20%2B-green.svg)](package.json)
+Enterprise-grade, production-ready universal seed and ingestion system for automated data collection, normalization, and AI-powered analysis across multiple business verticals.
 
-## 🚀 Features
+## Features
 
-### Frontend
-- **Modern Stack**: React 19 + TypeScript + Vite + TailwindCSS v4
-- **Responsive Dashboard**: Real-time monitoring and management interface
-- **Agent Management**: Full CRUD operations for intelligent agents
-- **System Monitoring**: Live metrics, alerts, and health status
-- **Production-Ready**: Optimized builds, code splitting, lazy loading
+- **Multi-Industry Coverage**: Pre-configured seeds for top 10 global business industries
+- **Distributed Crawling**: Robust, resumable web crawling and scraping framework
+- **Multiple Source Connectors**: GitHub, AI platforms, real estate, government, social media
+- **LLM Analysis Pipeline**: Unified interface for Vertex AI, OpenAI, Ollama, and more
+- **Production-Ready**: FAANG-level code quality with comprehensive error handling
+- **Extensible Architecture**: Template-based system for easy adaptation to new verticals
 
-### Vision Cortex AI Chat
-- **Multi-Provider Support**: OpenAI (GPT-4, GPT-3.5), Anthropic (Claude 3), Ollama (Local)
-- **Model Switching**: Seamless switching between AI models in real-time
-- **Persistent Sessions**: Chat history saved and retrievable
-- **Autonomous Features**:
-  - Code execution capabilities
-  - GitHub integration for repo operations
-  - Page navigation and access
-  - Context-aware responses
-- **24/7 Availability**: Always-on AI assistance
+## Quick Start
 
-### Backend Intelligence
-- **Agent Orchestration**: Manage multiple intelligent agents simultaneously
-- **Real-time Communication**: WebSocket-based updates for instant feedback
-- **RESTful API**: Comprehensive API for all operations
-- **Data Gathering**: Automated data collection from multiple sources
-- **System Metrics**: CPU, memory, network, and service monitoring
-
-### Deployment
-- **Docker Support**: Fully containerized with Docker Compose
-- **Hostinger Ready**: Optimized for Hostinger VPS/Cloud deployment
-- **One-Command Launch**: Automated setup and deployment script
-- **Health Checks**: Built-in health monitoring and auto-recovery
-- **Production Grade**: Security, performance, and reliability built-in
-
-## 📋 Prerequisites
-
-- Docker 20.10+
-- Docker Compose 2.0+
-- Node.js 20+ (for local development)
-- Git
-
-## 🎯 Quick Start
-
-### Launch with One Command
+### Installation
 
 ```bash
-# Clone the repository
-git clone https://github.com/InfinityXOneSystems/infinity-matrix.git
-cd infinity-matrix
-
-# Launch the entire system
-./launch.sh
+pip install -r requirements.txt
 ```
 
-The system will be available at:
-- **Frontend**: http://localhost
-- **Backend API**: http://localhost:3000
-- **Health Check**: http://localhost:3000/health
+### Configuration
 
-### Manual Setup
+Copy the example configuration:
 
-#### Backend
 ```bash
-cd backend
-npm install
-cp .env.example .env
-# Edit .env with your configuration
-npm run dev
+cp config/config.example.yaml config/config.yaml
 ```
 
-#### Frontend
+Edit `config/config.yaml` with your API keys and preferences.
+
+### Running the System
+
 ```bash
-cd frontend
-npm install
-cp .env.example .env
-npm run dev
+# Run ingestion for a specific industry
+python -m infinity_matrix.cli ingest --industry technology
+
+# Run analysis pipeline
+python -m infinity_matrix.cli analyze --industry technology
+
+# Check status
+python -m infinity_matrix.cli status
 ```
 
-## ⚙️ Configuration
+## Architecture
 
-### Backend Environment Variables
+### Core Components
 
-```env
-# Server Configuration
-PORT=3000
-NODE_ENV=production
+1. **Seed Manager**: Manages industry seeds and source configurations
+2. **Ingestion Engine**: Distributed crawling and scraping framework
+3. **Data Pipeline**: Normalization, validation, and storage
+4. **LLM Framework**: Multi-provider AI analysis and insights
+5. **State Manager**: Persistent, resumable operation tracking
 
-# Security
-JWT_SECRET=your-secret-key-change-in-production
-
-# AI Providers
-OPENAI_API_KEY=sk-...
-ANTHROPIC_API_KEY=sk-ant-...
-OLLAMA_URL=http://localhost:11434
-
-# GitHub Integration
-GITHUB_TOKEN=ghp_...
-GITHUB_APP_ID=123456
-
-# CORS
-CORS_ORIGIN=http://localhost:5173
-```
-
-### AI Provider Setup
-
-#### OpenAI (GPT Models)
-1. Get API key: https://platform.openai.com/api-keys
-2. Add to `backend/.env`: `OPENAI_API_KEY=sk-...`
-3. Restart backend
-
-#### Anthropic (Claude Models)
-1. Get API key: https://console.anthropic.com/
-2. Add to `backend/.env`: `ANTHROPIC_API_KEY=sk-ant-...`
-3. Restart backend
-
-#### Ollama (Local LLM)
-1. Install Ollama: https://ollama.ai/download
-2. Pull models: `ollama pull llama2`, `ollama pull codellama`
-3. Configure: `OLLAMA_URL=http://localhost:11434`
-4. Restart backend
-
-**Hybrid Mode**: Enable all providers simultaneously for maximum flexibility!
-
-## 🏗️ Architecture
-
-```
-┌─────────────────────────────────────────────────────────────┐
-│                        Frontend Layer                        │
-│  React 19 + TypeScript + Vite + TailwindCSS + Socket.IO     │
-│                                                              │
-│  ┌──────────┐  ┌──────────┐  ┌──────────┐  ┌──────────┐   │
-│  │Dashboard │  │ Agents   │  │ AI Chat  │  │ Monitor  │   │
-│  └──────────┘  └──────────┘  └──────────┘  └──────────┘   │
-└───────────────────────────┬──────────────────────────────────┘
-                            │
-                            ▼
-┌─────────────────────────────────────────────────────────────┐
-│                        Nginx Layer                           │
-│        Static Files + API Proxy + WebSocket Proxy           │
-└───────────────────────────┬──────────────────────────────────┘
-                            │
-                            ▼
-┌─────────────────────────────────────────────────────────────┐
-│                       Backend Layer                          │
-│       Node.js + Express + TypeScript + Socket.IO            │
-│                                                              │
-│  ┌──────────┐  ┌──────────┐  ┌──────────┐  ┌──────────┐   │
-│  │   API    │  │WebSocket │  │  Agent   │  │  System  │   │
-│  │  Server  │  │  Server  │  │ Manager  │  │ Monitor  │   │
-│  └──────────┘  └──────────┘  └──────────┘  └──────────┘   │
-└───────────────────────────┬──────────────────────────────────┘
-                            │
-                            ▼
-┌─────────────────────────────────────────────────────────────┐
-│                     AI Provider Layer                        │
-│                                                              │
-│  ┌──────────┐  ┌──────────┐  ┌──────────┐  ┌──────────┐   │
-│  │  OpenAI  │  │Anthropic │  │  Ollama  │  │  GitHub  │   │
-│  │   GPT    │  │  Claude  │  │  Local   │  │   API    │   │
-│  └──────────┘  └──────────┘  └──────────┘  └──────────┘   │
-└─────────────────────────────────────────────────────────────┘
-```
-
-## 📚 Documentation
-
-- **[Operator Runbook](OPERATOR_RUNBOOK.md)**: Comprehensive operations guide
-- **API Documentation**: See `backend/README.md` (coming soon)
-- **Frontend Guide**: See `frontend/README.md`
-
-## 🔧 Development
-
-### Project Structure
+### Directory Structure
 
 ```
 infinity-matrix/
-├── frontend/                 # React/Vite frontend
-│   ├── src/
-│   │   ├── components/       # React components
-│   │   │   ├── admin/       # Admin dashboard components
-│   │   │   ├── ai-chat/     # AI chat components
-│   │   │   ├── layout/      # Layout components
-│   │   │   └── ui/          # Reusable UI components
-│   │   ├── pages/           # Page components
-│   │   ├── services/        # API and WebSocket services
-│   │   ├── store/           # State management (Zustand)
-│   │   ├── types/           # TypeScript types
-│   │   └── utils/           # Utility functions
-│   ├── Dockerfile
-│   └── nginx.conf
-│
-├── backend/                  # Node.js/Express backend
-│   ├── src/
-│   │   ├── controllers/     # Request handlers
-│   │   ├── routes/          # API routes
-│   │   ├── services/        # Business logic
-│   │   │   ├── aiService.ts # AI provider integration
-│   │   │   ├── agentService.ts # Agent management
-│   │   │   └── systemService.ts # System monitoring
-│   │   ├── types/           # TypeScript types
-│   │   └── config/          # Configuration
-│   ├── Dockerfile
-│   └── .env.example
-│
-├── docker-compose.yml       # Docker orchestration
-├── launch.sh               # Automated launch script
-├── OPERATOR_RUNBOOK.md     # Operations guide
-└── README.md              # This file
+├── infinity_matrix/          # Main package
+│   ├── core/                 # Core framework components
+│   ├── connectors/           # Source-specific connectors
+│   ├── models/               # Data models
+│   ├── pipelines/            # Data processing pipelines
+│   ├── llm/                  # LLM integration framework
+│   └── cli.py                # Command-line interface
+├── config/                   # Configuration files
+│   ├── industries/           # Industry-specific configs
+│   └── sources/              # Source connector configs
+├── data/                     # Data storage (gitignored)
+├── tests/                    # Test suite
+└── docs/                     # Documentation
+
 ```
 
-### Building
+## Industry Coverage
 
-```bash
-# Frontend
-cd frontend
-npm run build
+Pre-configured seeds for:
 
-# Backend
-cd backend
-npm run build
-```
+1. Technology & Software
+2. Finance & Banking
+3. Healthcare & Pharmaceuticals
+4. Retail & E-commerce
+5. Real Estate & Construction
+6. Energy & Utilities
+7. Manufacturing & Industrial
+8. Media & Entertainment
+9. Transportation & Logistics
+10. Professional Services
 
-### Testing
+## Supported Data Sources
 
-```bash
-# Run linters
-cd frontend && npm run lint
-cd backend && npm run lint
+- **Code Repositories**: GitHub, GitLab, Bitbucket
+- **AI/ML Platforms**: Hugging Face, Kaggle, Papers with Code
+- **Real Estate**: Zillow, Realtor.com, commercial listings
+- **Government**: Data.gov, SEC EDGAR, regulatory agencies
+- **Social Media**: Twitter/X, LinkedIn, Reddit, YouTube
+- **Business Data**: Company websites, news feeds, press releases
 
-# Run tests (when implemented)
-npm test
-```
+## LLM Providers
 
-## 🚢 Deployment
+- Google Vertex AI
+- OpenAI (ChatGPT, GPT-4)
+- Ollama (local models)
+- Anthropic Claude
+- AWS Bedrock
+- Azure OpenAI
 
-### Docker Deployment (Recommended)
+## Production Features
 
-```bash
-# Configure environment
-cp backend/.env.example backend/.env
-# Edit backend/.env with your API keys
+- Distributed task queue with Celery/Redis
+- Persistent state management with PostgreSQL/MongoDB
+- Rate limiting and respectful crawling
+- Comprehensive error handling and retry logic
+- Structured logging and monitoring
+- Docker and Kubernetes ready
+- Horizontal scalability
+- Health checks and metrics
 
-# Launch
-./launch.sh
+## Extending the System
 
-# Or manually
-docker-compose up -d
-```
+### Adding a New Industry
 
-### Hostinger Deployment
+1. Create configuration in `config/industries/new_industry.yaml`
+2. Define seed URLs and source priorities
+3. Customize analysis prompts if needed
 
-See [OPERATOR_RUNBOOK.md](OPERATOR_RUNBOOK.md#deployment-to-hostinger) for detailed Hostinger deployment instructions.
+### Adding a New Source Connector
 
-### Production Checklist
+1. Inherit from `BaseConnector` in `infinity_matrix/connectors/base.py`
+2. Implement required methods: `fetch()`, `parse()`, `normalize()`
+3. Add connector configuration
+4. Register in connector factory
 
-- [ ] Set strong `JWT_SECRET` in backend/.env
-- [ ] Configure AI provider API keys
-- [ ] Update `CORS_ORIGIN` to production domain
-- [ ] Enable HTTPS with SSL certificates
-- [ ] Configure firewall rules
-- [ ] Set up log rotation
-- [ ] Configure backup strategy
-- [ ] Test all features in production environment
+### Adding a New LLM Provider
 
-## 📊 Monitoring
+1. Inherit from `BaseLLMProvider` in `infinity_matrix/llm/base.py`
+2. Implement `analyze()` and `batch_analyze()` methods
+3. Add provider configuration
+4. Register in LLM factory
 
-### Health Checks
+## License
 
-```bash
-# Backend health
-curl http://localhost:3000/health
+MIT License - See LICENSE file for details
 
-# System status
-curl http://localhost:3000/api/system/status
+## Contributing
 
-# Agent list
-curl http://localhost:3000/api/agents
-```
-
-### Logs
-
-```bash
-# View all logs
-docker-compose logs -f
-
-# Backend only
-docker-compose logs -f backend
-
-# Frontend only
-docker-compose logs -f frontend
-```
-
-## 🛠️ Troubleshooting
-
-See [OPERATOR_RUNBOOK.md](OPERATOR_RUNBOOK.md#troubleshooting) for comprehensive troubleshooting guide.
-
-Common issues:
-- Backend won't start → Check .env configuration
-- Frontend won't load → Verify backend is running
-- WebSocket fails → Check CORS settings
-- AI chat errors → Verify API keys
-
-## 🤝 Contributing
-
-Contributions are welcome! Please follow these steps:
-
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
-
-## 📝 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## 🙏 Acknowledgments
-
-- React and Vite teams for excellent tools
-- TailwindCSS for beautiful styling
-- OpenAI, Anthropic, and Ollama for AI capabilities
-- Socket.IO for real-time communication
-
-## 📧 Support
-
-For issues, questions, or suggestions:
-- Open an issue: https://github.com/InfinityXOneSystems/infinity-matrix/issues
-- Email: support@infinityxonesystems.com
-
----
-
-**Built with ❤️ for enterprise operations**
-
-*Ready for production. Ready for scale. Ready for intelligence.*
+Contributions welcome! Please see CONTRIBUTING.md for guidelines.
