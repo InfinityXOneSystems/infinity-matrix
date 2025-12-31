@@ -168,7 +168,7 @@ jobs:
                 owner: context.repo.owner,
                 repo: context.repo.repo,
                 pull_number: prNumber,
-                merge_method: 'squash', // Options: 'merge', 'squash', 'rebase'
+                merge_method: 'squash', # Options: 'merge', 'squash', 'rebase'
                 commit_title: `Auto-merge: PR #${prNumber}`,
                 commit_message: 'Automatically merged by GitHub Actions workflow',
               });

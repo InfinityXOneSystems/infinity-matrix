@@ -208,27 +208,27 @@ The system includes:
 
 ## Next Steps
 
-1. ✅ Complete setup above
-2. ✅ Test with a simple PR
-3. ✅ Read full README
-4. ✅ Customize workflows for your needs
-5. ✅ Roll out to team
+1. Complete setup above
+2. Test with a simple PR
+3. Read full README
+4. Customize workflows for your needs
+5. Roll out to team
 
 ## 🌟 Best Practices
 
 **DO:**
-- ✅ Start with draft PRs for complex changes
-- ✅ Use labels to control automation
-- ✅ Monitor the first few auto-merges
-- ✅ Keep documentation updated
-- ✅ Trust the automation for simple changes
+- Start with draft PRs for complex changes
+- Use labels to control automation
+- Monitor the first few auto-merges
+- Keep documentation updated
+- Trust the automation for simple changes
 
 **DON'T:**
-- ❌ Auto-merge breaking changes without review
-- ❌ Ignore auto-fix commits - review them
-- ❌ Skip writing tests
-- ❌ Override safety features
-- ❌ Force-push to PR branches
+- Auto-merge breaking changes without review
+- Ignore auto-fix commits - review them
+- Skip writing tests
+- Override safety features
+- Force-push to PR branches
 
 ---
 

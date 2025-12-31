@@ -64,8 +64,16 @@ jobs:
         if: steps.auto_resolve.outputs.resolved == 'true'
         run: |
           echo "Running validation checks..."
-          # Add validation commands here based on your project
-          # For example: pytest, npm test, etc.
+          echo "Note: Add project-specific validation commands here"
+          echo "Examples:"
+          echo "  - pytest tests/"
+          echo "  - npm test"
+          echo "  - make test"
+          # Customize this section based on your project's needs
+          # For example:
+          # pytest tests/
+          # npm test
+          # make test
           
       - name: Comment on successful resolution
         if: steps.auto_resolve.outputs.resolved == 'true'

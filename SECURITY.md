@@ -246,7 +246,7 @@ If you discover a security vulnerability:
 2. **DO NOT** commit the vulnerability to demonstrate it
 3. **DO** report privately via GitHub Security Advisories:
    - Go to Security tab → Advisories → New draft advisory
-   - Or email: security@infinityxonesystems.com (if provided)
+   - This is the preferred reporting method
 
 ### What to Include
 
