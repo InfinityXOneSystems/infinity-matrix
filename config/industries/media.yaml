@@ -1,0 +1,35 @@
+id: media
+name: Media & Entertainment
+type: media
+description: Digital media, streaming, content creation, gaming, social media platforms
+keywords:
+  - media
+  - entertainment
+  - streaming
+  - video
+  - audio
+  - content creation
+  - gaming
+  - social media
+  - broadcasting
+  - digital publishing
+priority: 8
+enabled: true
+
+seeds:
+  - url: https://github.com/videojs/video.js
+    source_id: github_media
+    priority: 8
+    depth: 2
+  - url: https://github.com/Netflix/conductor
+    source_id: github_media
+    priority: 8
+    depth: 2
+  - url: https://github.com/spotify
+    source_id: github_media
+    priority: 8
+    depth: 2
+  - url: https://github.com/godotengine/godot
+    source_id: github_media
+    priority: 7
+    depth: 2

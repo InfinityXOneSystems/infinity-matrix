@@ -2,331 +2,213 @@
 
 ## System Architecture
 
+Infinity Matrix implements a distributed Model Context Protocol (MCP) mesh that enables real-time synchronization and intelligence sharing across multiple AI platforms.
+
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│                     Frontend Layer                          │
-│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐     │
-│  │   Web UI     │  │   Tablet     │  │    Phone     │     │
-│  │  (Browser)   │  │   Interface  │  │   Interface  │     │
-│  └──────┬───────┘  └──────┬───────┘  └──────┬───────┘     │
-│         │                  │                  │              │
-│         └──────────────────┴──────────────────┘              │
-│                            │                                 │
-│                    WebSocket + REST API                      │
-│                            │                                 │
-└────────────────────────────┼─────────────────────────────────┘
+│                     Client Layer                             │
+│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐      │
+│  │  VS Code     │  │   Web UI     │  │   CLI Tool   │      │
+│  │  Extension   │  │   Dashboard  │  │              │      │
+│  └──────┬───────┘  └──────┬───────┘  └──────┬───────┘      │
+└─────────┼──────────────────┼──────────────────┼─────────────┘
+          │                  │                  │
+          └──────────────────┼──────────────────┘
                              │
 ┌────────────────────────────┼─────────────────────────────────┐
-│                     Backend Layer                            │
-│                            │                                 │
-│  ┌─────────────────────────▼──────────────────────────────┐ │
-│  │              FastAPI Application Server                 │ │
-│  │                                                          │ │
-│  │  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐ │ │
-│  │  │   REST API   │  │  WebSocket   │  │    TwiML     │ │ │
-│  │  │   Endpoints  │  │    Manager   │  │   Handlers   │ │ │
-│  │  └──────────────┘  └──────────────┘  └──────────────┘ │ │
-│  └──────────────────────────────────────────────────────────┘ │
-│                            │                                 │
-│  ┌────────────────────────┼─────────────────────────────┐   │
-│  │         Service Layer  │                              │   │
-│  │  ┌─────────────────────▼────────┐  ┌──────────────┐  │   │
-│  │  │    AI Voice Agent Service    │  │ Enrichment   │  │   │
-│  │  │   (OpenAI + Twilio)          │  │   Service    │  │   │
-│  │  └──────────────────────────────┘  └──────────────┘  │   │
-│  └──────────────────────────────────────────────────────┘   │
-│                            │                                 │
-└────────────────────────────┼─────────────────────────────────┘
-                             │
-┌────────────────────────────┼─────────────────────────────────┐
-│                    Data Layer                                │
-│  ┌─────────────────────────▼──────────────────────────────┐ │
-│  │              SQLAlchemy ORM                              │ │
-│  └──────────────────────────┬───────────────────────────────┘ │
-│                             │                                 │
-│  ┌──────────────────────────▼───────────────────────────┐   │
-│  │          SQLite / PostgreSQL Database                 │   │
-│  │                                                        │   │
-│  │  ┌───────┐ ┌────────────┐ ┌──────────┐ ┌──────────┐ │   │
-│  │  │ Leads │ │ Call       │ │ Calendar │ │  Sales   │ │   │
-│  │  │       │ │ Sessions   │ │ Events   │ │  Reps    │ │   │
-│  │  └───────┘ └────────────┘ └──────────┘ └──────────┘ │   │
-│  └────────────────────────────────────────────────────────┘   │
+│                     API Gateway                               │
+│  ┌──────────────────────────────────────────────────────┐    │
+│  │  FastAPI Server (Python)                             │    │
+│  │  • REST API endpoints                                │    │
+│  │  • WebSocket support                                 │    │
+│  │  • Authentication & Authorization                    │    │
+│  │  • Rate limiting                                     │    │
+│  └──────────────────────────────────────────────────────┘    │
 └─────────────────────────────────────────────────────────────┘
                              │
 ┌────────────────────────────┼─────────────────────────────────┐
-│              External Services                               │
-│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐      │
-│  │  Twilio      │  │   OpenAI     │  │  Web Scraping│      │
-│  │  Voice API   │  │   GPT-4      │  │  Services    │      │
-│  └──────────────┘  └──────────────┘  └──────────────┘      │
+│                     MCP Core Layer                            │
+│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐       │
+│  │ MCP Protocol │  │ Sync Engine  │  │  Message     │       │
+│  │              │  │              │  │  Router      │       │
+│  └──────────────┘  └──────────────┘  └──────────────┘       │
+└─────────────────────────────────────────────────────────────┘
+                             │
+┌────────────────────────────┼─────────────────────────────────┐
+│                   Storage & Cache Layer                       │
+│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐       │
+│  │  PostgreSQL  │  │     Redis    │  │  File Store  │       │
+│  │  (Primary)   │  │   (Cache)    │  │   (Blobs)    │       │
+│  └──────────────┘  └──────────────┘  └──────────────┘       │
+└─────────────────────────────────────────────────────────────┘
+                             │
+┌────────────────────────────┼─────────────────────────────────┐
+│                   AI Integration Layer                        │
+│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐       │
+│  │  Vertex AI   │  │   ChatGPT    │  │   GitHub     │       │
+│  │  Adapter     │  │   Adapter    │  │   Copilot    │       │
+│  └──────────────┘  └──────────────┘  └──────────────┘       │
 └─────────────────────────────────────────────────────────────┘
 ```
 
-## Component Details
+## Core Components
 
-### Frontend Layer
+### 1. MCP Protocol Layer
+- **Protocol Definition**: Message formats, types, and routing rules
+- **Serialization**: Efficient data encoding/decoding
+- **Validation**: Schema validation and type checking
 
-#### Web UI
-- **Technology**: Vanilla JavaScript, HTML5, CSS3
-- **Features**:
-  - Real-time WebSocket connection
-  - Interactive lead management
-  - Calendar visualization
-  - CRM sheet view
-  - Activity feed
-  - Responsive design
+### 2. Synchronization Engine
+- **Real-time Sync**: WebSocket-based bidirectional communication
+- **Conflict Resolution**: CRDT-based merge strategies
+- **State Management**: Distributed state with Redis
+- **Event Sourcing**: Audit trail of all changes
 
-#### Key Components:
-1. **Connection Manager**: WebSocket handler with auto-reconnect
-2. **Lead Manager**: CRUD operations for leads
-3. **Activity Feed**: Real-time event display
-4. **Calendar Widget**: Visual callback scheduling
-5. **CRM Table**: Structured lead data view
+### 3. AI Provider Adapters
+Each AI provider has a dedicated adapter that:
+- Translates MCP messages to provider-specific formats
+- Handles authentication and rate limiting
+- Manages connection pooling
+- Implements retry logic and circuit breakers
 
-### Backend Layer
-
-#### FastAPI Application
-- **Framework**: FastAPI 0.109+
-- **Python**: 3.8+
-- **Features**:
-  - Async/await support
-  - Auto-generated OpenAPI docs
-  - WebSocket support
-  - CORS middleware
-  - Request validation (Pydantic)
-
-#### Core Modules:
-
-1. **main.py**: Application entry point and route definitions
-2. **models.py**: Database models (SQLAlchemy)
-3. **schemas.py**: Pydantic models for validation
-4. **database.py**: Database connection and session management
-5. **voice_agent.py**: AI voice integration
-6. **enrichment.py**: Data enrichment pipeline
-7. **websocket_manager.py**: Real-time communication
-
-### Service Layer
-
-#### AI Voice Agent
-- **AI Model**: OpenAI GPT-4 Turbo
-- **Voice Provider**: Twilio Voice API
-- **Features**:
-  - Natural conversation flow
-  - Information extraction
-  - Sentiment analysis
-  - Lead scoring
-  - Call recording
-
-**Workflow**:
-1. Initiate outbound call via Twilio
-2. Generate greeting TwiML
-3. Process speech input
-4. Generate AI responses
-5. Extract structured data
-6. Summarize conversation
-7. Score lead quality
-
-#### Data Enrichment Service
-- **Purpose**: Augment lead data with public information
-- **Sources**:
-  - Web scraping
-  - Social media APIs
-  - Company databases
-  - Phone verification
-
-**Enrichment Pipeline**:
-1. Receive lead data
-2. Validate phone number
-3. Search social profiles
-4. Scrape company info
-5. Aggregate results
-6. Store enriched data
-7. Broadcast update
-
-### Data Layer
-
-#### Database Models
-
-1. **Lead**: Core lead information
-2. **Interaction**: Communication history
-3. **Note**: Annotations and notes
-4. **CallSession**: Active call tracking
-5. **CalendarEvent**: Scheduled callbacks
-6. **SalesRepresentative**: Team members
-
-#### Relationships:
-- Lead → Interactions (one-to-many)
-- Lead → Notes (one-to-many)
-- Lead → CalendarEvents (one-to-many)
-- SalesRepresentative → CalendarEvents (one-to-many)
-
-### External Services
-
-#### Twilio Voice API
-- Outbound calling
-- TwiML webhooks
-- Call recording
-- Status callbacks
-
-#### OpenAI API
-- GPT-4 conversation
-- Information extraction
-- Sentiment analysis
-- Summary generation
-
-#### Web Scraping
-- BeautifulSoup for HTML parsing
-- Selenium for dynamic content
-- Playwright for modern sites
+### 4. Intelligence Sharing
+- **Knowledge Graph**: Relationships between concepts
+- **Pattern Recognition**: Identify common code patterns
+- **Learning Transfer**: Share insights across AIs
+- **Confidence Scoring**: Weight intelligence by reliability
 
 ## Data Flow
 
-### Lead Creation Flow
-```
-User Input → POST /api/leads → Create Lead → Broadcast WebSocket
-    ↓
-Background Task → Enrich Data → Update Lead → Broadcast Update
-```
+### Context Synchronization Flow
 
-### Voice Call Flow
 ```
-POST /api/voice/initiate-call → Twilio API → Call Initiated
-    ↓
-Twilio Webhook → /api/voice/twiml → Return Greeting
-    ↓
-User Speaks → /api/voice/process → AI Processing → Generate Response
-    ↓
-Extract Info → Update Lead → Broadcast Update
-    ↓
-Call Ends → Status Webhook → Generate Summary → Update Lead
-```
-
-### Real-Time Update Flow
-```
-Backend Event → WebSocket Manager → Broadcast → All Connected Clients
-    ↓
-Frontend Receives → Update UI → Trigger Animation
+1. User edits code in VS Code
+   ↓
+2. VS Code extension captures context
+   ↓
+3. Context sent to MCP server via REST API
+   ↓
+4. MCP server validates and enriches context
+   ↓
+5. Sync engine broadcasts to Redis pub/sub
+   ↓
+6. AI adapters receive and translate context
+   ↓
+7. Context pushed to each AI provider
+   ↓
+8. Acknowledgments collected and logged
 ```
 
-## Security Considerations
+### Intelligence Sharing Flow
 
-### API Security
-- Environment variables for secrets
-- CORS configuration
-- Input validation (Pydantic)
-- SQL injection prevention (SQLAlchemy ORM)
-- Rate limiting (production)
-
-### Data Privacy
-- Secure storage of phone numbers
-- Call recording consent
-- GDPR compliance ready
-- Data retention policies
-
-### Production Recommendations
-1. HTTPS/WSS only
-2. JWT authentication
-3. Role-based access control
-4. API key rotation
-5. Audit logging
-6. Encryption at rest
+```
+1. AI generates insight (e.g., ChatGPT suggests pattern)
+   ↓
+2. Insight captured by adapter
+   ↓
+3. Intelligence packaged with metadata
+   ↓
+4. Confidence score calculated
+   ↓
+5. Relevant providers identified
+   ↓
+6. Intelligence distributed via sync engine
+   ↓
+7. Each provider incorporates into knowledge base
+   ↓
+8. Usage tracked for quality metrics
+```
 
 ## Scalability
 
 ### Horizontal Scaling
-- Stateless API design
-- Database connection pooling
-- Redis for WebSocket pub/sub
-- Celery for background tasks
-- Load balancer ready
+- **Stateless API servers**: Scale behind load balancer
+- **Redis Cluster**: Distributed caching and pub/sub
+- **PostgreSQL Read Replicas**: Read-heavy workloads
+- **Message Queue**: Decouple synchronization from API
 
-### Performance Optimization
-- Database indexing
-- Query optimization
-- Caching (Redis)
-- Async operations
-- Connection reuse
+### Performance Optimizations
+- **Connection Pooling**: Reuse database and HTTP connections
+- **Caching Strategy**: Multi-tier caching (memory → Redis → DB)
+- **Async Processing**: Non-blocking I/O throughout
+- **Batch Operations**: Group similar operations
 
-### Monitoring
-- Health check endpoint
-- Logging (structured)
-- Error tracking (Sentry)
-- Performance metrics
-- WebSocket connection tracking
+## Security
+
+### Authentication & Authorization
+- **JWT Tokens**: Stateless authentication
+- **API Keys**: Service-to-service communication
+- **OAuth 2.0**: Third-party integrations
+- **RBAC**: Role-based access control
+
+### Data Security
+- **Encryption at Rest**: Database encryption
+- **Encryption in Transit**: TLS 1.3 for all connections
+- **Secrets Management**: Google Secret Manager
+- **Audit Logging**: All operations logged
+
+## Monitoring & Observability
+
+### Metrics (Prometheus)
+- Request latency and throughput
+- Error rates by endpoint
+- AI provider response times
+- Cache hit rates
+- Queue depths
+
+### Logging (Structured)
+- Request/response logging
+- Error tracking with context
+- Performance profiling
+- Security events
+
+### Tracing (Distributed)
+- Request flow across services
+- AI provider call chains
+- Database query performance
+- Cache access patterns
 
 ## Deployment
 
 ### Development
-- SQLite database
-- Local file storage
-- Debug mode enabled
-- Auto-reload
+```bash
+docker-compose up
+```
 
 ### Staging
-- PostgreSQL database
-- Cloud storage
-- Error tracking
-- Performance monitoring
+- Google Cloud Run (auto-scaling)
+- Cloud SQL (PostgreSQL)
+- Memorystore (Redis)
 
 ### Production
-- Managed database (RDS/Cloud SQL)
+- Multi-region deployment
 - CDN for static assets
-- Auto-scaling
-- Backup automation
-- High availability
+- DDoS protection
+- Automated failover
 
-## Technology Stack Summary
+## Technology Stack
 
 ### Backend
-- **Framework**: FastAPI
-- **Language**: Python 3.8+
-- **Database**: SQLAlchemy ORM (SQLite/PostgreSQL)
-- **Async**: asyncio, aiohttp
-- **Validation**: Pydantic
+- **Python 3.11**: Core language
+- **FastAPI**: Web framework
+- **SQLAlchemy**: ORM
+- **asyncpg**: Async PostgreSQL driver
+- **redis-py**: Redis client
 
-### Frontend
-- **Core**: Vanilla JavaScript (ES6+)
-- **Styling**: CSS3 with animations
-- **Communication**: WebSocket, Fetch API
-- **UI**: Responsive, device-ready
+### Frontend (VS Code Extension)
+- **TypeScript**: Language
+- **VS Code API**: Extension framework
+- **Axios**: HTTP client
+- **WebSocket**: Real-time communication
 
 ### Infrastructure
-- **Web Server**: Uvicorn
-- **Reverse Proxy**: Nginx (production)
-- **Process Manager**: systemd/supervisord
-- **Container**: Docker (optional)
+- **Docker**: Containerization
+- **Kubernetes**: Orchestration (optional)
+- **Terraform**: Infrastructure as Code
+- **GitHub Actions**: CI/CD
 
-### External Services
-- **AI**: OpenAI GPT-4
-- **Voice**: Twilio
-- **Storage**: Local/S3
-- **Cache**: Redis (optional)
-- **Queue**: Celery (optional)
-
-## Development Workflow
-
-1. **Local Development**
-   - Install dependencies
-   - Configure environment
-   - Run backend server
-   - Open frontend in browser
-
-2. **Testing**
-   - Unit tests (pytest)
-   - Integration tests
-   - E2E tests (Playwright)
-   - Load testing
-
-3. **Deployment**
-   - Build artifacts
-   - Run migrations
-   - Deploy backend
-   - Serve frontend
-   - Configure webhooks
-
-4. **Monitoring**
-   - Check health endpoint
-   - Monitor logs
-   - Track metrics
-   - Alert on errors
+### AI Providers
+- **Google Vertex AI**: Gemini Pro
+- **OpenAI**: GPT-4 Turbo
+- **GitHub Copilot**: Code completion
+- **Custom Models**: Extensible architecture

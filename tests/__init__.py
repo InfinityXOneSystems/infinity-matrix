@@ -1,1 +1,1 @@
-"""Tests package"""
+"""Test configuration."""

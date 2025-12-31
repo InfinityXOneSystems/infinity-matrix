@@ -1,0 +1,209 @@
+name: Auto-Bootstrap - Autonomous Repository Management
+
+on:
+  # Run weekly on Mondays at 00:00 UTC
+  schedule:
+    - cron: '0 0 * * 1'
+  
+  # Allow manual trigger
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: 'Agent operation mode'
+        required: true
+        default: 'dry-run'
+        type: choice
+        options:
+          - dry-run
+          - analysis
+          - full
+      create_pr:
+        description: 'Create PR with results'
+        required: false
+        default: 'false'
+        type: boolean
+
+  # Trigger on push to main (for testing)
+  push:
+    branches:
+      - main
+    paths:
+      - '.github/workflows/auto-bootstrap.yml'
+      - 'scripts/autonomous_agent.py'
+
+env:
+  PYTHON_VERSION: '3.11'
+
+jobs:
+  autonomous-analysis:
+    name: Autonomous Repository Analysis
+    runs-on: ubuntu-latest
+    
+    permissions:
+      contents: write
+      pull-requests: write
+      issues: write
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Full history for better analysis
+      
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: 'pip'
+      
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+      
+      - name: Configure agent
+        run: |
+          cp .env.example .env
+          # Set configuration from workflow inputs or defaults
+          MODE="${{ github.event.inputs.mode || 'dry-run' }}"
+          echo "AGENT_MODE=${MODE}" >> .env
+          echo "GITHUB_TOKEN=${{ secrets.GITHUB_TOKEN }}" >> .env
+          echo "GITHUB_OWNER=${{ github.repository_owner }}" >> .env
+          echo "GITHUB_REPO=${{ github.event.repository.name }}" >> .env
+          echo "GITHUB_DEFAULT_BRANCH=${{ github.event.repository.default_branch }}" >> .env
+          
+          # Set PR creation flag
+          if [ "${{ github.event.inputs.create_pr }}" = "true" ]; then
+            echo "AUTO_CREATE_PR=true" >> .env
+          else
+            echo "AUTO_CREATE_PR=false" >> .env
+          fi
+          
+          echo "Agent configured with mode: ${MODE}"
+      
+      - name: Run autonomous agent
+        id: agent
+        run: |
+          echo "::group::Agent Execution"
+          python scripts/autonomous_agent.py --mode "${{ github.event.inputs.mode || 'dry-run' }}" | tee agent_output.log
+          echo "::endgroup::"
+          
+          # Save output for potential PR creation
+          echo "AGENT_OUTPUT<<EOF" >> $GITHUB_OUTPUT
+          cat agent_output.log >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+      
+      - name: Run code quality checks
+        id: quality
+        continue-on-error: true
+        run: |
+          echo "::group::Code Quality Check"
+          flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics || true
+          flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics || true
+          echo "::endgroup::"
+      
+      - name: Generate analysis summary
+        run: |
+          echo "## 🤖 Autonomous Agent Analysis" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Mode:** ${{ github.event.inputs.mode || 'dry-run' }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Timestamp:** $(date -u '+%Y-%m-%d %H:%M:%S UTC')" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Analysis Results" >> $GITHUB_STEP_SUMMARY
+          echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+          head -n 50 agent_output.log >> $GITHUB_STEP_SUMMARY
+          echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+      
+      - name: Upload analysis artifacts
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: analysis-report-${{ github.run_id }}
+          path: |
+            agent_output.log
+            .env
+          retention-days: 30
+      
+      - name: Create analysis issue (on failure)
+        if: failure()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const logContent = fs.readFileSync('agent_output.log', 'utf8');
+            
+            const issueBody = `## 🚨 Autonomous Agent Execution Failed
+            
+            **Workflow Run:** ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+            **Mode:** ${{ github.event.inputs.mode || 'dry-run' }}
+            **Timestamp:** ${new Date().toISOString()}
+            
+            ### Agent Output
+            
+            \`\`\`
+            ${logContent.slice(0, 5000)}
+            \`\`\`
+            
+            ### Action Required
+            
+            Please review the agent output and investigate the failure cause.
+            `;
+            
+            await github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: '🤖 Autonomous Agent Execution Failed',
+              body: issueBody,
+              labels: ['automated', 'bot', 'needs-investigation']
+            });
+      
+      - name: Notify on success
+        if: success()
+        run: |
+          echo "✅ Autonomous agent execution completed successfully!"
+          echo "Mode: ${{ github.event.inputs.mode || 'dry-run' }}"
+          echo "Check the artifacts for detailed analysis results."
+
+  security-scan:
+    name: Security and Dependency Scan
+    runs-on: ubuntu-latest
+    needs: autonomous-analysis
+    if: github.event_name == 'workflow_dispatch' || github.event_name == 'schedule'
+
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+      
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install safety bandit
+      
+      - name: Run safety check
+        continue-on-error: true
+        run: |
+          echo "::group::Dependency Security Scan"
+          safety check --json || true
+          echo "::endgroup::"
+      
+      - name: Run bandit security scan
+        continue-on-error: true
+        run: |
+          echo "::group::Code Security Scan"
+          bandit -r scripts/ -f json || true
+          echo "::endgroup::"
+      
+      - name: Security summary
+        run: |
+          echo "## 🔒 Security Scan Results" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "Security scans completed. Check logs for details." >> $GITHUB_STEP_SUMMARY

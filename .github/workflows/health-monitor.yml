@@ -1,0 +1,55 @@
+name: Health Monitor
+
+on:
+  schedule:
+    # Run every 15 minutes
+    - cron: '*/15 * * * *'
+  workflow_dispatch:
+
+jobs:
+  monitor-health:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+      
+      - name: Run health checks
+        run: |
+          export PYTHONPATH="${PYTHONPATH}:${GITHUB_WORKSPACE}/src"
+          python -c "
+from agents.self_healing import SelfHealingAgent, ZeroInterventionTrigger
+import json
+
+# Run self-healing
+healing = SelfHealingAgent()
+result = healing.monitor_and_heal()
+print('Healing result:', json.dumps(result, indent=2))
+
+# Check triggers
+trigger = ZeroInterventionTrigger()
+trigger_result = trigger.check_and_trigger()
+print('Trigger result:', json.dumps(trigger_result, indent=2))
+"
+      
+      - name: Export health report
+        run: |
+          export PYTHONPATH="${PYTHONPATH}:${GITHUB_WORKSPACE}/src"
+          python -c "from exporters.artifact_exporter import ArtifactExporter; ArtifactExporter().export_markdown()"
+      
+      - name: Upload health artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: health-report-${{ github.run_number }}
+          path: .prooftest/reports/
+          retention-days: 30

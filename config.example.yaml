@@ -1,0 +1,101 @@
+# Example configuration for Infinity Matrix
+
+infinity_matrix:
+  # Core settings
+  debug: false
+  log_level: INFO
+  data_dir: ~/.infinity-matrix
+  
+  # Agent system configuration
+  agents:
+    max_concurrent: 10
+    registry_backend: memory  # Options: memory, redis, postgresql
+    heartbeat_interval: 30
+    timeout: 300
+  
+  # Vision Cortex configuration
+  vision:
+    enabled: true
+    models:
+      - gpt-4-vision
+      - claude-3-opus
+    max_image_size: 20000000  # 20MB
+    ocr_enabled: true
+  
+  # Auto-Builder configuration
+  builder:
+    enabled: true
+    platforms:
+      - python
+      - node
+      - go
+      - rust
+      - java
+    parallel_builds: 4
+    cache_enabled: true
+  
+  # Evolution Doc System configuration
+  docs:
+    enabled: true
+    auto_generate: true
+    formats:
+      - markdown
+      - html
+      - pdf
+    update_on_commit: true
+  
+  # Index System configuration
+  index:
+    enabled: true
+    backend: elasticsearch  # Options: elasticsearch, opensearch
+    semantic_search: true
+    embedding_model: text-embedding-ada-002
+  
+  # Taxonomy System configuration
+  taxonomy:
+    enabled: true
+    auto_classify: true
+    categories:
+      - backend
+      - frontend
+      - infrastructure
+      - documentation
+      - testing
+  
+  # PR Engine configuration
+  pr_engine:
+    enabled: true
+    auto_review: true
+    auto_merge: false
+    required_approvals: 1
+    conflict_resolution: manual  # Options: manual, auto
+  
+  # ETL System configuration
+  etl:
+    enabled: true
+    max_workers: 10
+    rate_limit: 100  # requests per minute
+    retry_attempts: 3
+  
+  # External integrations
+  integrations:
+    github:
+      enabled: true
+      token: ${GITHUB_TOKEN}
+      api_url: https://api.github.com
+      webhook_secret: ${GITHUB_WEBHOOK_SECRET}
+    
+    gcp:
+      enabled: false
+      project_id: ${GCP_PROJECT_ID}
+      credentials_file: ${GOOGLE_APPLICATION_CREDENTIALS}
+    
+    hostinger:
+      enabled: false
+      api_key: ${HOSTINGER_API_KEY}
+      api_url: https://api.hostinger.com
+    
+    vscode:
+      enabled: true
+      extension_id: infinityxone.infinity-matrix
+      lsp_enabled: true

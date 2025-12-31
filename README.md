@@ -55,6 +55,10 @@ Infinity-Matrix is a fully autonomous development system that operates 24/7 with
 git clone https://github.com/InfinityXOneSystems/infinity-matrix.git
 cd infinity-matrix
 
+# Create virtual environment
+python -m venv venv
+source venv/bin/activate  # On Windows: venv\Scripts\activate
+
 # Install dependencies
 npm install
 
@@ -254,6 +258,8 @@ npm run deploy:prod      # Deploy to production
 
 ### Project Structure
 
+# Deploy to production
+docker-compose -f docker-compose.prod.yml up -d
 ```
 infinity-matrix/
 ├── docs/                      # Documentation

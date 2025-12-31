@@ -1,193 +1,380 @@
-# System Architecture
+# Infinity Matrix Auto-Builder Architecture
+
+## Overview
+
+The Infinity Matrix Auto-Builder is a sophisticated autonomous code generation and deployment system that uses a multi-agent architecture orchestrated by Vision Cortex. This document describes the system architecture, components, and design patterns.
+
+## High-Level Architecture
 
 ```
-┌─────────────────────────────────────────────────────────────────────┐
-│                        INFINITY MATRIX SYSTEM                        │
-└─────────────────────────────────────────────────────────────────────┘
+┌─────────────────────────────────────────────────────────────┐
+│                      External Interfaces                     │
+│  ┌──────────┐  ┌──────────┐  ┌──────────┐  ┌──────────┐   │
+│  │   CLI    │  │REST API  │  │WebSocket │  │  WebHook │   │
+│  └────┬─────┘  └────┬─────┘  └────┬─────┘  └────┬─────┘   │
+└───────┼─────────────┼─────────────┼─────────────┼──────────┘
+        │             │             │             │
+┌───────┴─────────────┴─────────────┴─────────────┴──────────┐
+│                      Auto-Builder Core                       │
+│  ┌───────────────────────────────────────────────────────┐  │
+│  │              Vision Cortex Orchestrator                │  │
+│  │    (High-level planning & agent coordination)          │  │
+│  └─────────────────────┬─────────────────────────────────┘  │
+│                        │                                     │
+│  ┌─────────────────────┴─────────────────────────────────┐  │
+│  │               Agent Management Layer                   │  │
+│  │  ┌──────┐ ┌────────┐ ┌──────────┐ ┌──────────────┐   │  │
+│  │  │Crawler│ │Ingestion│ │Predictor│ │     CEO      │   │  │
+│  │  └──────┘ └────────┘ └──────────┘ └──────────────┘   │  │
+│  │  ┌────────┐ ┌────────┐ ┌─────────┐ ┌────────────┐   │  │
+│  │  │Strategist│ │Organizer│ │Validator│ │Documentor│   │  │
+│  │  └────────┘ └────────┘ └─────────┘ └────────────┘   │  │
+│  └──────────────────────────────────────────────────────┘  │
+│                        │                                     │
+│  ┌─────────────────────┴─────────────────────────────────┐  │
+│  │              Code Generation Layer                     │  │
+│  │  ┌────────────┐ ┌────────────┐ ┌──────────────────┐  │  │
+│  │  │  Template  │ │    Code    │ │   Repository     │  │  │
+│  │  │  Manager   │ │  Generator │ │   Manager        │  │  │
+│  │  └────────────┘ └────────────┘ └──────────────────┘  │  │
+│  └──────────────────────────────────────────────────────┘  │
+└─────────────────────────────────────────────────────────────┘
+        │             │             │             │
+┌───────┴─────────────┴─────────────┴─────────────┴──────────┐
+│                    External Systems                          │
+│  ┌──────────┐  ┌──────────┐  ┌──────────┐  ┌──────────┐   │
+│  │  GitHub  │  │   CI/CD  │  │ Storage  │  │  Database│   │
+│  └──────────┘  └──────────┘  └──────────┘  └──────────┘   │
+└─────────────────────────────────────────────────────────────┘
+```
 
-┌─────────────────────────────────────────────────────────────────────┐
-│                         VISION CORTEX                                │
-│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐              │
-│  │   Memory     │  │  Document    │  │    Event     │              │
-│  │    Store     │  │   Engine     │  │   System     │              │
-│  └──────────────┘  └──────────────┘  └──────────────┘              │
-└─────────────────────────────────────────────────────────────────────┘
-                              │
-                              │ connects
-                              ▼
-┌─────────────────────────────────────────────────────────────────────┐
-│                         OMNI ROUTER                                  │
-│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐              │
-│  │    RBAC      │  │   Routing    │  │   Secret     │              │
-│  │   Policies   │  │    Engine    │  │   Manager    │              │
-│  └──────────────┘  └──────────────┘  └──────────────┘              │
-└─────────────────────────────────────────────────────────────────────┘
-                              │
-                              │ routes to
-                              ▼
-┌─────────────────────────────────────────────────────────────────────┐
-│                       AGENT REGISTRY                                 │
-│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐              │
-│  │Registration  │  │   Health     │  │  Heartbeat   │              │
-│  │   System     │  │  Monitoring  │  │   Tracking   │              │
-│  └──────────────┘  └──────────────┘  └──────────────┘              │
-└─────────────────────────────────────────────────────────────────────┘
-                              │
-                              │ manages
-                              ▼
-┌─────────────────────────────────────────────────────────────────────┐
-│                         SPECIALIZED AGENTS                           │
-│                                                                       │
-│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐              │
-│  │  Financial   │  │ Real Estate  │  │     Loan     │              │
-│  │    Agent     │  │    Agent     │  │    Agent     │              │
-│  └──────────────┘  └──────────────┘  └──────────────┘              │
-│                                                                       │
-│  ┌──────────────┐  ┌──────────────┐                                 │
-│  │  Analytics   │  │     NLP      │                                 │
-│  │    Agent     │  │    Agent     │                                 │
-│  └──────────────┘  └──────────────┘                                 │
-└─────────────────────────────────────────────────────────────────────┘
-                              │
-                              │ uses
-                              ▼
-┌─────────────────────────────────────────────────────────────────────┐
-│                      INFRASTRUCTURE LAYER                            │
-│                                                                       │
-│  ┌─────────────────────────┐  ┌─────────────────────────┐           │
-│  │   Firestore Integration │  │  Pub/Sub Integration    │           │
-│  │  ┌─────────┬──────────┐ │  │  ┌────────┬──────────┐ │           │
-│  │  │ Vector  │Relational│ │  │  │ Topics │Subscript.│ │           │
-│  │  │ Memory  │  Storage │ │  │  │        │          │ │           │
-│  │  └─────────┴──────────┘ │  │  └────────┴──────────┘ │           │
-│  └─────────────────────────┘  └─────────────────────────┘           │
-└─────────────────────────────────────────────────────────────────────┘
-                              │
-                              │ exposed via
-                              ▼
-┌─────────────────────────────────────────────────────────────────────┐
-│                         API SERVER (REST)                            │
-│                                                                       │
-│  /api/status                    System status                        │
-│  /api/agents                    List agents                          │
-│  /api/agents/{id}               Agent details                        │
-│  /api/agents/{id}/health        Agent health                         │
-│  /api/routes                    List routes                          │
-│  /api/dashboard                 Dashboard view                       │
-└─────────────────────────────────────────────────────────────────────┘
+## Core Components
 
+### 1. Vision Cortex
 
-═══════════════════════════════════════════════════════════════════════
-                            DATA FLOW
-═══════════════════════════════════════════════════════════════════════
+**Purpose**: Central orchestrator that coordinates all agents and manages the build lifecycle.
 
-1. Request → API Server → Omni Router
-2. Omni Router → Authentication & Policy Check
-3. Omni Router → Route to Appropriate Agent (via Registry)
-4. Agent → Process Request (using Memory/Firestore)
-5. Agent → Publish Events (via Pub/Sub)
-6. Vision Cortex → Coordinate & Monitor
-7. Response → Back through chain to API Server
+**Responsibilities**:
+- Build plan creation and execution
+- Agent task scheduling and distribution
+- Inter-agent communication management
+- Build state tracking and monitoring
+- Error handling and recovery
 
+**Key Features**:
+- Asynchronous task execution
+- Phase-based build orchestration
+- Agent capability matching
+- Build status aggregation
 
-═══════════════════════════════════════════════════════════════════════
-                         SECURITY LAYERS
-═══════════════════════════════════════════════════════════════════════
+### 2. Agent System
 
-┌─────────────────────────────────────────────────────────────────────┐
-│ Layer 1: Authentication                                              │
-│   - User identification                                              │
-│   - Token validation                                                 │
-└─────────────────────────────────────────────────────────────────────┘
-                              ▼
-┌─────────────────────────────────────────────────────────────────────┐
-│ Layer 2: RBAC Policy Enforcement                                     │
-│   - Role verification (admin, agent, viewer)                         │
-│   - Permission checking (READ, WRITE, EXECUTE, ADMIN)                │
-└─────────────────────────────────────────────────────────────────────┘
-                              ▼
-┌─────────────────────────────────────────────────────────────────────┐
-│ Layer 3: Resource Access Control                                     │
-│   - Resource-level permissions                                       │
-│   - Rate limiting                                                    │
-└─────────────────────────────────────────────────────────────────────┘
-                              ▼
-┌─────────────────────────────────────────────────────────────────────┐
-│ Layer 4: Secret Management                                           │
-│   - Credential storage                                               │
-│   - Secret retrieval with access control                             │
-└─────────────────────────────────────────────────────────────────────┘
+The system includes eight specialized agents, each responsible for specific aspects of the build process:
 
+#### Crawler Agent
+- **Purpose**: Analyze existing codebases, documentation, and templates
+- **Actions**: 
+  - `analyze_repo`: Scan repository structure and patterns
+  - `scan_templates`: Discover available templates
+  - `analyze_docs`: Process documentation
+- **Use Cases**: Finding best practices, extracting patterns, template discovery
 
-═══════════════════════════════════════════════════════════════════════
-                         EVENT FLOW
-═══════════════════════════════════════════════════════════════════════
+#### Ingestion Agent
+- **Purpose**: Process and structure input data
+- **Actions**:
+  - `parse_blueprint`: Convert blueprint YAML to internal format
+  - `process_prompt`: Parse natural language requirements
+  - `extract_requirements`: Structure requirement lists
+- **Use Cases**: Blueprint parsing, requirement analysis, data normalization
 
-Agent Events:
-  agent_registered → Cortex, Registry
-  agent_unregistered → Cortex, Registry
-  agent_status_changed → Cortex, Registry, Monitoring
+#### Predictor Agent
+- **Purpose**: Make predictions about optimal architectures and technologies
+- **Actions**:
+  - `predict_architecture`: Suggest system architecture
+  - `recommend_technologies`: Propose tech stack
+  - `estimate_complexity`: Calculate build complexity
+- **Use Cases**: Architecture design, technology selection, effort estimation
 
-Cortex Events:
-  cortex_started → System
-  cortex_stopped → System
-  documents_loaded → Agents, Memory
+#### CEO Agent
+- **Purpose**: High-level decision making and approval
+- **Actions**:
+  - `approve_architecture`: Validate architectural decisions
+  - `select_technologies`: Choose final tech stack
+  - `make_decision`: General decision making
+- **Use Cases**: Final approvals, strategic decisions, conflict resolution
 
-Memory Events:
-  memory_updated → Agents, Analytics
-  document_ingested → Search, Indexing
+#### Strategist Agent
+- **Purpose**: Create implementation strategies and plans
+- **Actions**:
+  - `create_strategy`: Develop implementation approach
+  - `plan_phases`: Break down into phases
+  - `optimize_workflow`: Improve build process
+- **Use Cases**: Implementation planning, milestone definition, optimization
 
-Document Events:
-  document_processed → Memory, Search
-  index_updated → Cortex, Agents
+#### Organizer Agent
+- **Purpose**: Manage project structure and organization
+- **Actions**:
+  - `organize_structure`: Define file/folder layout
+  - `manage_dependencies`: Handle dependency management
+  - `create_layout`: Generate project skeleton
+- **Use Cases**: Project structure, dependency management, file organization
 
+#### Validator Agent
+- **Purpose**: Validate generated code and configurations
+- **Actions**:
+  - `validate_code`: Check code quality
+  - `run_tests`: Execute test suites
+  - `check_security`: Scan for vulnerabilities
+- **Use Cases**: Quality assurance, testing, security validation
 
-═══════════════════════════════════════════════════════════════════════
-                      DEPLOYMENT WORKFLOW
-═══════════════════════════════════════════════════════════════════════
+#### Documentor Agent
+- **Purpose**: Generate documentation
+- **Actions**:
+  - `generate_readme`: Create README files
+  - `generate_api_docs`: Generate API documentation
+  - `create_guides`: Write user guides
+- **Use Cases**: Documentation generation, onboarding materials, guides
 
-GitHub Actions: .github/workflows/cortex_bootstrap.yml
+### 3. Auto-Builder Core
 
-Triggers:
-  - Push to main/develop
-  - Pull request
-  - Schedule (daily at 00:00 UTC)
-  - Manual dispatch
+**Purpose**: Main interface for building projects.
 
-Steps:
-  1. Checkout code
-  2. Setup Python 3.11
-  3. Install dependencies
-  4. Verify system structure
-  5. Sync documentation
-  6. Run validation
-  7. Initialize Cortex
-  8. Auto-ingest documents
-  9. Generate report
-  10. Upload artifacts
-  11. Post summary
+**Features**:
+- Blueprint-based builds
+- Prompt-based builds
+- Build status tracking
+- Artifact generation
+- Asynchronous execution
 
+**Build Process**:
+1. Input processing (blueprint/prompt)
+2. Build plan creation via Vision Cortex
+3. Phase execution (Analysis → Decision → Organization → Validation → Documentation)
+4. Artifact generation
+5. Status reporting
 
-═══════════════════════════════════════════════════════════════════════
-                       MONITORING & HEALTH
-═══════════════════════════════════════════════════════════════════════
+### 4. Blueprint System
 
-Health Checks:
-  - Agent heartbeats (every 30s)
-  - Component status polling
-  - Health endpoint monitoring
-  - Error count tracking
+**Purpose**: Define project specifications in a structured format.
 
-Metrics:
-  - Active agents count
-  - Request routing stats
-  - Memory usage
-  - Event propagation stats
-  - API response times
+**Structure**:
+```yaml
+name: project-name
+version: 1.0.0
+type: microservice|web-app|cli-tool|library|api
+description: Project description
+requirements: [list of requirements]
+components: [list of components]
+deployment: deployment configuration
+testing: testing configuration
+documentation: documentation configuration
+```
 
-Dashboard:
-  - Real-time system status
-  - Agent health matrix
-  - Route configuration
-  - Security policy status
-  - Event statistics
+**Supported Project Types**:
+- Microservices
+- Web Applications
+- CLI Tools
+- Libraries
+- REST/GraphQL APIs
+- Mobile Apps
+- Data Pipelines
+- ML Models
+- Infrastructure
+
+### 5. Code Generation Layer
+
+#### Template Manager
+- Template discovery and loading
+- Template validation
+- Template caching
+
+#### Code Generator
+- Jinja2-based code generation
+- Python module generation
+- API endpoint generation
+- Test file generation
+
+#### Repository Manager
+- Git operations (init, clone, commit, push)
+- Branch management
+- Tag creation
+- Status tracking
+
+## Build Phases
+
+### Phase 1: Analysis & Planning
+- Crawler scans for templates and patterns
+- Ingestion processes blueprint/prompt
+- Predictor suggests architecture
+
+### Phase 2: Decision Making
+- CEO approves architecture
+- Strategist creates implementation strategy
+
+### Phase 3: Organization
+- Organizer defines project structure
+- Organizer manages dependencies
+
+### Phase 4: Validation
+- Validator checks generated code
+- Validator runs security scans
+
+### Phase 5: Documentation
+- Documentor generates README
+- Documentor creates API documentation
+
+## Integration Points
+
+### API Layer
+- FastAPI-based REST API
+- JWT authentication
+- WebSocket support for real-time updates
+- OpenAPI documentation
+
+### CLI
+- Typer-based CLI
+- Rich formatting
+- Progress tracking
+- Interactive features
+
+### External Services
+- **GitHub**: Repository management, PR creation, CI/CD triggers
+- **CI/CD**: Build automation, testing, deployment
+- **Storage**: Artifact storage, template storage
+- **Database**: Build history, metrics (future)
+
+## Data Flow
+
+```
+User Input (Prompt/Blueprint)
+    ↓
+Auto-Builder.build()
+    ↓
+Vision Cortex.orchestrate_build()
+    ↓
+Build Plan Creation
+    ↓
+Phase Execution (Sequential)
+    ↓
+Agent Task Execution (Parallel within phase)
+    ↓
+Artifact Generation
+    ↓
+Build Completion
+    ↓
+Status Reporting
+```
+
+## Design Patterns
+
+### 1. Multi-Agent Pattern
+- Specialized agents for specific tasks
+- Agent coordination via orchestrator
+- Capability-based task assignment
+
+### 2. Pipeline Pattern
+- Sequential phase execution
+- Phase dependencies
+- Progress tracking
+
+### 3. Observer Pattern
+- Build status monitoring
+- Event-based notifications
+- Real-time updates
+
+### 4. Template Method Pattern
+- Base agent interface
+- Concrete agent implementations
+- Consistent execution flow
+
+### 5. Strategy Pattern
+- Multiple build strategies
+- Pluggable agents
+- Configurable behavior
+
+## Scalability Considerations
+
+### Horizontal Scaling
+- Stateless API servers
+- Distributed agent execution
+- Load balancing
+
+### Vertical Scaling
+- Async/await for I/O operations
+- Parallel agent execution
+- Resource pooling
+
+### Performance Optimizations
+- Template caching
+- Blueprint validation caching
+- Lazy loading
+- Connection pooling
+
+## Security
+
+### Authentication & Authorization
+- JWT-based API authentication
+- Role-based access control
+- Secret management
+
+### Code Security
+- Input validation
+- Code scanning
+- Dependency vulnerability checks
+- Secure defaults
+
+### Network Security
+- HTTPS enforcement
+- CORS configuration
+- Rate limiting
+- Request validation
+
+## Monitoring & Observability
+
+### Metrics
+- Build success/failure rates
+- Build duration
+- Agent execution times
+- API latency
+
+### Logging
+- Structured logging
+- Log levels (DEBUG, INFO, WARNING, ERROR)
+- Correlation IDs
+- Audit trails
+
+### Tracing
+- Request tracing
+- Build lifecycle tracing
+- Agent execution tracing
+
+## Future Enhancements
+
+1. **Machine Learning Integration**
+   - Pattern recognition
+   - Architecture prediction
+   - Complexity estimation
+
+2. **Advanced Agent Capabilities**
+   - Natural language understanding
+   - Code refactoring
+   - Performance optimization
+
+3. **Enhanced Orchestration**
+   - Dynamic agent selection
+   - Adaptive strategies
+   - Self-healing builds
+
+4. **Extended Integrations**
+   - More CI/CD platforms
+   - Cloud providers
+   - IDEs and editors
+
+5. **Collaborative Features**
+   - Multi-user builds
+   - Team workflows
+   - Review systems
+
+## Conclusion
+
+The Infinity Matrix Auto-Builder architecture is designed for extensibility, scalability, and maintainability. The multi-agent approach provides flexibility and specialization, while the Vision Cortex orchestrator ensures coordinated execution. The system adheres to enterprise standards and best practices, making it suitable for production use in demanding environments.

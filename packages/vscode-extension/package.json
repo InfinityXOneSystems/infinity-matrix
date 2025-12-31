@@ -1,0 +1,133 @@
+{
+  "name": "infinity-matrix",
+  "displayName": "Infinity Matrix - AI Context Mesh",
+  "description": "Real-time AI intelligence sharing and context synchronization across multiple AI platforms",
+  "version": "1.0.0",
+  "publisher": "infinityxone-systems",
+  "engines": {
+    "vscode": "^1.85.0"
+  },
+  "categories": [
+    "Other",
+    "Machine Learning",
+    "Programming Languages"
+  ],
+  "keywords": [
+    "ai",
+    "mcp",
+    "copilot",
+    "chatgpt",
+    "vertex-ai",
+    "context-sharing"
+  ],
+  "activationEvents": [
+    "onStartupFinished"
+  ],
+  "main": "./dist/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "infinityMatrix.syncContext",
+        "title": "Infinity Matrix: Sync Context to All AIs"
+      },
+      {
+        "command": "infinityMatrix.shareIntelligence",
+        "title": "Infinity Matrix: Share Intelligence"
+      },
+      {
+        "command": "infinityMatrix.connect",
+        "title": "Infinity Matrix: Connect to MCP Server"
+      },
+      {
+        "command": "infinityMatrix.disconnect",
+        "title": "Infinity Matrix: Disconnect from MCP Server"
+      },
+      {
+        "command": "infinityMatrix.showStatus",
+        "title": "Infinity Matrix: Show Status"
+      }
+    ],
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "infinityMatrix",
+          "title": "Infinity Matrix",
+          "icon": "resources/icon.svg"
+        }
+      ]
+    },
+    "views": {
+      "infinityMatrix": [
+        {
+          "id": "infinityMatrix.aiProviders",
+          "name": "AI Providers"
+        },
+        {
+          "id": "infinityMatrix.contextSync",
+          "name": "Context Sync"
+        },
+        {
+          "id": "infinityMatrix.intelligence",
+          "name": "Shared Intelligence"
+        }
+      ]
+    },
+    "configuration": {
+      "title": "Infinity Matrix",
+      "properties": {
+        "infinityMatrix.serverUrl": {
+          "type": "string",
+          "default": "http://localhost:3000",
+          "description": "URL of the Infinity Matrix MCP server"
+        },
+        "infinityMatrix.autoSync": {
+          "type": "boolean",
+          "default": true,
+          "description": "Automatically sync context on file changes"
+        },
+        "infinityMatrix.enabledProviders": {
+          "type": "array",
+          "default": ["vertex_ai", "chatgpt", "github_copilot"],
+          "description": "List of enabled AI providers",
+          "items": {
+            "type": "string",
+            "enum": ["vertex_ai", "chatgpt", "github_copilot", "vscode_copilot"]
+          }
+        },
+        "infinityMatrix.syncInterval": {
+          "type": "number",
+          "default": 30000,
+          "description": "Context sync interval in milliseconds"
+        },
+        "infinityMatrix.apiKey": {
+          "type": "string",
+          "default": "",
+          "description": "API key for authentication (optional)"
+        }
+      }
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "pretest": "npm run compile && npm run lint",
+    "lint": "eslint src --ext ts",
+    "test": "node ./out/test/runTest.js",
+    "package": "vsce package"
+  },
+  "devDependencies": {
+    "@types/node": "^20.10.0",
+    "@types/vscode": "^1.85.0",
+    "@typescript-eslint/eslint-plugin": "^6.13.0",
+    "@typescript-eslint/parser": "^6.13.0",
+    "@vscode/test-electron": "^2.3.8",
+    "eslint": "^8.54.0",
+    "typescript": "^5.3.3",
+    "vsce": "^2.15.0"
+  },
+  "dependencies": {
+    "axios": "^1.6.2",
+    "ws": "^8.15.0"
+  }
+}
