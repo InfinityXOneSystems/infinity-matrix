@@ -1,434 +1,231 @@
-# Contributing to Infinity-Matrix
+# Contributing to Infinity Matrix
 
-Thank you for your interest in contributing to the Infinity-Matrix Autonomous System! This guide will help you get started.
+Thank you for your interest in contributing to the Infinity Matrix autonomous tracking and management system!
 
-## Table of Contents
+## How to Contribute
 
-- [Code of Conduct](#code-of-conduct)
-- [Getting Started](#getting-started)
-- [Development Workflow](#development-workflow)
-- [Code Standards](#code-standards)
-- [Testing](#testing)
-- [Documentation](#documentation)
-- [Pull Request Process](#pull-request-process)
-- [Agent Development](#agent-development)
+### Reporting Issues
 
-## Code of Conduct
+1. **Check existing issues** - Search for similar issues before creating new ones
+2. **Use issue templates** - Follow the provided templates for consistency
+3. **Provide details** - Include steps to reproduce, expected behavior, and actual behavior
+4. **Add labels** - Help categorize the issue appropriately
 
-### Our Pledge
+### Submitting Pull Requests
 
-We are committed to providing a welcoming and inclusive environment for all contributors.
+1. **Fork the repository**
+2. **Create a feature branch** - `git checkout -b feature/your-feature-name`
+3. **Make your changes** - Follow our coding standards
+4. **Test your changes** - Ensure everything works as expected
+5. **Commit with clear messages** - Use conventional commit format
+6. **Push to your fork** - `git push origin feature/your-feature-name`
+7. **Open a Pull Request** - Describe your changes clearly
 
-### Our Standards
+## Automatic Tracking
 
-- Be respectful and constructive
-- Welcome diverse perspectives
-- Accept constructive criticism gracefully
-- Focus on what's best for the community
-- Show empathy towards others
+All contributions are automatically tracked:
+- **Commits** are logged by the tracking system
+- **Pull Requests** are synced to the project board
+- **Changes** generate audit logs
+- **Documentation** is updated automatically
 
-## Getting Started
+You don't need to manually update tracking or documentation - the system handles this autonomously.
 
-### 1. Fork the Repository
+## Development Guidelines
 
-```bash
-# Fork on GitHub, then clone your fork
-git clone https://github.com/YOUR_USERNAME/infinity-matrix.git
-cd infinity-matrix
+### Code Style
+
+- Follow existing code patterns
+- Use clear, descriptive variable names
+- Comment complex logic
+- Keep functions focused and small
+
+### Workflow Development
+
+When creating or modifying workflows:
+
+```yaml
+name: Your Workflow Name
+
+on:
+  # Clear trigger conditions
+  push:
+    branches: [main]
+
+permissions:
+  # Minimal required permissions
+  contents: read
+
+jobs:
+  your-job:
+    runs-on: ubuntu-latest
+    name: Clear Job Description
+    
+    steps:
+      - name: Descriptive step name
+        run: |
+          # Well-commented commands
+          echo "Clear output messages"
 ```
 
-### 2. Set Up Development Environment
+### Documentation
 
-```bash
-# Create virtual environment
-python -m venv .venv
-source .venv/bin/activate
+- Update SOPs if changing system behavior
+- Add inline comments for complex logic
+- Update README if changing setup process
+- Include examples in guides
 
-# Install dependencies
-pip install -r requirements.txt
-pip install -e .
+### Testing
 
-# Copy environment file
-cp .env.example .env
-# Edit .env with your configuration
-```
+- Test workflows locally with `act` if possible
+- Use `workflow_dispatch` for manual testing
+- Verify logs are generated correctly
+- Check dashboard updates
 
-### 3. Create a Branch
+## Commit Message Format
 
-```bash
-git checkout -b feature/your-feature-name
-# or
-git checkout -b fix/your-bug-fix
-```
-
-## Development Workflow
-
-### Branch Naming Convention
-
-- **Features**: `feature/description`
-- **Bug Fixes**: `fix/description`
-- **Documentation**: `docs/description`
-- **Performance**: `perf/description`
-- **Refactoring**: `refactor/description`
-
-### Commit Messages
-
-Follow the [Conventional Commits](https://www.conventionalcommits.org/) specification:
+We use conventional commits:
 
 ```
-<type>(<scope>): <subject>
+type(scope): subject
 
-<body>
+body (optional)
 
-<footer>
+footer (optional)
 ```
 
-**Types**:
+Types:
 - `feat`: New feature
 - `fix`: Bug fix
-- `docs`: Documentation only
-- `style`: Code style changes (formatting, etc.)
+- `docs`: Documentation changes
+- `style`: Code style changes
 - `refactor`: Code refactoring
-- `test`: Adding or updating tests
+- `test`: Test additions or changes
 - `chore`: Maintenance tasks
 
-**Examples**:
-```bash
-feat(agents): add new crawler agent capability
-fix(vision-cortex): resolve debate consensus logic
-docs(readme): update installation instructions
-test(api): add integration tests for health endpoint
+Examples:
 ```
-
-### Making Changes
-
-1. **Make your changes** following code standards
-2. **Add tests** for new functionality
-3. **Update documentation** as needed
-4. **Run tests** to ensure nothing breaks
-5. **Commit your changes** with clear messages
-
-## Code Standards
-
-### Python Style Guide
-
-We follow [PEP 8](https://pep8.org/) with some modifications:
-
-- **Line length**: 100 characters
-- **Quotes**: Prefer double quotes for strings
-- **Imports**: Use absolute imports, organize with isort
-- **Type hints**: Use type hints for function signatures
-
-### Code Formatting
-
-We use automated tools for consistent formatting:
-
-```bash
-# Format code
-black .
-isort .
-
-# Check formatting
-black --check .
-isort --check-only .
+feat(tracking): add support for release events
+fix(dashboard): correct metrics calculation
+docs(sop): update workflow operations guide
 ```
-
-### Linting
-
-```bash
-# Run all linters
-make lint
-
-# Or individually
-flake8 .
-mypy .
-pylint ai_stack/
-```
-
-### Code Structure
-
-```python
-"""Module docstring describing purpose."""
-
-import standard_library
-import third_party
-import local_modules
-
-from typing import Any, Dict, List, Optional
-
-
-class MyClass:
-    """Class docstring.
-    
-    Attributes:
-        attr1: Description
-        attr2: Description
-    """
-    
-    def __init__(self, param: str):
-        """Initialize the class.
-        
-        Args:
-            param: Description
-        """
-        self.attr1 = param
-    
-    def my_method(self, arg: int) -> bool:
-        """Method docstring.
-        
-        Args:
-            arg: Description
-        
-        Returns:
-            Description of return value
-        
-        Raises:
-            ValueError: When arg is invalid
-        """
-        if arg < 0:
-            raise ValueError("arg must be non-negative")
-        return True
-```
-
-## Testing
-
-### Writing Tests
-
-- Place tests in `tests/` directory
-- Name test files `test_*.py`
-- Name test functions `test_*`
-- Use fixtures for common setup
-- Mock external dependencies
-
-**Example**:
-
-```python
-"""Tests for MyClass."""
-
-import pytest
-from my_module import MyClass
-
-
-@pytest.fixture
-def my_class():
-    """Create MyClass instance for testing."""
-    return MyClass("test")
-
-
-def test_my_method(my_class):
-    """Test my_method returns expected result."""
-    result = my_class.my_method(5)
-    assert result is True
-
-
-def test_my_method_raises_error(my_class):
-    """Test my_method raises error for invalid input."""
-    with pytest.raises(ValueError):
-        my_class.my_method(-1)
-```
-
-### Running Tests
-
-```bash
-# Run all tests
-make test
-
-# Run specific test file
-pytest tests/test_api.py -v
-
-# Run specific test
-pytest tests/test_api.py::test_health_endpoint -v
-
-# Run with coverage
-pytest --cov=. --cov-report=html
-```
-
-### Test Coverage
-
-- Aim for >80% coverage
-- Focus on critical paths
-- Test edge cases and error conditions
-- Don't test external libraries
-
-## Documentation
-
-### Code Documentation
-
-- **Docstrings**: All modules, classes, and functions
-- **Type hints**: All function signatures
-- **Comments**: Explain complex logic, not obvious code
-- **README**: Keep up-to-date
-
-### Documentation Files
-
-- **Architecture**: `docs/blueprint.md`
-- **Roadmap**: `docs/roadmap.md`
-- **Configuration**: `docs/configuration.md`
-- **API**: Auto-generated from code
-
-### Writing Documentation
-
-- Use Markdown format
-- Include code examples
-- Add diagrams where helpful
-- Keep it up-to-date
-- Link between related docs
 
 ## Pull Request Process
 
-### Before Submitting
+1. **Automated Checks**
+   - All workflows must pass
+   - No broken links in documentation
+   - Valid YAML syntax
 
-1. **Update your branch**:
-   ```bash
-   git fetch origin
-   git rebase origin/main
-   ```
+2. **Review Process**
+   - At least one approval required
+   - Address reviewer feedback
+   - Keep PR focused and small
 
-2. **Run full test suite**:
-   ```bash
-   make test
-   make lint
-   ```
+3. **Merge**
+   - Squash and merge preferred
+   - Clear merge commit message
+   - Automatic tracking triggers
 
-3. **Update documentation**
+## Project Board
 
-4. **Write clear commit messages**
+When you create an Issue or PR:
+- It's automatically added to the project board
+- Status updates based on PR state
+- No manual board management needed
 
-### Submitting PR
+Columns:
+- **To Do**: New issues and PRs
+- **In Progress**: Active work
+- **Review**: Ready for review
+- **Done**: Completed and merged
 
-1. **Push your branch**:
-   ```bash
-   git push origin feature/your-feature-name
-   ```
+## Code Review Guidelines
 
-2. **Create Pull Request** on GitHub
+### As a Reviewer
 
-3. **Fill out PR template**:
-   - Description of changes
-   - Related issues
-   - Testing done
-   - Screenshots (if UI changes)
+- Be constructive and respectful
+- Suggest improvements clearly
+- Approve when ready
+- Check for:
+  - Code quality
+  - Test coverage
+  - Documentation updates
+  - Security issues
 
-4. **Request review** from maintainers
+### As an Author
 
-### PR Review Process
+- Respond to feedback promptly
+- Make requested changes
+- Ask questions if unclear
+- Keep discussions focused
 
-- **Automated checks** must pass
-- **Code review** by at least one maintainer
-- **Address feedback** promptly
-- **Squash commits** if requested
-- **Merge** when approved
+## Community Guidelines
 
-### After Merge
+### Be Respectful
 
-1. **Delete your branch**:
-   ```bash
-   git branch -d feature/your-feature-name
-   git push origin --delete feature/your-feature-name
-   ```
+- Treat everyone with respect
+- Value diverse perspectives
+- Be patient and helpful
+- Focus on constructive feedback
 
-2. **Update your main branch**:
-   ```bash
-   git checkout main
-   git pull origin main
-   ```
+### Be Collaborative
 
-## Agent Development
+- Share knowledge freely
+- Help others learn
+- Document decisions
+- Communicate clearly
 
-### Creating a New Agent
+### Be Professional
 
-1. **Create agent file**: `ai_stack/agents/my_agent.py`
-
-2. **Inherit from BaseAgent**:
-   ```python
-   from .base_agent import BaseAgent
-   
-   class MyAgent(BaseAgent):
-       """Description of agent."""
-       
-       def __init__(self, config):
-           super().__init__(config, "my_agent")
-       
-       async def on_start(self):
-           """Initialize resources."""
-           pass
-       
-       async def on_stop(self):
-           """Cleanup resources."""
-           pass
-       
-       async def run(self):
-           """Main agent logic."""
-           return {"status": "success"}
-   ```
-
-3. **Register in Vision Cortex**:
-   Add to `vision_cortex.py`:
-   ```python
-   from ai_stack.agents.my_agent import MyAgent
-   
-   self.agents['my_agent'] = MyAgent(self.config)
-   ```
-
-4. **Add tests**: `tests/test_my_agent.py`
-
-5. **Update documentation**
-
-### Agent Best Practices
-
-- **Single responsibility**: Each agent should have one clear purpose
-- **Async/await**: Use async methods for I/O operations
-- **Error handling**: Handle errors gracefully
-- **Logging**: Use structured logging
-- **Configuration**: Use config for all settings
-- **State**: Minimize shared state
-- **Testing**: Write comprehensive tests
-
-## Integration Development
-
-### Adding External Service Integration
-
-1. **Create integration module**: `ai_stack/models/service_integration.py`
-
-2. **Implement client wrapper**:
-   ```python
-   class ServiceClient:
-       """Client for external service."""
-       
-       def __init__(self, api_key: str):
-           self.api_key = api_key
-       
-       async def call_api(self, data: dict):
-           """Call external API."""
-           # Implementation
-   ```
-
-3. **Add configuration**:
-   - Add to `.env.example`
-   - Add to `config.py`
-
-4. **Add tests with mocks**
-
-5. **Update documentation**
+- Follow code of conduct
+- Keep discussions on topic
+- Avoid spam or self-promotion
+- Respect project maintainers
 
 ## Getting Help
 
-- **Questions**: Open a GitHub Discussion
-- **Bugs**: Open a GitHub Issue
-- **Security**: Email security@infinityxai.com
-- **Chat**: Join our Slack channel
+### Documentation
+
+- [System Overview SOP](docs/sops/system-overview.md)
+- [Implementation Guides](infinity_library/guides/README.md)
+- [Architecture Docs](infinity_library/architecture/README.md)
+
+### Community
+
+- [GitHub Discussions](https://github.com/InfinityXOneSystems/infinity-matrix/discussions)
+- [Q&A Forum](https://github.com/InfinityXOneSystems/infinity-matrix/discussions/categories/q-a)
+- [Wiki](https://github.com/InfinityXOneSystems/infinity-matrix/wiki)
+
+### Support
+
+- Create an issue for bugs
+- Use discussions for questions
+- Tag maintainers if urgent
+- Check FAQ first
 
 ## Recognition
 
-Contributors will be:
-- Listed in CONTRIBUTORS.md
-- Mentioned in release notes
-- Acknowledged in commit messages
+Contributors are recognized through:
+- Automatic commit attribution
+- PR merge credits
+- Contributor list updates
+- Community highlights
 
 ## License
 
-By contributing, you agree that your contributions will be licensed under the same license as the project.
+By contributing, you agree that your contributions will be licensed under the MIT License.
+
+## Questions?
+
+If you have questions about contributing:
+1. Check the documentation
+2. Search existing discussions
+3. Ask in Q&A discussions
+4. Create an issue if needed
+
+Thank you for contributing to Infinity Matrix! 🎯
 
 ---
 
-Thank you for contributing to Infinity-Matrix! 🚀
+**Note**: This repository uses autonomous tracking. All your contributions are automatically logged, tracked, and documented. You don't need to update documentation manually unless making structural changes.
