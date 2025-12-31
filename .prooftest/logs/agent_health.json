@@ -1,0 +1,13 @@
+{
+  "cd_orchestrator": {
+    "type": "orchestrator",
+    "status": "healthy",
+    "registered_at": "2025-12-31T02:56:34.225068",
+    "last_heartbeat": "2025-12-31T02:56:34.225446",
+    "error_count": 0,
+    "success_count": 1,
+    "metadata": {
+      "description": "Main orchestrator for CD pipeline"
+    }
+  }
+}
