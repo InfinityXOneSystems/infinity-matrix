@@ -61,6 +61,11 @@ local_settings.py
 db.sqlite3
 db.sqlite3-journal
 
+# Lead Generation Pipeline
+lead_generation.db
+database/
+logs/
+
 # Flask stuff:
 instance/
 .webassets-cache

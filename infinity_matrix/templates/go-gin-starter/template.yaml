@@ -1,0 +1,50 @@
+name: go-gin-starter
+description: Gin-based Go REST API with modern practices
+category: go
+language: go
+version: 1.0.0
+
+modules:
+  - api
+  - database
+  - auth
+  - logging
+
+parameters:
+  - name: app_name
+    type: string
+    default: my-api
+    description: Application name
+  
+  - name: module_path
+    type: string
+    default: github.com/example/my-api
+    description: Go module path
+  
+  - name: include_auth
+    type: boolean
+    default: true
+    description: Include JWT authentication
+  
+  - name: database
+    type: choice
+    choices: [postgresql, mysql, sqlite, mongodb]
+    default: postgresql
+    description: Database to use
+
+features:
+  - Gin web framework
+  - GORM ORM integration
+  - JWT authentication
+  - Structured logging with zerolog
+  - Docker containerization
+  - Comprehensive testing
+
+requirements:
+  go: ">=1.21"
+  
+stack:
+  - Gin
+  - GORM
+  - JWT-Go
+  - Zerolog
