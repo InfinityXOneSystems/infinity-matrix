@@ -1,354 +1,205 @@
-# Lead Generation Pipeline - Interactive Demo System
+# Infinity Matrix
 
-## Overview
+A comprehensive AI-powered system for orchestrating agents, managing memory, and processing information across multiple domains.
 
-A full-featured, production-ready lead generation pipeline with AI voice agent integration, real-time CRM updates, calendar management, and data enrichment capabilities. Built for demo presentations on phones, tablets, and laptops with engaging real-time animations and interactions.
+## System Architecture
 
-## 🚀 Features
+The Infinity Matrix is a modular system consisting of:
 
-### Core Capabilities
-- **AI Voice Agent**: OpenAI-powered conversational AI that calls leads and qualifies them
-- **Real-Time Updates**: WebSocket-based live updates across all connected devices
-- **Data Enrichment**: Automated web scraping and social profile discovery
-- **CRM Integration**: Full customer relationship management with visual pipeline
-- **Calendar System**: Drag-and-drop callback scheduling with visual placement
-- **Interactive UI**: Engaging animations, smooth transitions, and device-ready design
-- **Call Recording**: Automatic transcription and sentiment analysis
-- **Lead Scoring**: AI-powered qualification scoring (0-100)
+### Core Components
 
-### Technology Stack
-- **Backend**: FastAPI (Python 3.8+)
-- **Database**: SQLite (dev) / PostgreSQL (production)
-- **AI**: OpenAI GPT-4 Turbo
-- **Voice**: Twilio Voice API
-- **Frontend**: Vanilla JavaScript, WebSocket, CSS3 animations
-- **Data Enrichment**: BeautifulSoup, Selenium, Playwright
+1. **Vision Cortex** (`/cortex/vision_cortex.py`)
+   - Main orchestrator for the entire system
+   - Manages in-memory and persistent storage
+   - Coordinates between agents, gateway, and registry
+   - Document evolution engine with indexing and taxonomy
+   - RAG (Retrieval-Augmented Generation) support
 
-## 📋 Prerequisites
+2. **Omni Router** (`/gateway/omni_router.py`)
+   - Smart routing gateway with load balancing
+   - Agent and API registration
+   - RBAC-based policy enforcement
+   - Credential and secret management
+   - Pub/Sub event layer
 
-- Python 3.8 or higher
-- Node.js 14+ (for optional frontend dev server)
-- Twilio account with phone number
-- OpenAI API key
-- PostgreSQL (for production) or SQLite (for development)
+3. **Agent Registry** (`/agent_registry.py`)
+   - Central registry for all agents
+   - Health monitoring and heartbeat tracking
+   - Context, roles, and permissions management
+   - Always-on communication with cortex
 
-## 🔧 Installation
+### Integrations
 
-### 1. Clone the Repository
+4. **Firestore Integration** (`/cortex/firestore_integration.py`)
+   - Vector memory storage
+   - Relational data management
+   - Document ingestion
+   - RAG query support
+
+5. **Pub/Sub Integration** (`/cortex/pubsub_integration.py`)
+   - Event-driven messaging
+   - Topic-based subscriptions
+   - Event propagation between components
+
+### Agents
+
+6. **Specialized Agents** (`/agents/`)
+   - **Financial Agent**: Market analysis, portfolio management, risk assessment
+   - **Real Estate Agent**: Property valuation, market analysis, investment analysis
+   - **Loan Agent**: Application processing, credit assessment, rate calculation
+   - **Analytics Agent**: Data analysis, report generation, trend detection
+   - **NLP Agent**: Text processing, sentiment analysis, entity extraction
+
+### API & Monitoring
+
+7. **API Server** (`/api_server.py`)
+   - REST API endpoints for system control
+   - Agent status and health monitoring
+   - Dashboard audit capabilities
+   - Route management
+
+## Quick Start
+
+### Installation
 
 ```bash
+# Clone the repository
 git clone https://github.com/InfinityXOneSystems/infinity-matrix.git
 cd infinity-matrix
-```
-
-### 2. Set Up Python Environment
-
-```bash
-# Create virtual environment
-python -m venv venv
-
-# Activate virtual environment
-# On macOS/Linux:
-source venv/bin/activate
-# On Windows:
-venv\Scripts\activate
 
 # Install dependencies
 pip install -r requirements.txt
 ```
 
-### 3. Configure Environment Variables
+### Running the System
 
 ```bash
-# Copy example environment file
-cp .env.example .env
-
-# Edit .env with your credentials
-# Required variables:
-# - OPENAI_API_KEY
-# - TWILIO_ACCOUNT_SID
-# - TWILIO_AUTH_TOKEN
-# - TWILIO_PHONE_NUMBER
+# Start the entire system
+python main.py
 ```
 
-### 4. Initialize Database
+The system will:
+1. Initialize Firestore and Pub/Sub infrastructure
+2. Start Vision Cortex, Omni Router, and Agent Registry
+3. Register and start all specialized agents
+4. Load documentation from `/docs/` directory
+5. Start the API server on http://localhost:8080
 
-```bash
-# The database will be automatically initialized on first run
-python -m backend.main
+### API Endpoints
+
+Once running, access these endpoints:
+
+- `GET /api/status` - Overall system status
+- `GET /api/agents` - List all registered agents
+- `GET /api/agents/{agent_id}` - Get specific agent details
+- `GET /api/agents/{agent_id}/health` - Agent health status
+- `GET /api/routes` - List all configured routes
+- `GET /api/dashboard` - Dashboard audit view
+
+## Documentation
+
+System documentation is automatically loaded on startup from the `/docs/` directory. The document evolution engine:
+- Indexes all documentation
+- Builds taxonomy by category
+- Enables full-text search
+- Supports RAG queries
+
+## Security
+
+The system implements comprehensive security:
+
+- **RBAC**: Role-Based Access Control for all operations
+- **Policy Enforcement**: Configurable security policies
+- **Secret Management**: Secure credential storage
+- **Authentication**: Required for sensitive operations
+- **Rate Limiting**: Configurable per route
+
+### Default Roles
+
+- `admin`: Full system access
+- `agent`: Agent operations (read/write/execute)
+- `viewer`: Read-only access
+
+## GitHub Workflow
+
+The system includes automated deployment via GitHub Actions:
+
+```yaml
+.github/workflows/cortex_bootstrap.yml
 ```
 
-## 🚀 Quick Start
+This workflow:
+- Validates system structure
+- Syncs documentation
+- Initializes all components
+- Auto-ingests documents
+- Generates system reports
+- Runs on push, PR, schedule, or manual trigger
 
-### Running the Backend
+## Project Structure
 
-```bash
-# Development mode with auto-reload
-python -m backend.main
-
-# Or using uvicorn directly
-uvicorn backend.main:app --reload --host 0.0.0.0 --port 8000
+```
+infinity-matrix/
+├── cortex/
+│   ├── vision_cortex.py          # Main orchestrator
+│   ├── firestore_integration.py  # Vector/relational memory
+│   └── pubsub_integration.py     # Event propagation
+├── gateway/
+│   └── omni_router.py             # Smart routing gateway
+├── agents/
+│   ├── base_agent.py              # Abstract agent base
+│   ├── financial_agent.py         # Financial operations
+│   ├── real_estate_agent.py       # Real estate operations
+│   ├── loan_agent.py              # Loan processing
+│   ├── analytics_agent.py         # Data analytics
+│   └── nlp_agent.py               # NLP processing
+├── agent_registry.py              # Agent registry
+├── api_server.py                  # REST API server
+├── main.py                        # System launcher
+├── requirements.txt               # Python dependencies
+├── docs/                          # System documentation
+└── .github/
+    └── workflows/
+        └── cortex_bootstrap.yml   # Deployment workflow
 ```
 
-The API will be available at:
-- API: http://localhost:8000
-- Documentation: http://localhost:8000/docs
-- WebSocket: ws://localhost:8000/ws
+## Development
 
-### Running the Frontend
+### Adding New Agents
 
-#### Option 1: Using Python HTTP Server
-```bash
-cd frontend
-python -m http.server 3000
-```
+1. Create a new agent class inheriting from `BaseAgent`
+2. Implement required methods: `process_request()`, `on_start()`, `on_stop()`
+3. Register agent in `main.py`
+4. Configure routes in the Omni Router
 
-#### Option 2: Using Node.js http-server
-```bash
-cd frontend
-npx http-server -p 3000
-```
+### Extending Functionality
 
-#### Option 3: Open directly in browser
-```bash
-open frontend/index.html
-```
+- Add new routes in `gateway/omni_router.py`
+- Create custom policies for RBAC
+- Extend document processing in `vision_cortex.py`
+- Add new API endpoints in `api_server.py`
 
-Access the demo at: http://localhost:3000
+## Monitoring
 
-## 📱 Usage
+Monitor system health through:
+- API dashboard endpoint: `/api/dashboard`
+- Agent health checks: `/api/agents/{agent_id}/health`
+- System logs (INFO level by default)
+- GitHub Actions workflow runs
 
-### 1. Starting a Lead Call
+## Contributing
 
-1. Enter a phone number in the format: `+1 (555) 123-4567`
-2. Click "Start Call"
-3. Watch real-time updates as:
-   - AI agent initiates the call
-   - Conversation progresses
-   - Lead information is collected
-   - Data enrichment occurs
-   - CRM is updated
-   - Calendar event is scheduled
+1. Fork the repository
+2. Create a feature branch
+3. Implement changes
+4. Submit a pull request
 
-### 2. Monitoring Activity
+## License
 
-The live activity feed shows:
-- Call initiations
-- AI conversation stages
-- Data enrichment progress
-- Calendar updates
-- CRM changes
+Copyright © 2024 InfinityXOne Systems. All rights reserved.
 
-### 3. Managing Leads
+## Support
 
-- View all leads in the Active Leads panel
-- See real-time status updates
-- Monitor lead quality scores
-- Track enrichment status
-
-### 4. Calendar Management
-
-- View scheduled callbacks
-- Drag and drop events (visual representation)
-- See callback assignments to sales reps
-
-## 🔌 API Endpoints
-
-### Lead Management
-- `POST /api/leads` - Create a new lead
-- `GET /api/leads` - List all leads
-- `GET /api/leads/{id}` - Get specific lead
-- `PATCH /api/leads/{id}` - Update lead
-- `DELETE /api/leads/{id}` - Delete lead
-
-### Voice & Calls
-- `POST /api/voice/initiate-call` - Start AI voice call
-- `POST /api/voice/twiml` - Twilio TwiML endpoint
-- `POST /api/voice/process` - Process voice input
-- `POST /api/voice/status` - Call status callback
-
-### Calendar
-- `POST /api/calendar/events` - Create calendar event
-- `GET /api/calendar/events` - List events
-- `PATCH /api/calendar/events/{id}` - Update event (drag-drop)
-- `DELETE /api/calendar/events/{id}` - Delete event
-
-### CRM
-- `POST /api/interactions` - Log interaction
-- `GET /api/leads/{id}/interactions` - Get lead interactions
-- `POST /api/notes` - Add note
-- `GET /api/leads/{id}/notes` - Get lead notes
-
-## 🎨 Demo Features
-
-### Visual Animations
-- Smooth slide-in animations for new leads
-- Pulse effects for live status indicators
-- Hover effects on interactive elements
-- Real-time activity feed updates
-
-### Device Responsiveness
-- Optimized for phones (portrait/landscape)
-- Tablet-friendly interface
-- Desktop full-screen experience
-- Touch and mouse interactions
-
-### Real-Time Updates
-- WebSocket connection with auto-reconnect
-- Live activity feed
-- Dynamic statistics updates
-- Instant CRM synchronization
-
-## 🔒 Security Considerations
-
-### Production Deployment
-1. Change `SECRET_KEY` in `.env`
-2. Use PostgreSQL instead of SQLite
-3. Enable HTTPS/WSS
-4. Set proper CORS origins
-5. Implement authentication
-6. Use environment-specific API keys
-7. Enable rate limiting
-
-### API Key Management
-- Never commit `.env` file
-- Rotate keys regularly
-- Use separate keys for dev/prod
-- Monitor API usage
-
-## 🧪 Testing
-
-### Manual Testing
-```bash
-# Test API endpoints
-curl http://localhost:8000/health
-
-# Test lead creation
-curl -X POST http://localhost:8000/api/leads \
-  -H "Content-Type: application/json" \
-  -d '{"phone_number": "+15551234567"}'
-```
-
-### WebSocket Testing
-Open browser console and run:
-```javascript
-const ws = new WebSocket('ws://localhost:8000/ws');
-ws.onmessage = (e) => console.log('Received:', JSON.parse(e.data));
-```
-
-## 📊 Data Enrichment
-
-The system automatically enriches lead data with:
-- Phone verification and carrier info
-- Geographic location
-- Social media profiles (LinkedIn, Twitter)
-- Company information
-- Revenue estimates
-- Employee count
-
-### Mock Data for Demo
-When `ENABLE_DATA_ENRICHMENT=true`, the system uses mock data for reliable demos.
-For production, integrate real APIs:
-- Clearbit
-- FullContact
-- Hunter.io
-- LinkedIn API
-
-## 🎯 AI Voice Agent
-
-### Conversation Flow
-1. Greeting and name collection
-2. Company and role inquiry
-3. Needs assessment
-4. Interest level evaluation
-5. Callback scheduling
-6. Professional close
-
-### Customization
-Edit `backend/voice_agent.py` to modify:
-- System prompt
-- Conversation stages
-- Information extraction
-- Response generation
-- Sentiment analysis
-
-## 📈 Scalability
-
-### Horizontal Scaling
-- Stateless API design
-- WebSocket with Redis Pub/Sub
-- Celery for background tasks
-- Load balancer compatible
-
-### Database Optimization
-- Indexed phone numbers
-- Efficient queries
-- Connection pooling
-- Read replicas support
-
-## 🛠️ Troubleshooting
-
-### WebSocket Connection Issues
-```bash
-# Check if backend is running
-curl http://localhost:8000/health
-
-# Verify CORS settings in .env
-ALLOWED_ORIGINS=http://localhost:3000
-```
-
-### Twilio Integration Issues
-```bash
-# Test Twilio credentials
-python -c "from twilio.rest import Client; c = Client('SID', 'TOKEN'); print(c.api.accounts.list())"
-
-# Check webhook URL is accessible
-ngrok http 8000
-```
-
-### Database Issues
-```bash
-# Reset database
-rm lead_generation.db
-python -m backend.main
-```
-
-## 📝 License
-
-This project is proprietary software owned by InfinityXOneSystems.
-
-## 🤝 Support
-
-For issues, questions, or feature requests:
-- Open an issue on GitHub
-- Contact: support@infinityxonesystems.com
-
-## 🎓 Training & Documentation
-
-See `/docs` directory for:
-- Architecture diagrams
-- API documentation
-- Deployment guides
-- Training materials
-- Video tutorials
-
-## 🚀 Deployment
-
-### Heroku
-```bash
-# See docs/deployment/heroku.md
-```
-
-### AWS
-```bash
-# See docs/deployment/aws.md
-```
-
-### Docker
-```bash
-# See docs/deployment/docker.md
-```
-
----
-
-Built with ❤️ by InfinityXOneSystems
+For issues and questions:
+- GitHub Issues: https://github.com/InfinityXOneSystems/infinity-matrix/issues
+- Documentation: https://github.com/InfinityXOneSystems/infinity-matrix/tree/main/docs
