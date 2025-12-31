@@ -1,0 +1,115 @@
+# {{ app_name }}
+
+A modern FastAPI-based REST API application.
+
+## Features
+
+- ⚡ FastAPI framework for high-performance APIs
+- 🔒 JWT authentication{% if include_auth %} (enabled){% endif %}
+- 🗄️ {{ database }} database integration
+- ✅ Pydantic data validation
+- 📝 Comprehensive logging
+- 🐳 Docker support{% if include_docker %} (included){% endif %}
+- 🧪 Testing with pytest
+
+## Quick Start
+
+### Prerequisites
+
+- Python 3.9 or higher
+- pip or poetry
+{% if include_docker %}- Docker and Docker Compose (optional){% endif %}
+
+### Installation
+
+1. Create a virtual environment:
+```bash
+python -m venv venv
+source venv/bin/activate  # On Windows: venv\Scripts\activate
+```
+
+2. Install dependencies:
+```bash
+pip install -r requirements.txt
+```
+
+3. Set up environment variables:
+```bash
+cp .env.example .env
+# Edit .env with your configuration
+```
+
+4. Run database migrations:
+```bash
+alembic upgrade head
+```
+
+5. Start the application:
+```bash
+uvicorn main:app --reload
+```
+
+The API will be available at `http://localhost:8000`
+
+### Using Docker
+
+```bash
+docker-compose up -d
+```
+
+## API Documentation
+
+Once running, visit:
+- Swagger UI: http://localhost:8000/docs
+- ReDoc: http://localhost:8000/redoc
+
+## Project Structure
+
+```
+{{ app_name }}/
+├── app/
+│   ├── __init__.py
+│   ├── main.py          # Application entry point
+│   ├── config.py        # Configuration management
+│   ├── models/          # Database models
+│   ├── schemas/         # Pydantic schemas
+│   ├── api/             # API routes
+│   ├── core/            # Core functionality
+│   └── db/              # Database utilities
+├── tests/               # Test suite
+├── alembic/             # Database migrations
+├── requirements.txt     # Python dependencies
+├── .env.example         # Environment template
+{% if include_docker %}├── Dockerfile
+├── docker-compose.yml
+{% endif %}└── README.md
+```
+
+## Development
+
+### Running Tests
+
+```bash
+pytest
+```
+
+### Code Quality
+
+```bash
+# Format code
+black .
+
+# Lint code
+ruff check .
+
+# Type checking
+mypy .
+```
+
+## Deployment
+
+See [DEPLOYMENT.md](DEPLOYMENT.md) for deployment instructions.
+
+## License
+
+MIT License
