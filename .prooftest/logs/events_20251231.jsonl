@@ -32,3 +32,8 @@
 {"timestamp": "2025-12-31T03:00:06.518970", "agent_id": "self_healing_agent", "event_type": "SUCCESS", "message": "Operation completed successfully"}
 {"timestamp": "2025-12-31T03:00:06.519994", "agent_id": "zero_intervention_trigger", "event_type": "SUCCESS", "message": "Operation completed successfully"}
 {"timestamp": "2025-12-31T03:00:06.520242", "agent_id": "cd_orchestrator", "event_type": "SUCCESS", "message": "Operation completed successfully"}
+{"timestamp": "2025-12-31T03:01:22.502865", "agent_id": "stub_todo_scanner", "event_type": "REGISTER", "message": "Agent registered"}
+{"timestamp": "2025-12-31T03:01:22.503269", "agent_id": "pr_automation_agent", "event_type": "REGISTER", "message": "Agent registered"}
+{"timestamp": "2025-12-31T03:01:22.503796", "agent_id": "self_healing_agent", "event_type": "REGISTER", "message": "Agent registered"}
+{"timestamp": "2025-12-31T03:01:22.504167", "agent_id": "zero_intervention_trigger", "event_type": "REGISTER", "message": "Agent registered"}
+{"timestamp": "2025-12-31T03:01:22.504416", "agent_id": "cd_orchestrator", "event_type": "REGISTER", "message": "Agent registered"}
