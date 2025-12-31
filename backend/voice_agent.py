@@ -22,15 +22,32 @@ class VoiceAgent:
         twilio_sid = os.getenv("TWILIO_ACCOUNT_SID")
         twilio_token = os.getenv("TWILIO_AUTH_TOKEN")
         
-        self.openai_client = openai.OpenAI(api_key=openai_key) if openai_key else None
-        self.twilio_client = Client(twilio_sid, twilio_token) if (twilio_sid and twilio_token) else None
+        # Initialize OpenAI client with error handling
+        self.openai_client = None
+        if openai_key:
+            try:
+                self.openai_client = openai.OpenAI(api_key=openai_key)
+            except Exception as e:
+                print(f"Warning: Failed to initialize OpenAI client: {e}")
+        
+        # Initialize Twilio client with error handling
+        self.twilio_client = None
+        if twilio_sid and twilio_token:
+            try:
+                self.twilio_client = Client(twilio_sid, twilio_token)
+            except Exception as e:
+                print(f"Warning: Failed to initialize Twilio client: {e}")
+        
         self.twilio_phone = os.getenv("TWILIO_PHONE_NUMBER")
         self.conversation_history: Dict[str, list] = {}
 
     async def initiate_call(self, phone_number: str, callback_url: str) -> Dict[str, Any]:
         """Initiate an outbound call to a lead"""
         if not self.twilio_client:
-            raise Exception("Twilio client not configured. Please set TWILIO_ACCOUNT_SID and TWILIO_AUTH_TOKEN environment variables.")
+            raise Exception("Twilio client not configured. Please set TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN, and TWILIO_PHONE_NUMBER environment variables.")
+        
+        if not self.twilio_phone:
+            raise Exception("Twilio phone number not configured. Please set TWILIO_PHONE_NUMBER environment variable.")
         
         try:
             call = self.twilio_client.calls.create(
