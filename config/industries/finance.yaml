@@ -1,0 +1,35 @@
+id: finance
+name: Finance & Banking
+type: finance
+description: Financial services, banking, fintech, payments, cryptocurrency, investment platforms
+keywords:
+  - finance
+  - banking
+  - fintech
+  - payments
+  - cryptocurrency
+  - blockchain
+  - investment
+  - trading
+  - insurance
+  - wealth management
+priority: 9
+enabled: true
+
+seeds:
+  - url: https://github.com/stripe
+    source_id: github_finance
+    priority: 10
+    depth: 2
+  - url: https://github.com/bitcoin/bitcoin
+    source_id: github_finance
+    priority: 9
+    depth: 2
+  - url: https://github.com/ccxt/ccxt
+    source_id: github_finance
+    priority: 8
+    depth: 2
+  - url: https://github.com/plaid
+    source_id: github_finance
+    priority: 8
+    depth: 2

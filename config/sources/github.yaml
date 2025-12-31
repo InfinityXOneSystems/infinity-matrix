@@ -1,0 +1,89 @@
+- id: github_tech
+  name: GitHub Technology
+  type: github
+  base_url: https://api.github.com
+  industry_id: technology
+  enabled: true
+  rate_limit: 60
+  authentication_required: false
+
+- id: github_finance
+  name: GitHub Finance
+  type: github
+  base_url: https://api.github.com
+  industry_id: finance
+  enabled: true
+  rate_limit: 60
+  authentication_required: false
+
+- id: github_healthcare
+  name: GitHub Healthcare
+  type: github
+  base_url: https://api.github.com
+  industry_id: healthcare
+  enabled: true
+  rate_limit: 60
+  authentication_required: false
+
+- id: github_retail
+  name: GitHub Retail
+  type: github
+  base_url: https://api.github.com
+  industry_id: retail
+  enabled: true
+  rate_limit: 60
+  authentication_required: false
+
+- id: github_realestate
+  name: GitHub Real Estate
+  type: github
+  base_url: https://api.github.com
+  industry_id: real_estate
+  enabled: true
+  rate_limit: 60
+  authentication_required: false
+
+- id: github_energy
+  name: GitHub Energy
+  type: github
+  base_url: https://api.github.com
+  industry_id: energy
+  enabled: true
+  rate_limit: 60
+  authentication_required: false
+
+- id: github_manufacturing
+  name: GitHub Manufacturing
+  type: github
+  base_url: https://api.github.com
+  industry_id: manufacturing
+  enabled: true
+  rate_limit: 60
+  authentication_required: false
+
+- id: github_media
+  name: GitHub Media
+  type: github
+  base_url: https://api.github.com
+  industry_id: media
+  enabled: true
+  rate_limit: 60
+  authentication_required: false
+
+- id: github_transportation
+  name: GitHub Transportation
+  type: github
+  base_url: https://api.github.com
+  industry_id: transportation
+  enabled: true
+  rate_limit: 60
+  authentication_required: false
+
+- id: github_services
+  name: GitHub Professional Services
+  type: github
+  base_url: https://api.github.com
+  industry_id: professional_services
+  enabled: true
+  rate_limit: 60
+  authentication_required: false

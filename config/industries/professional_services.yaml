@@ -1,0 +1,35 @@
+id: professional_services
+name: Professional Services
+type: professional_services
+description: Consulting, legal tech, HR tech, accounting, business services, collaboration tools
+keywords:
+  - consulting
+  - legal tech
+  - HR tech
+  - accounting
+  - business services
+  - collaboration
+  - project management
+  - CRM
+  - ERP
+  - professional tools
+priority: 7
+enabled: true
+
+seeds:
+  - url: https://github.com/salesforce
+    source_id: github_services
+    priority: 9
+    depth: 2
+  - url: https://github.com/odoo/odoo
+    source_id: github_services
+    priority: 8
+    depth: 2
+  - url: https://github.com/frappe/erpnext
+    source_id: github_services
+    priority: 8
+    depth: 2
+  - url: https://github.com/projectcalico
+    source_id: github_services
+    priority: 7
+    depth: 2
