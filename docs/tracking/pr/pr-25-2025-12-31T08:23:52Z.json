@@ -1,0 +1,21 @@
+{
+  "timestamp": "2025-12-31T08:23:52Z",
+  "event_type": "pull_request",
+  "event_id": "pr-25",
+  "actor": "InfinityXOneSystems",
+  "action": "closed",
+  "details": {
+    "pr_number": 25,
+    "title": "Implement auto-resolve and auto-merge system with dependency graph management\n",
+    "state": "closed",
+    "draft": false,
+    "base_ref": "main",
+    "head_ref": "copilot/auto-resolve-merge-systems",
+    "mergeable": ""
+  },
+  "status": "tracked",
+  "metadata": {
+    "pr_number": 25,
+    "workflow_run_id": "20615202634"
+  }
+}

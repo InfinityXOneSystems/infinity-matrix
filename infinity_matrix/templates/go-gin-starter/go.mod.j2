@@ -1,0 +1,15 @@
+module {{ module_path }}
+
+go 1.21
+
+require (
+	github.com/gin-gonic/gin v1.10.0
+	gorm.io/gorm v1.25.0
+{% if database == "postgresql" %}	gorm.io/driver/postgres v1.5.0
+{% elif database == "mysql" %}	gorm.io/driver/mysql v1.5.0
+{% elif database == "sqlite" %}	gorm.io/driver/sqlite v1.5.0
+{% elif database == "mongodb" %}	go.mongodb.org/mongo-driver v1.13.0
+{% endif %}{% if include_auth %}	github.com/golang-jwt/jwt/v5 v5.2.0
+{% endif %}	github.com/rs/zerolog v1.31.0
+	github.com/joho/godotenv v1.5.1
+)

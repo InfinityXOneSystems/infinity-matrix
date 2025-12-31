@@ -1,0 +1,31 @@
+id: manufacturing
+name: Manufacturing & Industrial
+type: manufacturing
+description: Industry 4.0, IoT, automation, supply chain, industrial software
+keywords:
+  - manufacturing
+  - industrial
+  - Industry 4.0
+  - IoT
+  - automation
+  - robotics
+  - supply chain
+  - quality control
+  - production
+  - industrial IoT
+priority: 7
+enabled: true
+
+seeds:
+  - url: https://github.com/ros-planning/moveit
+    source_id: github_manufacturing
+    priority: 8
+    depth: 2
+  - url: https://github.com/eclipse/mraa
+    source_id: github_manufacturing
+    priority: 7
+    depth: 2
+  - url: https://github.com/edgexfoundry/edgex-go
+    source_id: github_manufacturing
+    priority: 7
+    depth: 2

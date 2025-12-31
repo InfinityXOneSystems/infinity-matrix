@@ -1,0 +1,31 @@
+id: retail
+name: Retail & E-commerce
+type: retail
+description: E-commerce platforms, retail technology, inventory management, customer engagement
+keywords:
+  - e-commerce
+  - retail
+  - online shopping
+  - inventory management
+  - POS systems
+  - customer engagement
+  - marketplace
+  - dropshipping
+  - fulfillment
+  - omnichannel
+priority: 8
+enabled: true
+
+seeds:
+  - url: https://github.com/shopify
+    source_id: github_retail
+    priority: 10
+    depth: 2
+  - url: https://github.com/magento/magento2
+    source_id: github_retail
+    priority: 8
+    depth: 2
+  - url: https://github.com/woocommerce/woocommerce
+    source_id: github_retail
+    priority: 8
+    depth: 2
