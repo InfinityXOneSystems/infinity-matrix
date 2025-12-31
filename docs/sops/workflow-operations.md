@@ -1,8 +1,8 @@
 # Workflow Operations SOP
 
 **SOP ID**: SOP-002  
-**Version**: 20251231083713  
-**Last Updated**: 2025-12-31T08:37:13Z  
+**Version**: 20251231090047  
+**Last Updated**: 2025-12-31T09:00:47Z  
 **Status**: Active
 
 ## Purpose
@@ -15,22 +15,31 @@ This document covers all GitHub Actions workflows in `.github/workflows/` and th
 
 ## Active Workflows
 
+- agent-tasks.yml
 - audit-logger.yml
+- auto-bootstrap.yml
 - auto-fix.yml
 - auto-merge.yml
 - auto-pull.yml
 - auto-resolve.yml
+- autonomous-agent.yml
+- autonomous-pipeline.yml
 - ci-cd.yml
 - ci.yml
 - cortex_bootstrap.yml
 - dashboard-updater.yml
 - deploy.yml
 - docs.yml
+- health-monitor.yml
 - init-labels.yml
+- pr-automation.yml
 - project-board-sync.yml
 - security.yml
 - sop-generator.yml
+- system-health.yml
+- system-manifest.yml
 - tracking.yml
+- vision_cortex_genesis.yml
 
 
 ### Tracking Workflow
@@ -162,7 +171,7 @@ This document covers all GitHub Actions workflows in `.github/workflows/` and th
 
 | Version | Date | Changes | Updated By |
 |---------|------|---------|------------|
-| 20251231083713 | 2025-12-31T08:37:13Z | Auto-generated update | SOP Generator |
+| 20251231090047 | 2025-12-31T09:00:47Z | Auto-generated update | SOP Generator |
 
 ---
 
