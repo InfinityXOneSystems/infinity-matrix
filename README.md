@@ -1,134 +1,144 @@
-# Infinity Matrix
+# Infinity Matrix - Intelligence Discovery System
 
-[![Documentation](https://img.shields.io/badge/docs-latest-blue.svg)](docs/)
-[![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
-[![Status](https://img.shields.io/badge/status-active-success.svg)]()
+An enterprise-grade, fully automated business intelligence and discovery platform that transforms client information into comprehensive intelligence reports, proposals, and strategic insights.
 
-> Enterprise-grade distributed system with comprehensive documentation, automated workflows, and operational excellence.
+## Overview
 
-## 📚 Documentation Portal
+The Intelligence Discovery System accepts minimal input (client name and business name) and automatically:
+- Discovers and analyzes public business, financial, and competitive intelligence
+- Generates comprehensive discovery packs with key findings and opportunities
+- Creates tailored AI-generated proposals, investor decks, and MVP blueprints
+- Provides simulations and projections with multiple timeline scenarios
+- Delivers an interactive UI for both operators and clients
 
-Welcome to the Infinity Matrix documentation hub. This portal provides comprehensive access to all system documentation, operational guides, and proof artifacts.
+## Architecture
 
-### 🏗️ Architecture & Design
+- **Backend**: Python FastAPI with async support
+- **Frontend**: React with TypeScript and Vision Cortex integration
+- **Intelligence Engine**: Multi-agent LLM orchestration
+- **Data Layer**: PostgreSQL + Vector DB for embeddings
+- **Deployment**: Docker containerized, cloud-ready
 
-- [**Architecture Overview**](docs/architecture/README.md) - System architecture, design patterns, and component relationships
-- [**System Manifest**](docs/architecture/MANIFEST.md) - Complete technical inventory and system roadmap
-- [**Design Decisions**](docs/architecture/DECISIONS.md) - Architectural decision records (ADRs)
+## Quick Start
 
-### 🚀 Getting Started
+### Prerequisites
+- Python 3.11+
+- Node.js 18+
+- Docker & Docker Compose
 
-- [**Quick Start Guide**](docs/guides/QUICK_START.md) - Get up and running in minutes
-- [**Onboarding**](docs/guides/ONBOARDING.md) - Complete onboarding guide for new team members
-- [**Setup Instructions**](docs/guides/SETUP.md) - Detailed environment setup and configuration
+### Installation
 
-### 👥 User & Administrator Guides
+```bash
+# Clone repository
+git clone https://github.com/InfinityXOneSystems/infinity-matrix.git
+cd infinity-matrix
 
-- [**User Manual**](docs/guides/USER_MANUAL.md) - End-user documentation and workflows
-- [**Administrator Manual**](docs/guides/ADMIN_MANUAL.md) - System administration and management
-- [**Agent Workflows**](docs/agents/WORKFLOWS.md) - Complete agent orchestration guides
-- [**Error Handling & Auto-Healing**](docs/guides/ERROR_HANDLING.md) - Troubleshooting and recovery procedures
+# Backend setup
+cd backend
+pip install -r requirements.txt
+python -m pytest
 
-### 🤖 Agent Registry
+# Frontend setup
+cd ../frontend
+npm install
+npm test
 
-- [**Agent Registry**](docs/agents/REGISTRY.md) - Complete catalog of available agents
-- [**Agent Invocation Guide**](docs/agents/INVOCATION.md) - Sample invocations and usage patterns
-- [**Agent Development**](docs/agents/DEVELOPMENT.md) - Guide for creating custom agents
+# Run with Docker
+docker-compose up
+```
 
-### 📖 API Documentation
+## Features
 
-- [**API Overview**](docs/api/README.md) - API documentation hub
-- [**Python API Reference**](docs/api/python/) - Auto-generated Python API documentation
-- [**TypeScript API Reference**](docs/api/typescript/) - Auto-generated TypeScript API documentation
-- [**REST API Documentation**](docs/api/REST_API.md) - REST endpoints and specifications
+### Intelligence Discovery
+- Automated data crawling and discovery
+- Business analysis and profiling
+- Competitive intelligence gathering
+- Market consensus analysis
+- Gap detection and opportunity identification
 
-### 🛠️ Operations & Runbooks
+### AI-Powered Generation
+- Discovery pack creation
+- Custom proposal generation
+- Investor deck building
+- MVP blueprint design
+- Pricing and offering recommendations
 
-- [**Operational Runbooks**](docs/runbooks/README.md) - Step-by-step operational procedures
-- [**Deployment Runbook**](docs/runbooks/DEPLOYMENT.md) - Deployment procedures and rollback
-- [**Monitoring & Alerting**](docs/runbooks/MONITORING.md) - System monitoring and alert response
-- [**Incident Response**](docs/runbooks/INCIDENT_RESPONSE.md) - Incident management procedures
-- [**SOPs**](docs/runbooks/SOPS.md) - Standard Operating Procedures
+### Simulation & Analytics
+- Investment impact modeling
+- Lead generation projections
+- AI capability assessment
+- Multi-timeline scenarios
+- Baseline comparison analysis
 
-### 📋 Compliance & Audit
+### Interactive Interface
+- Vision Cortex integration
+- Real-time chat and Q&A
+- Knowledge summaries
+- Operator and client dashboards
+- Narrative presentation mode
 
-- [**Compliance Overview**](docs/compliance/README.md) - Compliance framework and requirements
-- [**Audit Trail Templates**](docs/compliance/AUDIT_TRAIL.md) - Audit logging and trail management
-- [**Compliance Checklists**](docs/compliance/CHECKLISTS.md) - Regulatory compliance verification
-- [**Security Standards**](docs/compliance/SECURITY.md) - Security policies and standards
+## Project Structure
 
-### 🔍 Proof & Demo Artifacts
+```
+infinity-matrix/
+├── backend/              # Python FastAPI backend
+│   ├── app/
+│   │   ├── api/         # REST API endpoints
+│   │   ├── core/        # Core business logic
+│   │   ├── models/      # Data models
+│   │   ├── services/    # Business services
+│   │   └── intelligence/ # Intelligence engines
+│   ├── tests/           # Backend tests
+│   └── requirements.txt
+├── frontend/            # React TypeScript frontend
+│   ├── src/
+│   │   ├── components/  # React components
+│   │   ├── services/    # API clients
+│   │   ├── features/    # Feature modules
+│   │   └── vision-cortex/ # Vision Cortex integration
+│   └── package.json
+├── shared/              # Shared types and schemas
+├── docs/                # Documentation
+├── docker-compose.yml
+└── README.md
+```
 
-Our commitment to operational excellence includes verifiable proof of all functionality:
+## API Documentation
 
-- [**Demo Workflows**](.prooftest/demos/) - Live demonstrations of system capabilities
-- [**Status Dashboard**](.prooftest/DASHBOARD.md) - Real-time system status and metrics
-- [**Execution Logs**](.prooftest/logs/) - Complete audit trail of workflow executions
-- [**Proof Artifacts**](.prooftest/README.md) - Exportable proof of operational status
+API documentation is available at `http://localhost:8000/docs` when running the backend.
 
-#### Export Capabilities
+## Security
 
-All proof artifacts can be exported in multiple formats:
-- 📄 **Markdown** - Human-readable documentation format
-- 📊 **PDF** - Professional reports for stakeholders
-- 📈 **CSV** - Data analysis and audit compliance
+- API key authentication
+- Rate limiting
+- Input validation and sanitization
+- Secure data storage
+- Audit logging
 
-Export scripts available in [`.prooftest/exports/`](.prooftest/exports/)
+## Development
 
-### 📊 Reports & Tracking
+```bash
+# Run backend tests
+cd backend
+pytest --cov=app tests/
 
-- [**Changelogs**](docs/reports/CHANGELOG.md) - Complete version history and changes
-- [**Feature Roadmap**](docs/reports/ROADMAP.md) - Planned features and development timeline
-- [**Feature Gap Analysis**](docs/reports/FEATURE_GAPS.md) - Known limitations and planned improvements
-- [**Audit Reports**](docs/reports/AUDIT.md) - System audit reports and compliance status
+# Run frontend tests
+cd frontend
+npm test
 
-## 🔄 Documentation Updates
+# Lint code
+cd backend && ruff check .
+cd frontend && npm run lint
+```
 
-Our documentation system is fully automated:
+## Deployment
 
-- ✅ **Auto-generated API docs** - Updates on every commit
-- ✅ **CI/CD Integration** - Automated builds and deployments
-- ✅ **Version Control** - Full history tracking
-- ✅ **Quality Assurance** - Automated validation and testing
+See [DEPLOYMENT.md](docs/DEPLOYMENT.md) for production deployment instructions.
 
-See [Documentation Automation](.github/workflows/docs.yml) for details.
+## License
 
-## 🎯 Quick Navigation
+Proprietary - All Rights Reserved
 
-| Need to... | Go to... |
-|------------|----------|
-| Start using the system | [Quick Start Guide](docs/guides/QUICK_START.md) |
-| Understand architecture | [Architecture Overview](docs/architecture/README.md) |
-| Find an agent | [Agent Registry](docs/agents/REGISTRY.md) |
-| Troubleshoot issues | [Error Handling Guide](docs/guides/ERROR_HANDLING.md) |
-| Deploy to production | [Deployment Runbook](docs/runbooks/DEPLOYMENT.md) |
-| Check compliance | [Compliance Checklists](docs/compliance/CHECKLISTS.md) |
-| View system status | [Status Dashboard](.prooftest/DASHBOARD.md) |
-| Export audit logs | [Export Scripts](.prooftest/exports/) |
+## Support
 
-## 🤝 Contributing
-
-We maintain high documentation standards. See our [Contribution Guidelines](docs/CONTRIBUTING.md) for how to:
-
-- Submit documentation improvements
-- Report issues or gaps
-- Propose new features
-- Review documentation changes
-
-## 📞 Support
-
-- **Documentation Issues**: [File an issue](https://github.com/InfinityXOneSystems/infinity-matrix/issues)
-- **Operational Support**: See [Support Guide](docs/guides/SUPPORT.md)
-- **Emergency Response**: See [Incident Response Runbook](docs/runbooks/INCIDENT_RESPONSE.md)
-
-## 📄 License
-
-This project and its documentation are licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
----
-
-**Documentation Version**: 1.0.0  
-**Last Updated**: 2025-12-31  
-**Status**: ✅ Active Development
-
-*All features are backed by operational proof and exported artifacts. No feature is marked complete until verified.*
+For support, contact: support@infinityxone.systems
