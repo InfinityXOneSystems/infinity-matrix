@@ -205,3 +205,12 @@ cython_debug/
 marimo/_static/
 marimo/_lsp/
 __marimo__/
+
+# Infinity Matrix - Data directories
+data/raw/
+data/normalized/
+data/analyzed/
+data/tasks/
+
+# Configuration
+config/config.yaml

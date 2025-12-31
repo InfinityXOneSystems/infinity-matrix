@@ -1,0 +1,27 @@
+id: real_estate
+name: Real Estate & Construction
+type: real_estate
+description: Property technology, construction management, real estate platforms, smart buildings
+keywords:
+  - real estate
+  - property management
+  - construction
+  - proptech
+  - smart buildings
+  - architecture
+  - urban planning
+  - facilities management
+  - building automation
+  - land development
+priority: 7
+enabled: true
+
+seeds:
+  - url: https://github.com/opendoor-labs
+    source_id: github_realestate
+    priority: 8
+    depth: 2
+  - url: https://github.com/buildingos
+    source_id: github_realestate
+    priority: 7
+    depth: 2
