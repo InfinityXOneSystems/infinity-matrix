@@ -176,11 +176,6 @@ marimo/_static/
 marimo/_lsp/
 __marimo__/
 
-# Infinity Matrix - Data directories
-data/raw/
-data/normalized/
-data/analyzed/
-data/tasks/
-
-# Configuration
-config/config.yaml
+# Infinity-Matrix generated files
+system_manifest.json
+health_report.md

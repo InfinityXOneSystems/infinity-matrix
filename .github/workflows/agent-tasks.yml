@@ -1,0 +1,122 @@
+name: Agent Task Execution
+
+on:
+  schedule:
+    - cron: '0 * * * *'  # Every hour
+  workflow_dispatch:
+    inputs:
+      prompt_id:
+        description: 'Prompt ID to execute (e.g., INIT-001, ANALYZE-001)'
+        required: true
+        type: string
+      context:
+        description: 'JSON context for the prompt (optional)'
+        required: false
+        type: string
+        default: '{}'
+
+jobs:
+  execute-agent-task:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+      
+      - name: Install dependencies
+        run: |
+          if [ -f package.json ]; then
+            npm ci || npm install
+          fi
+      
+      - name: Load Prompt from Suite
+        id: load_prompt
+        run: |
+          PROMPT_ID="${{ github.event.inputs.prompt_id }}"
+          
+          if [ -z "$PROMPT_ID" ]; then
+            echo "No prompt specified, checking task queue..."
+            # In a real implementation, this would query Supabase for pending tasks
+            echo "prompt_loaded=false" >> $GITHUB_OUTPUT
+          else
+            echo "Loading prompt: $PROMPT_ID"
+            
+            # Extract prompt from docs/prompt_suite.md
+            if grep -q "### $PROMPT_ID:" docs/prompt_suite.md; then
+              echo "prompt_loaded=true" >> $GITHUB_OUTPUT
+              echo "prompt_id=$PROMPT_ID" >> $GITHUB_OUTPUT
+            else
+              echo "Error: Prompt $PROMPT_ID not found"
+              echo "prompt_loaded=false" >> $GITHUB_OUTPUT
+              exit 1
+            fi
+          fi
+      
+      - name: Execute Prompt
+        if: steps.load_prompt.outputs.prompt_loaded == 'true'
+        env:
+          PROMPT_ID: ${{ steps.load_prompt.outputs.prompt_id }}
+          CONTEXT: ${{ github.event.inputs.context }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+        run: |
+          echo "Executing prompt: $PROMPT_ID"
+          echo "Context: $CONTEXT"
+          
+          # This is a placeholder for actual agent execution
+          # In production, this would call the agent framework
+          
+          echo "✓ Prompt execution initiated"
+          echo "  See docs/prompt_suite.md for prompt details"
+      
+      - name: Report Results
+        if: always()
+        run: |
+          echo "## Agent Task Execution Report"
+          echo ""
+          echo "**Prompt ID**: ${{ github.event.inputs.prompt_id || 'None (scheduled)' }}"
+          echo "**Status**: ${{ job.status }}"
+          echo "**Timestamp**: $(date -u +%Y-%m-%dT%H:%M:%SZ)"
+          echo ""
+          echo "For detailed logs, see the workflow run."
+      
+      - name: Update Task Queue
+        if: always()
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+        run: |
+          # Update task status in Supabase
+          echo "Updating task queue..."
+          
+          # This would update the task status in the database
+          # Example: mark task as completed, record results, etc.
+          
+          echo "✓ Task queue updated"
+
+  check-pending-tasks:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'schedule'
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      
+      - name: Query Pending Tasks
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+        run: |
+          echo "Checking for pending tasks in queue..."
+          
+          # This would query Supabase for pending tasks
+          # and trigger execution for high-priority items
+          
+          echo "✓ Task queue checked"

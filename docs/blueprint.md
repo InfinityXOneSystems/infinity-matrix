@@ -1,333 +1,387 @@
-# Infinity-Matrix Blueprint
+# Infinity-Matrix System Blueprint
 
-## System Overview
+## Overview
 
-Infinity-Matrix is a self-evolving, agent-driven, enterprise AI platform inspired by Manus.im and FAANG standards. The system consists of multiple specialized agents orchestrated by the Vision Cortex to create an autonomous, intelligent operational framework.
+The Infinity-Matrix is a FAANG-grade, 100% hands-off autonomous system designed for continuous operation, universal building, and auto-consulting capabilities. This blueprint outlines the complete system architecture, technology stack, and integration points.
 
-## Architecture
+## System Architecture
 
-### Vision Cortex (Orchestrator)
+### Core Philosophy
+- **100% Autonomous Operation**: No manual intervention required for standard operations
+- **24/7 Availability**: Continuous monitoring, building, and deployment
+- **Universal Builder**: Capable of building, testing, and deploying any type of application
+- **Auto-Consulting**: Self-optimizing and self-improving based on metrics and feedback
+- **Cloud-Native**: Fully distributed, scalable, and resilient
 
-The Vision Cortex serves as the central orchestrator for the multi-agent system, coordinating data flow and operations across all specialized agents.
-
-**Key Features:**
-- Multi-agent coordination
-- Workflow orchestration
-- State management
-- Error handling and recovery
-- Real-time monitoring
-
-### Agent Ecosystem
-
-#### 1. CrawlerAgent
-**Purpose:** Data Collection and Acquisition
-
-- Auto-crawls repositories (GitHub, GitLab, etc.)
-- Web scraping and data extraction
-- API data collection
-- Source prioritization and filtering
-- Manus.im-style intelligent crawling
-
-**Outputs:** Raw data collections from multiple sources
-
-#### 2. IngestionAgent
-**Purpose:** Data Cleaning and Normalization
-
-- ETL pipeline operations
-- Data validation and schema enforcement
-- Format normalization
-- Workspace preparation for downstream agents
-- FAANG-grade data quality standards
-
-**Outputs:** Cleaned and normalized workspace data
-
-#### 3. PredictorAgent
-**Purpose:** AI-Driven Analytics and Predictions
-
-- Integration with LLMs (OpenAI, Vertex AI, ChatGPT)
-- Market analysis and forecasting
-- Financial predictions
-- Project outcome predictions
-- Confidence scoring
-
-**Outputs:** Predictions, insights, and confidence metrics
-
-#### 4. CEOAgent
-**Purpose:** Business-Level Decision Making
-
-- Strategic decision making based on predictions
-- Resource allocation planning
-- Priority management
-- Business goal alignment
-- Executive oversight
-
-**Outputs:** Action plans and strategic decisions
-
-#### 5. StrategistAgent
-**Purpose:** Strategic Planning and Roadmapping
-
-- Go-to-market (GTM) strategy development
-- Product roadmap creation
-- Competitive landscape analysis
-- Strategic positioning
-- Milestone definition
-
-**Outputs:** Strategic roadmap and GTM plans
-
-#### 6. OrganizerAgent
-**Purpose:** Data Organization and Indexing
-
-- FAANG-grade taxonomy systems
-- Hierarchical data indexing
-- Intelligent tagging
-- Search optimization
-- Metadata enrichment
-
-**Outputs:** Organized, indexed, and tagged data structures
-
-#### 7. ValidatorAgent
-**Purpose:** Quality Assurance and Validation
-
-- Automated fact-checking
-- Data deduplication
-- Quality scoring
-- Consistency validation
-- Automated debate system for accuracy
-
-**Outputs:** Validation reports with quality scores
-
-#### 8. DocumentorAgent
-**Purpose:** Documentation Generation
-
-- Enterprise-grade documentation
-- Standard Operating Procedures (SOPs)
-- Design specifications
-- Meeting notes and chat logs
-- Automated report generation
-
-**Outputs:** Comprehensive documentation artifacts
-
-## Workflow Pipeline
+### High-Level Architecture
 
 ```
-Input Signal
-    ↓
-CrawlerAgent → Raw Data
-    ↓
-IngestionAgent → Cleaned Workspace
-    ↓
-PredictorAgent → Predictions
-    ↓
-CEOAgent → Strategic Decisions
-    ↓
-StrategistAgent → Strategic Roadmap
-    ↓
-OrganizerAgent → Organized Data
-    ↓
-ValidatorAgent → Validated Results
-    ↓
-DocumentorAgent → Documentation
-    ↓
-Final Output
+┌─────────────────────────────────────────────────────────────────┐
+│                     Infinity-Matrix System                       │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                   │
+│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐          │
+│  │   GitHub     │  │  VS Code     │  │   Hostinger  │          │
+│  │  Automation  │  │  Extension   │  │  Web Portal  │          │
+│  └──────┬───────┘  └──────┬───────┘  └──────┬───────┘          │
+│         │                  │                  │                   │
+│         └──────────────────┼──────────────────┘                   │
+│                            │                                      │
+│                   ┌────────▼─────────┐                           │
+│                   │  Core Orchestrator│                           │
+│                   │  (Agent Manager)  │                           │
+│                   └────────┬─────────┘                           │
+│                            │                                      │
+│         ┌──────────────────┼──────────────────┐                  │
+│         │                  │                  │                  │
+│  ┌──────▼───────┐  ┌──────▼───────┐  ┌──────▼───────┐          │
+│  │   Build      │  │   Deploy     │  │   Monitor    │          │
+│  │   Pipeline   │  │   Pipeline   │  │   & Alert    │          │
+│  └──────┬───────┘  └──────┬───────┘  └──────┬───────┘          │
+│         │                  │                  │                  │
+│         └──────────────────┼──────────────────┘                  │
+│                            │                                      │
+│                   ┌────────▼─────────┐                           │
+│                   │  Data Layer      │                           │
+│                   │  (Supabase)      │                           │
+│                   └──────────────────┘                           │
+│                                                                   │
+└─────────────────────────────────────────────────────────────────┘
 ```
 
-## Omni-Gateway (Future Integration)
+## Technology Stack
 
-The Omni-Gateway will handle:
-- Agent-to-agent communication
-- Credential management
-- Shared memory and state
-- Inter-process messaging
-- API gateway for external integrations
+### 1. Source Control & Automation Platform
+**GitHub**
+- **Purpose**: Primary source control, CI/CD orchestration, issue tracking
+- **Components**:
+  - GitHub Actions: Automated workflows for build, test, deploy
+  - GitHub Apps: Custom integrations for autonomous operations
+  - GitHub API: Programmatic access for agent operations
+  - GitHub Webhooks: Event-driven automation triggers
+- **Integration Points**:
+  - OAuth2 authentication for secure access
+  - GraphQL API for efficient data retrieval
+  - REST API for CRUD operations
+  - Actions workflows triggered by push, PR, issues, schedules
 
-## Data Flow
+### 2. Development Environment
+**VS Code**
+- **Purpose**: Primary IDE with extension support for agent-driven development
+- **Components**:
+  - Custom VS Code Extension: Agent interface for code generation and review
+  - Language Servers: Intelligent code completion and analysis
+  - Remote Development: Container and SSH support
+  - Integrated Terminal: Direct CLI access
+- **Integration Points**:
+  - Extension API for custom commands and UI
+  - Language Server Protocol (LSP) for code intelligence
+  - Debug Adapter Protocol (DAP) for debugging
+  - Git integration for version control operations
 
-### Stage 1: Collection
-- Multiple data sources crawled simultaneously
-- Raw data aggregation
-- Source metadata preservation
+### 3. Web Hosting & Domain Management
+**Hostinger (infinityxai.com)**
+- **Purpose**: Web hosting, domain management, and public-facing portal
+- **Components**:
+  - Web Hosting: Application and static site hosting
+  - Domain Management: DNS configuration and SSL certificates
+  - Control Panel: Web-based administration interface
+  - File Manager: Direct file access and management
+- **Integration Points**:
+  - FTP/SFTP for file deployment
+  - API access for programmatic management (if available)
+  - Webhook endpoints for CI/CD deployments
+  - Database hosting for web applications
 
-### Stage 2: Processing
-- Data cleaning and normalization
-- Schema validation
-- Quality checks
+### 4. Cloud Platform
+**Google Cloud Platform (GCP)**
+- **Purpose**: Scalable cloud infrastructure, AI/ML services, storage
+- **Components**:
+  - Compute Engine: VM instances for specialized workloads
+  - Cloud Run: Serverless container deployment
+  - Cloud Functions: Event-driven serverless functions
+  - Cloud Build: Container building and CI/CD
+  - Cloud Storage: Object storage for artifacts and data
+  - Cloud SQL: Managed relational databases
+  - Secret Manager: Secure credential storage
+  - AI Platform: Machine learning model deployment
+  - Logging & Monitoring: Centralized observability
+- **Integration Points**:
+  - gcloud CLI for command-line operations
+  - REST APIs for all services
+  - Service accounts for secure authentication
+  - IAM for fine-grained access control
+  - Cloud Pub/Sub for event-driven architecture
 
-### Stage 3: Intelligence
-- AI-powered analysis
-- Prediction generation
-- Insight extraction
+### 5. Database & Backend Services
+**Supabase**
+- **Purpose**: Real-time database, authentication, storage, and serverless functions
+- **Components**:
+  - PostgreSQL Database: Primary data store
+  - Authentication: User management and auth flows
+  - Storage: File and media storage
+  - Realtime: Live database subscriptions
+  - Edge Functions: Serverless TypeScript/JavaScript
+  - REST API: Auto-generated from database schema
+  - GraphQL: Optional query interface
+- **Integration Points**:
+  - Supabase JS Client: Frontend/backend SDKs
+  - Database webhooks for event triggers
+  - Auth integration with OAuth providers
+  - Storage buckets for file management
+  - Row Level Security (RLS) for data access control
 
-### Stage 4: Decision
-- Executive-level decisions
-- Resource allocation
-- Priority setting
+## Integration Architecture
 
-### Stage 5: Strategy
-- Roadmap creation
-- Market positioning
-- Competitive analysis
+### GitHub ↔ System Integration
 
-### Stage 6: Organization
-- Data indexing
-- Taxonomic classification
-- Tag management
+#### GitHub App Configuration
+```yaml
+Name: Infinity-Matrix Automation
+Permissions:
+  - Repository:
+      - Contents: Read & Write
+      - Issues: Read & Write
+      - Pull Requests: Read & Write
+      - Actions: Read & Write
+      - Workflows: Read & Write
+  - Organization:
+      - Members: Read
+      - Projects: Read & Write
+Events:
+  - push
+  - pull_request
+  - issues
+  - workflow_run
+  - schedule
+```
 
-### Stage 7: Validation
-- Quality assurance
-- Fact-checking
-- Consistency validation
+#### GitHub Actions Workflows
+- **continuous-integration.yml**: Build and test on every push
+- **continuous-deployment.yml**: Deploy to staging/production
+- **agent-orchestration.yml**: Schedule and trigger agent operations
+- **system-health-check.yml**: Periodic system monitoring
+- **auto-update.yml**: Dependency updates and security patches
 
-### Stage 8: Documentation
-- Automated documentation
-- Report generation
-- Artifact creation
+### VS Code Extension Integration
 
-## Configuration
-
-### Agent Configuration Schema
-
+#### Extension Manifest
 ```json
 {
-  "crawler": {
-    "sources": ["github", "web", "api"],
-    "rate_limit": 100,
-    "concurrent": true
-  },
-  "predictor": {
-    "model": "gpt-4",
-    "temperature": 0.7,
-    "max_tokens": 2000
-  },
-  "ceo": {
-    "decision_threshold": 0.7
-  },
-  "validator": {
-    "quality_threshold": 0.8
-  },
-  "documentor": {
-    "output_dir": "docs/output",
-    "format": "markdown"
+  "name": "infinity-matrix-agent",
+  "displayName": "Infinity Matrix Agent",
+  "description": "AI-powered autonomous development agent",
+  "version": "1.0.0",
+  "publisher": "InfinityXOne",
+  "categories": ["Programming Languages", "Other"],
+  "activationEvents": [
+    "onStartupFinished",
+    "onCommand:infinity-matrix.startAgent",
+    "onCommand:infinity-matrix.executePrompt"
+  ],
+  "contributes": {
+    "commands": [
+      {
+        "command": "infinity-matrix.startAgent",
+        "title": "Start Infinity Matrix Agent"
+      },
+      {
+        "command": "infinity-matrix.executePrompt",
+        "title": "Execute Master Prompt"
+      }
+    ]
   }
 }
 ```
 
-## Extensibility
+### Hostinger Web Portal Integration
 
-### Adding New Agents
+#### Deployment Pipeline
+1. **GitHub Actions Trigger**: On merge to main branch
+2. **Build Process**: Compile and package application
+3. **Transfer**: SFTP upload to Hostinger hosting
+4. **Verification**: Health check endpoint validation
+5. **Notification**: Status update via Slack/Email
 
-1. Create agent class in `cortex/agents/`
-2. Implement required methods
-3. Register in VisionCortex orchestrator
-4. Update workflow pipeline
+#### Web Portal Components
+- **Dashboard**: System status and metrics visualization
+- **Admin Panel**: Configuration and management interface
+- **API Gateway**: External API access and rate limiting
+- **Documentation Site**: Auto-generated from markdown files
 
-### Custom Workflows
+### Google Cloud Integration
 
-The Vision Cortex supports custom workflow definitions:
-- Sequential processing
-- Parallel agent execution
-- Conditional branching
-- Error recovery strategies
-
-## Integration Points
-
-### GitHub Actions
-- Automated workflow triggers
-- CI/CD integration
-- Scheduled runs
-- Manual dispatch
-
-### External APIs
-- LLM providers (OpenAI, Anthropic, etc.)
-- Data sources
-- Notification services
-- Storage systems
-
-### Monitoring and Observability
-- Agent status tracking
-- Performance metrics
-- Error logging
-- Audit trails
-
-## Security and Compliance
-
-### Data Protection
-- Secure credential management
-- Data encryption at rest and in transit
-- Access control and permissions
-- Audit logging
-
-### Quality Standards
-- FAANG-grade code quality
-- Enterprise security practices
-- Automated testing
-- Documentation requirements
-
-## Deployment
-
-### Local Development
-```bash
-python -m cortex.agents.vision_cortex
+#### Service Architecture
+```
+GitHub Actions
+    ↓
+Cloud Build (Container Build)
+    ↓
+Artifact Registry (Container Storage)
+    ↓
+Cloud Run (Deployment)
+    ↓
+Cloud Logging (Monitoring)
 ```
 
-### GitHub Actions
-```bash
-# Automatic via workflow dispatch
-# See .github/workflows/vision_cortex_genesis.yml
+#### Infrastructure as Code
+- **Terraform**: Infrastructure provisioning
+- **Config Files**: Declarative configuration management
+- **Secrets**: Managed via Secret Manager
+
+### Supabase Integration
+
+#### Database Schema
+- **projects**: Project metadata and configuration
+- **builds**: Build history and artifacts
+- **deployments**: Deployment records
+- **metrics**: System performance metrics
+- **logs**: Application and system logs
+- **agents**: Agent status and task queue
+
+#### Real-time Subscriptions
+- Build status updates
+- Deployment notifications
+- Agent heartbeat monitoring
+- System health metrics
+
+## Security Architecture
+
+### Authentication & Authorization
+1. **GitHub OAuth**: User authentication via GitHub accounts
+2. **Service Accounts**: Machine-to-machine authentication
+3. **API Keys**: Scoped access tokens for external services
+4. **JWT Tokens**: Stateless authentication for APIs
+5. **IAM Roles**: Cloud resource access control
+
+### Secrets Management
+- **GitHub Secrets**: CI/CD credentials and tokens
+- **GCP Secret Manager**: Cloud service credentials
+- **Supabase Vault**: Database credentials and API keys
+- **Environment Variables**: Runtime configuration
+
+### Network Security
+- **HTTPS/TLS**: Encrypted communication
+- **API Rate Limiting**: DDoS protection
+- **IP Whitelisting**: Restricted access where applicable
+- **VPN/Private Networks**: Internal service communication
+
+## Data Flow
+
+### Build & Deploy Flow
+```
+1. Developer pushes code → GitHub
+2. GitHub webhook → Triggers Actions workflow
+3. Actions workflow → Builds container
+4. Container → Pushed to Artifact Registry
+5. Cloud Run → Deploys new container
+6. Supabase → Records deployment event
+7. Monitoring → Validates deployment health
+8. Notification → Sends status update
 ```
 
-### Production
-- Containerized deployment
-- Kubernetes orchestration
-- Auto-scaling
-- High availability
+### Agent Operation Flow
+```
+1. Scheduled trigger → GitHub Actions
+2. Agent starts → Checks task queue (Supabase)
+3. Task execution → Code generation/review
+4. Results → Committed to GitHub
+5. Verification → Tests run automatically
+6. Deployment → If tests pass
+7. Metrics → Recorded in Supabase
+8. Next task → Agent continues
+```
 
-## Metrics and KPIs
+## Monitoring & Observability
 
-### Agent Performance
-- Execution time per agent
-- Success/failure rates
-- Data quality scores
-- Resource utilization
+### Metrics Collection
+- **Application Metrics**: Response times, error rates, throughput
+- **System Metrics**: CPU, memory, disk, network usage
+- **Business Metrics**: Build frequency, deployment success rate, MTTR
+- **Agent Metrics**: Task completion rate, accuracy, efficiency
 
-### Business Metrics
-- Strategic decisions made
-- Documentation generated
-- Quality improvements
-- Automation efficiency
+### Logging Strategy
+- **Structured Logging**: JSON format for easy parsing
+- **Centralized Logs**: Aggregated in Cloud Logging
+- **Log Levels**: ERROR, WARN, INFO, DEBUG
+- **Retention**: 30 days standard, 1 year for compliance
+
+### Alerting Rules
+- **Critical**: System down, deployment failed, security breach
+- **Warning**: High error rate, slow response time, resource exhaustion
+- **Info**: Successful deployment, scheduled maintenance
+
+## Scalability & Performance
+
+### Horizontal Scaling
+- **Cloud Run**: Auto-scales based on traffic
+- **Load Balancing**: Distributes requests across instances
+- **Database Replicas**: Read replicas for query load
+
+### Vertical Scaling
+- **Resource Limits**: Configurable CPU/memory per service
+- **Performance Tuning**: Query optimization, caching strategies
+
+### Caching Strategy
+- **CDN**: Static asset caching via Cloudflare/similar
+- **Application Cache**: Redis/Memcached for hot data
+- **Database Cache**: Query result caching
+
+## Disaster Recovery
+
+### Backup Strategy
+- **Database Backups**: Daily automated backups
+- **Code Repository**: GitHub redundancy
+- **Configuration Backups**: Terraform state backups
+- **Artifact Retention**: Build artifacts retained for 90 days
+
+### Recovery Procedures
+- **RTO (Recovery Time Objective)**: 1 hour
+- **RPO (Recovery Point Objective)**: 24 hours
+- **Failover**: Automated to secondary region
+- **Restoration**: Documented playbooks
+
+## Cost Optimization
+
+### Resource Management
+- **Auto-shutdown**: Non-production environments during off-hours
+- **Right-sizing**: Regular review of resource allocations
+- **Spot Instances**: For non-critical batch workloads
+- **Reserved Capacity**: For predictable workloads
+
+### Cost Monitoring
+- **Budget Alerts**: Notifications at 50%, 75%, 90% of budget
+- **Cost Attribution**: Tagged resources by project/team
+- **Usage Reports**: Monthly cost analysis and optimization recommendations
 
 ## Future Enhancements
 
 ### Planned Features
-1. Real-time agent communication
-2. Distributed agent execution
-3. Advanced AI model integration
-4. Self-learning capabilities
-5. Dynamic workflow optimization
+- Multi-cloud support (AWS, Azure)
+- Advanced AI/ML model integration
+- Self-healing infrastructure
+- Predictive scaling
+- A/B testing automation
+- Canary deployments
+- Feature flag management
 
-### Roadmap
-- **Q1 2026:** Enhanced AI integration
-- **Q2 2026:** Distributed execution
-- **Q3 2026:** Self-learning systems
-- **Q4 2026:** Advanced automation
+### Technology Roadmap
+- Kubernetes adoption for orchestration
+- Service mesh (Istio) for microservices
+- GraphQL federation for distributed data
+- Event sourcing for audit trails
+- CQRS for read/write optimization
 
-## Support and Maintenance
+## References
 
-### Documentation
-- Agent API documentation
-- Integration guides
-- Troubleshooting guides
-- Best practices
-
-### Community
-- GitHub Discussions
-- Issue tracking
-- Feature requests
-- Contribution guidelines
+- [Roadmap](./roadmap.md) - Implementation phases and milestones
+- [Prompt Suite](./prompt_suite.md) - Master prompts for agents
+- [System Manifest](./system_manifest.md) - System inventory and configuration
+- [Setup Instructions](../setup_instructions.md) - Onboarding and setup guide
+- [Collaboration Guide](../COLLABORATION.md) - Team roles and protocols
 
 ---
 
-**Version:** 1.0.0  
-**Last Updated:** 2025-12-30  
-**Status:** Production Ready
-
-*This blueprint represents the foundational architecture of the Infinity-Matrix platform, designed to scale from startup to enterprise operations with FAANG-grade standards.*
+**Document Version**: 1.0.0  
+**Last Updated**: 2025-12-30  
+**Maintained By**: Infinity-Matrix System
