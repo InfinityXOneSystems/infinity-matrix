@@ -1,0 +1,42 @@
+# Core Backend
+fastapi==0.109.0
+uvicorn[standard]==0.27.0
+pydantic==2.5.3
+python-multipart==0.0.6
+
+# Database
+sqlalchemy==2.0.25
+alembic==1.13.1
+asyncpg==0.29.0
+aiosqlite==0.19.0
+
+# WebSocket & Real-time
+websockets==12.0
+python-socketio==5.11.0
+
+# AI & Voice Integration
+openai==1.10.0
+twilio==8.11.1
+pydub==0.25.1
+
+# Web Scraping & Data Enrichment
+aiohttp==3.9.1
+beautifulsoup4==4.12.3
+selenium==4.16.0
+playwright==1.41.2
+
+# Authentication & Security
+python-jose[cryptography]==3.3.0
+passlib[bcrypt]==1.7.4
+python-dotenv==1.0.0
+
+# Utilities
+redis==5.0.1
+celery==5.3.6
+httpx==0.26.0
+python-dateutil==2.8.2
+phonenumbers==8.13.27
+
+# Testing
+pytest==7.4.3
+pytest-asyncio==0.23.3
