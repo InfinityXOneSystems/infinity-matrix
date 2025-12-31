@@ -1,0 +1,77 @@
+# {{ app_name }}
+
+A modern Gin-based REST API in Go.
+
+## Features
+
+- ⚡ Gin web framework
+- 🔒 JWT authentication{% if include_auth %} (enabled){% endif %}
+- 🗄️ {{ database }} database with GORM
+- 📝 Structured logging with zerolog
+- 🐳 Docker support
+- 🧪 Testing with testify
+
+## Quick Start
+
+### Prerequisites
+
+- Go 1.21 or higher
+- Docker (optional)
+
+### Installation
+
+1. Install dependencies:
+```bash
+go mod download
+```
+
+2. Set up environment variables:
+```bash
+cp .env.example .env
+# Edit .env with your configuration
+```
+
+3. Run the application:
+```bash
+go run main.go
+```
+
+The API will be available at `http://localhost:8080`
+
+## Project Structure
+
+```
+{{ app_name }}/
+├── main.go              # Application entry point
+├── go.mod               # Go module file
+├── handlers/            # HTTP handlers
+├── models/              # Data models
+├── middleware/          # Middleware
+├── config/              # Configuration
+└── tests/               # Tests
+```
+
+## Development
+
+### Running Tests
+
+```bash
+go test ./...
+```
+
+### Building
+
+```bash
+go build -o {{ app_name }}
+```
+
+### Using Docker
+
+```bash
+docker build -t {{ app_name }} .
+docker run -p 8080:8080 {{ app_name }}
+```
+
+## License
+
+MIT License

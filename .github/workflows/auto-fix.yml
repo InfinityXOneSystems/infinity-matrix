@@ -1,0 +1,89 @@
+name: Auto-Fix PR Issues
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  auto-fix:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.head_ref }}
+          token: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 0
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install auto-fix tools
+        run: |
+          pip install --upgrade pip
+          pip install black isort flake8 autopep8 pylint mypy
+
+      - name: Run Black formatter
+        run: |
+          if find . -name "*.py" -not -path "./venv/*" -not -path "./.venv/*" -not -path "./env/*" | grep -q .; then
+            black . --exclude '/(\.git|\.venv|venv|env|build|dist|\.eggs)/' || true
+          fi
+
+      - name: Run isort
+        run: |
+          if find . -name "*.py" -not -path "./venv/*" -not -path "./.venv/*" -not -path "./env/*" | grep -q .; then
+            isort . --skip venv --skip .venv --skip env --skip build --skip dist || true
+          fi
+
+      - name: Run autopep8
+        run: |
+          if find . -name "*.py" -not -path "./venv/*" -not -path "./.venv/*" -not -path "./env/*" | grep -q .; then
+            autopep8 --in-place --recursive --aggressive --aggressive . \
+              --exclude='venv,.venv,env,build,dist,.eggs' || true
+          fi
+
+      - name: Fix trailing whitespace
+        run: |
+          find . -type f \( -name "*.py" -o -name "*.md" -o -name "*.yml" -o -name "*.yaml" -o -name "*.json" \) \
+            -not -path "./venv/*" -not -path "./.venv/*" -not -path "./env/*" \
+            -not -path "./.git/*" -exec sed -i 's/[[:space:]]*$//' {} + || true
+
+      - name: Fix line endings
+        run: |
+          find . -type f \( -name "*.py" -o -name "*.md" -o -name "*.yml" -o -name "*.yaml" \) \
+            -not -path "./venv/*" -not -path "./.venv/*" -not -path "./env/*" \
+            -not -path "./.git/*" -exec dos2unix {} + 2>/dev/null || true
+
+      - name: Check for changes
+        id: check_changes
+        run: |
+          git diff --exit-code || echo "changes=true" >> $GITHUB_OUTPUT
+
+      - name: Commit and push fixes
+        if: steps.check_changes.outputs.changes == 'true'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "Auto-fix: Apply formatting and linting fixes" || true
+          git push origin ${{ github.head_ref }} || true
+
+      - name: Comment on PR
+        if: steps.check_changes.outputs.changes == 'true'
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: '✅ Auto-fix applied: Formatting and linting issues have been automatically corrected.'
+            })

@@ -1,0 +1,35 @@
+id: transportation
+name: Transportation & Logistics
+type: transportation
+description: Logistics, fleet management, autonomous vehicles, ride-sharing, supply chain
+keywords:
+  - transportation
+  - logistics
+  - fleet management
+  - autonomous vehicles
+  - ride-sharing
+  - delivery
+  - supply chain
+  - warehousing
+  - route optimization
+  - freight
+priority: 8
+enabled: true
+
+seeds:
+  - url: https://github.com/uber
+    source_id: github_transportation
+    priority: 9
+    depth: 2
+  - url: https://github.com/lyft
+    source_id: github_transportation
+    priority: 8
+    depth: 2
+  - url: https://github.com/carla-simulator/carla
+    source_id: github_transportation
+    priority: 8
+    depth: 2
+  - url: https://github.com/openmove
+    source_id: github_transportation
+    priority: 7
+    depth: 2
