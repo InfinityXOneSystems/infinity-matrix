@@ -1,341 +1,107 @@
-# Security Best Practices
+# Security Guide
 
-Infinity Matrix includes enterprise-grade security features by default. This guide covers security best practices for building and deploying applications.
+## Overview
 
-## Secrets Management
+Infinity-Matrix implements comprehensive security measures across all layers of the platform.
 
-### Using the Secrets Manager
+## Automated Security Scanning
 
-Never hardcode secrets in your code or configuration files:
-
-```python
-from infinity_matrix.security.secrets import get_secrets_manager
-
-secrets = get_secrets_manager()
-
-# Set a secret
-secrets.set("database_password", "super_secret_password")
-
-# Get a secret
-db_password = secrets.get("database_password")
-
-# List all secrets (keys only)
-secret_keys = secrets.list()
-
-# Delete a secret
-secrets.delete("old_api_key")
-```
-
-### Environment Variables
-
-For sensitive configuration:
-
+### Python Code Security (Bandit)
 ```bash
-# Never commit .env files
-echo ".env" >> .gitignore
+# Run bandit scan
+bandit -r backend/infinity_matrix -f json -o bandit-report.json
 
-# Use .env.example as template
-cp .env.example .env
+# Via API
+curl -X POST http://localhost:8000/api/security/scan
 ```
 
-### Encryption
-
-All secrets are encrypted at rest using Fernet encryption:
-
-```python
-from infinity_matrix.security.secrets import LocalSecretsBackend
-
-# Custom encryption key
-backend = LocalSecretsBackend(encryption_key=b"your-key")
-```
-
-## Role-Based Access Control (RBAC)
-
-### Managing Roles
-
-```python
-from infinity_matrix.security.rbac import get_rbac_manager, Role, Permission
-
-rbac = get_rbac_manager()
-
-# Create custom role
-developer_role = Role(
-    name="senior_developer",
-    description="Senior developer with extended permissions",
-    permissions={
-        Permission.READ,
-        Permission.WRITE,
-        Permission.EXECUTE
-    }
-)
-rbac.create_role(developer_role)
-```
-
-### Managing Users
-
-```python
-from infinity_matrix.security.rbac import User
-
-# Create user
-user = User(
-    username="john_doe",
-    email="john@example.com"
-)
-rbac.create_user(user)
-
-# Assign roles
-rbac.assign_role("john_doe", "developer")
-rbac.assign_role("john_doe", "code_reviewer")
-
-# Check permissions
-if rbac.has_permission("john_doe", Permission.WRITE):
-    # Allow write access
-    pass
-```
-
-### Built-in Roles
-
-- **admin**: Full access to all resources
-- **developer**: Read, write, and execute permissions
-- **viewer**: Read-only access
-
-## Audit Logging
-
-### Enable Comprehensive Logging
-
-```python
-from infinity_matrix.security.audit import get_audit_logger, AuditAction, AuditLevel
-
-logger = get_audit_logger()
-
-# Log actions
-logger.info(
-    AuditAction.CREATE,
-    user="john_doe",
-    resource="api-endpoint",
-    details={"endpoint": "/api/users"},
-    ip_address="192.168.1.100"
-)
-
-logger.warning(
-    AuditAction.DELETE,
-    user="admin",
-    resource="database",
-    details={"database": "production"}
-)
-```
-
-### Query Audit Logs
-
-```python
-from datetime import datetime, timedelta
-
-# Query logs
-logs = logger.query(
-    user="john_doe",
-    start_time=datetime.now() - timedelta(days=7),
-    limit=100
-)
-
-# Get failed actions
-failed_logs = logger.query(
-    success=False,
-    limit=50
-)
-```
-
-## Authentication
-
-### JWT Authentication
-
-Generated applications include JWT authentication by default:
-
-```python
-# In your FastAPI application
-from infinity_matrix.modules.auth import JWTAuthProvider
-
-auth = JWTAuthProvider(secret_key="your-secret-key")
-
-# Authenticate user
-user_data = auth.authenticate({
-    "username": "john_doe",
-    "password": "password123"
-})
-
-if user_data:
-    # Generate token
-    token = auth.generate_token(user_data)
-    
-# Validate token
-payload = auth.validate_token(token)
-```
-
-## Input Validation
-
-### Use Pydantic Models
-
-All generated applications use Pydantic for input validation:
-
-```python
-from pydantic import BaseModel, Field, EmailStr
-
-class UserCreate(BaseModel):
-    username: str = Field(..., min_length=3, max_length=50)
-    email: EmailStr
-    password: str = Field(..., min_length=8)
-```
-
-## Encryption
-
-### Data Encryption at Rest
-
-Configure encryption for sensitive data:
-
-```yaml
-# config.yaml
-security:
-  encryption_enabled: true
-  encryption_algorithm: "AES-256-GCM"
-```
-
-### HTTPS/TLS
-
-Always use HTTPS in production:
-
+### Dependency Vulnerabilities (Safety)
 ```bash
-# In your application
-uvicorn main:app --ssl-keyfile=key.pem --ssl-certfile=cert.pem
+# Check dependencies
+safety check --json
+
+# Continuous monitoring enabled in CI/CD
 ```
 
-## Dependency Security
-
-### Scan Dependencies
-
-Regularly scan for vulnerable dependencies:
-
+### Container Security (Trivy)
 ```bash
-# Using agent
-infinity-matrix agent enable --type security-scan
-
-# Manual scan
-pip-audit  # For Python
-npm audit  # For Node.js
+# Scan Docker images
+trivy image infinity-matrix-backend:latest
+trivy image infinity-matrix-frontend:latest
 ```
 
-### Keep Dependencies Updated
-
-Enable auto-update agent:
-
+### Frontend Security (ESLint)
 ```bash
-infinity-matrix agent enable --type auto-update
-infinity-matrix schedule --task "update dependencies" --cron "0 0 * * 0"
+cd frontend
+npm run lint
 ```
 
-## Network Security
+## Incident Response
 
-### Firewall Rules
+See [Incident Response SOP](incident.md) for detailed procedures.
 
-Configure firewall rules in cloud deployments:
+### Auto-Response Features
+- **Auto-Lockdown**: Automatically triggered for critical incidents
+- **Alerting**: Multi-channel notifications (Slack, Email, PagerDuty)
+- **Rollback**: Automated or manual rollback capabilities
+- **Escalation**: Intelligent escalation based on severity
 
+### Incident Severity Levels
+- **Critical**: Immediate response (0-15 min)
+- **High**: Rapid response (15-30 min)
+- **Medium**: Standard response (1-4 hours)
+- **Low**: Normal response (4-24 hours)
+
+## Threat Detection
+
+Real-time threat detection monitors for:
+- SQL Injection attempts
+- Cross-Site Scripting (XSS)
+- Command Injection
+- Path Traversal
+- Unusual access patterns
+
+## Rate Limiting & Circuit Breakers
+
+### Rate Limiting
 ```python
-from infinity_matrix.integrations.cloud import DeploymentConfig, CloudProvider
-
-config = DeploymentConfig(
-    provider=CloudProvider.AWS,
-    region="us-east-1",
-    instance_type="t3.medium",
-    firewall_rules=[
-        {"port": 443, "source": "0.0.0.0/0"},  # HTTPS
-        {"port": 22, "source": "10.0.0.0/8"}   # SSH (internal only)
-    ]
-)
+# Configurable per endpoint
+max_requests = 100  # per window
+window_seconds = 60
 ```
 
-## Security Headers
+### Circuit Breakers
+- Automatic fault isolation
+- Graceful degradation
+- Self-healing capabilities
 
-Generated web applications include security headers:
+## Security Best Practices
 
-```python
-from fastapi.middleware.cors import CORSMiddleware
-from fastapi.middleware.trustedhost import TrustedHostMiddleware
+1. **Authentication**: JWT-based authentication
+2. **Authorization**: Role-based access control (RBAC)
+3. **Encryption**: TLS 1.2+ for all communications
+4. **Data at Rest**: Database encryption enabled
+5. **Secrets Management**: Environment variables, never in code
+6. **Audit Logging**: Complete audit trail of all actions
+7. **PII Protection**: Automatic PII detection and redaction
 
-# CORS
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["https://example.com"],  # Don't use "*" in production
-    allow_credentials=True,
-    allow_methods=["GET", "POST"],
-    allow_headers=["*"],
-)
+## Security Monitoring
 
-# Trusted hosts
-app.add_middleware(
-    TrustedHostMiddleware,
-    allowed_hosts=["example.com", "*.example.com"]
-)
-```
-
-## Regular Security Audits
-
-### Automated Security Scanning
-
-```bash
-# Enable security scanning agent
-infinity-matrix agent enable --type security-scan
-
-# Schedule daily scans
-infinity-matrix schedule --task "security scan" --cron "0 2 * * *"
-```
-
-### Manual Security Review
-
-Regularly review:
-- Access logs
+### Metrics
 - Failed authentication attempts
-- Unusual activity patterns
-- Permission changes
-- Configuration changes
+- Suspicious activity patterns
+- Security scan results
+- Incident response times
+
+### Alerts
+- Real-time security alerts
+- Threshold-based notifications
+- Escalation workflows
 
 ## Compliance
 
-### GDPR Compliance
+See [Compliance Guide](compliance.md) for framework-specific security requirements.
 
-Generated applications support GDPR requirements:
+---
 
-```python
-# Include data export functionality
-@app.get("/api/users/{user_id}/data")
-async def export_user_data(user_id: str):
-    # Export all user data
-    pass
-
-# Include data deletion
-@app.delete("/api/users/{user_id}/data")
-async def delete_user_data(user_id: str):
-    # Delete all user data
-    pass
-```
-
-## Best Practices Checklist
-
-- [ ] Never commit secrets or credentials
-- [ ] Use environment variables for configuration
-- [ ] Enable encryption at rest and in transit
-- [ ] Implement RBAC for access control
-- [ ] Enable comprehensive audit logging
-- [ ] Validate all user input
-- [ ] Use JWT or OAuth for authentication
-- [ ] Scan dependencies regularly
-- [ ] Keep all packages updated
-- [ ] Use HTTPS/TLS in production
-- [ ] Configure security headers
-- [ ] Implement rate limiting
-- [ ] Use CSP (Content Security Policy)
-- [ ] Enable security monitoring
-- [ ] Regular security audits
-
-## See Also
-
-- [Getting Started](getting-started.md)
-- [Agent Framework](agents.md)
-- [API Reference](api-reference.md)
+**Last Updated**: 2025-12-31
