@@ -1,21 +1,46 @@
 version: '3.8'
 
 services:
-  postgres:
-    image: postgres:16-alpine
+  backend:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.backend
+    ports:
+      - "8000:8000"
     environment:
-      POSTGRES_DB: infinity_matrix
-      POSTGRES_USER: infinity_user
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-changeme}
+      - DATABASE_URL=postgresql+asyncpg://postgres:postgres@db:5432/infinity_matrix
+      - REDIS_URL=redis://redis:6379/0
+      - DEBUG=false
+    depends_on:
+      - db
+      - redis
     volumes:
-      - postgres_data:/var/lib/postgresql/data
+      - ./backend:/app/backend
+    command: uvicorn infinity_matrix.main:app --host 0.0.0.0 --port 8000 --reload
+
+  frontend:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.frontend
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./frontend:/app/frontend
+      - /app/frontend/node_modules
+    environment:
+      - REACT_APP_API_URL=http://localhost:8000
+    command: npm start
+
+  db:
+    image: postgres:15-alpine
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=infinity_matrix
     ports:
       - "5432:5432"
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U infinity_user"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
 
   redis:
     image: redis:7-alpine
@@ -23,71 +48,31 @@ services:
       - "6379:6379"
     volumes:
       - redis_data:/data
-    healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
-      interval: 10s
-      timeout: 3s
-      retries: 5
 
-  backend:
-    build:
-      context: ./backend
-      dockerfile: Dockerfile
-    environment:
-      - DATABASE_URL=postgresql://infinity_user:${POSTGRES_PASSWORD:-changeme}@postgres:5432/infinity_matrix
-      - REDIS_URL=redis://redis:6379
-      - OPENAI_API_KEY=${OPENAI_API_KEY}
-      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
-      - SECRET_KEY=${SECRET_KEY:-dev-secret-key-change-in-production}
-      - ENVIRONMENT=${ENVIRONMENT:-development}
+  prometheus:
+    image: prom/prometheus:latest
     ports:
-      - "8000:8000"
-    depends_on:
-      postgres:
-        condition: service_healthy
-      redis:
-        condition: service_healthy
+      - "9090:9090"
     volumes:
-      - ./backend:/app
-      - backend_cache:/app/.cache
-    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+      - ./kubernetes/prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus_data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
 
-  frontend:
-    build:
-      context: ./frontend
-      dockerfile: Dockerfile
-    environment:
-      - REACT_APP_API_URL=http://localhost:8000
-      - REACT_APP_WS_URL=ws://localhost:8000
+  grafana:
+    image: grafana/grafana:latest
     ports:
-      - "3000:3000"
-    depends_on:
-      - backend
-    volumes:
-      - ./frontend:/app
-      - /app/node_modules
-    command: npm start
-
-  worker:
-    build:
-      context: ./backend
-      dockerfile: Dockerfile
+      - "3001:3000"
     environment:
-      - DATABASE_URL=postgresql://infinity_user:${POSTGRES_PASSWORD:-changeme}@postgres:5432/infinity_matrix
-      - REDIS_URL=redis://redis:6379
-      - OPENAI_API_KEY=${OPENAI_API_KEY}
-      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
-      - SECRET_KEY=${SECRET_KEY:-dev-secret-key-change-in-production}
-    depends_on:
-      postgres:
-        condition: service_healthy
-      redis:
-        condition: service_healthy
+      - GF_SECURITY_ADMIN_PASSWORD=admin
     volumes:
-      - ./backend:/app
-    command: python -m app.workers.intelligence_worker
+      - grafana_data:/var/lib/grafana
+    depends_on:
+      - prometheus
 
 volumes:
   postgres_data:
   redis_data:
-  backend_cache:
+  prometheus_data:
+  grafana_data:

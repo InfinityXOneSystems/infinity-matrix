@@ -1,31 +1,37 @@
 {
-  "name": "infinity-matrix-frontend",
+  "name": "infinity-matrix-dashboard",
   "version": "1.0.0",
-  "description": "Intelligence Discovery System - Frontend",
   "private": true,
   "dependencies": {
-    "@testing-library/jest-dom": "^6.1.5",
-    "@testing-library/react": "^14.1.2",
-    "@testing-library/user-event": "^14.5.1",
-    "@types/jest": "^29.5.11",
-    "@types/node": "^20.10.6",
-    "@types/react": "^18.2.46",
-    "@types/react-dom": "^18.2.18",
-    "axios": "^1.6.5",
+    "@testing-library/jest-dom": "^5.17.0",
+    "@testing-library/react": "^13.4.0",
+    "@testing-library/user-event": "^13.5.0",
+    "@types/jest": "^27.5.2",
+    "@types/node": "^16.18.68",
+    "@types/react": "^18.2.42",
+    "@types/react-dom": "^18.2.17",
+    "axios": "^1.6.2",
+    "chart.js": "^4.4.1",
+    "i18next": "^23.7.11",
     "react": "^18.2.0",
+    "react-chartjs-2": "^5.2.0",
     "react-dom": "^18.2.0",
-    "react-router-dom": "^6.21.1",
+    "react-i18next": "^14.0.0",
+    "react-router-dom": "^6.21.0",
     "react-scripts": "5.0.1",
-    "recharts": "^2.10.3",
-    "typescript": "^5.3.3",
-    "web-vitals": "^3.5.1"
+    "typescript": "^4.9.5",
+    "web-vitals": "^2.1.4"
   },
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
+    "test:coverage": "react-scripts test --coverage --watchAll=false",
+    "test:e2e": "cypress run",
+    "test:visual": "playwright test",
     "eject": "react-scripts eject",
-    "lint": "eslint src --ext .ts,.tsx"
+    "lint": "eslint src --ext .ts,.tsx",
+    "security:scan": "npm audit"
   },
   "eslintConfig": {
     "extends": [
@@ -46,7 +52,25 @@
     ]
   },
   "devDependencies": {
-    "@types/recharts": "^1.8.29",
-    "eslint": "^8.56.0"
+    "@playwright/test": "^1.40.1",
+    "cypress": "^13.6.2",
+    "eslint": "^8.56.0",
+    "eslint-config-react-app": "^7.0.1"
+  },
+  "jest": {
+    "collectCoverageFrom": [
+      "src/**/*.{js,jsx,ts,tsx}",
+      "!src/**/*.test.{js,jsx,ts,tsx}",
+      "!src/index.tsx",
+      "!src/reportWebVitals.ts"
+    ],
+    "coverageThreshold": {
+      "global": {
+        "branches": 90,
+        "functions": 90,
+        "lines": 90,
+        "statements": 90
+      }
+    }
   }
 }
