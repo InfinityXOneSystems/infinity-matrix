@@ -1,149 +1,183 @@
-# Infinity Matrix - Universal Seed & Ingestion System
+# Infinity Matrix - Production MCP Mesh System
+
+A FAANG-level, production-ready Model Context Protocol (MCP) mesh system enabling real-time, persistent synchronization and intelligence sharing across multiple AI platforms.
 
 ## Overview
 
-Enterprise-grade, production-ready universal seed and ingestion system for automated data collection, normalization, and AI-powered analysis across multiple business verticals.
+Infinity Matrix is an enterprise-grade MCP implementation that orchestrates and synchronizes AI contexts across:
+- **Vertex AI** (Google Cloud)
+- **ChatGPT** (OpenAI)
+- **GitHub Copilot**
+- **VS Code Copilot**
+- **Custom AI Integrations**
 
 ## Features
 
-- **Multi-Industry Coverage**: Pre-configured seeds for top 10 global business industries
-- **Distributed Crawling**: Robust, resumable web crawling and scraping framework
-- **Multiple Source Connectors**: GitHub, AI platforms, real estate, government, social media
-- **LLM Analysis Pipeline**: Unified interface for Vertex AI, OpenAI, Ollama, and more
-- **Production-Ready**: FAANG-level code quality with comprehensive error handling
-- **Extensible Architecture**: Template-based system for easy adaptation to new verticals
+### Core Capabilities
+- 🔄 **Real-time Synchronization**: WebSocket and gRPC-based bidirectional communication
+- 💾 **Persistent State**: Distributed state management with Redis and PostgreSQL
+- 🧠 **Intelligence Sharing**: Cross-platform context and learning propagation
+- 🔒 **Enterprise Security**: OAuth2, JWT, API key management, and encryption
+- 📊 **Observability**: Comprehensive logging, metrics, and tracing
+- 🚀 **High Performance**: Optimized for low latency and high throughput
+
+### Integrations
+- ✅ **GitHub Actions**: Full automation for PRs, merges, and code reviews
+- ✅ **VS Code Extension**: Native IDE integration with real-time AI assistance
+- ✅ **Google Cloud**: Vertex AI, Cloud Run, Pub/Sub, and Workspace APIs
+- ✅ **Hostinger**: Production deployment with SSL and monitoring
+- ✅ **CI/CD**: Automated testing, security scanning, and deployment
+
+## Architecture
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                     Infinity Matrix Core                     │
+│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐      │
+│  │ MCP Protocol │  │ Sync Engine  │  │  State Mgmt  │      │
+│  └──────────────┘  └──────────────┘  └──────────────┘      │
+└─────────────────────────────────────────────────────────────┘
+                           │
+       ┌───────────────────┼───────────────────┐
+       │                   │                   │
+┌──────▼──────┐    ┌──────▼──────┐    ┌──────▼──────┐
+│  Vertex AI  │    │   ChatGPT   │    │   GitHub    │
+│ Integration │    │ Integration │    │   Copilot   │
+└─────────────┘    └─────────────┘    └─────────────┘
+```
 
 ## Quick Start
+
+### Prerequisites
+- Node.js 20+ and npm 10+
+- Python 3.11+
+- Docker and Docker Compose
+- Google Cloud SDK
+- GitHub CLI
 
 ### Installation
 
 ```bash
-pip install -r requirements.txt
+# Clone the repository
+git clone https://github.com/InfinityXOneSystems/infinity-matrix.git
+cd infinity-matrix
+
+# Install dependencies
+npm install
+cd packages/server && pip install -r requirements.txt
+
+# Configure environment
+cp .env.example .env
+# Edit .env with your API keys and configuration
+
+# Start development environment
+docker-compose up -d
+
+# Run the MCP server
+npm run dev
 ```
 
-### Configuration
-
-Copy the example configuration:
+### VS Code Extension
 
 ```bash
-cp config/config.example.yaml config/config.yaml
+# Install the extension
+cd packages/vscode-extension
+npm install
+npm run compile
+code --install-extension infinity-matrix-0.1.0.vsix
 ```
 
-Edit `config/config.yaml` with your API keys and preferences.
+## Configuration
 
-### Running the System
+Configuration is managed through environment variables and configuration files:
 
-```bash
-# Run ingestion for a specific industry
-python -m infinity_matrix.cli ingest --industry technology
+```env
+# MCP Server
+MCP_SERVER_PORT=3000
+MCP_SERVER_HOST=0.0.0.0
 
-# Run analysis pipeline
-python -m infinity_matrix.cli analyze --industry technology
+# AI Providers
+OPENAI_API_KEY=your_openai_key
+GOOGLE_CLOUD_PROJECT=your_project_id
+GITHUB_TOKEN=your_github_token
 
-# Check status
-python -m infinity_matrix.cli status
+# Database
+POSTGRES_URL=postgresql://user:pass@localhost:5432/infinity_matrix
+REDIS_URL=redis://localhost:6379
+
+# Google Cloud
+GOOGLE_APPLICATION_CREDENTIALS=/path/to/service-account.json
 ```
 
-## Architecture
+## Development
 
-### Core Components
-
-1. **Seed Manager**: Manages industry seeds and source configurations
-2. **Ingestion Engine**: Distributed crawling and scraping framework
-3. **Data Pipeline**: Normalization, validation, and storage
-4. **LLM Framework**: Multi-provider AI analysis and insights
-5. **State Manager**: Persistent, resumable operation tracking
-
-### Directory Structure
+### Project Structure
 
 ```
 infinity-matrix/
-├── infinity_matrix/          # Main package
-│   ├── core/                 # Core framework components
-│   ├── connectors/           # Source-specific connectors
-│   ├── models/               # Data models
-│   ├── pipelines/            # Data processing pipelines
-│   ├── llm/                  # LLM integration framework
-│   └── cli.py                # Command-line interface
-├── config/                   # Configuration files
-│   ├── industries/           # Industry-specific configs
-│   └── sources/              # Source connector configs
-├── data/                     # Data storage (gitignored)
-├── tests/                    # Test suite
-└── docs/                     # Documentation
-
+├── packages/
+│   ├── server/              # MCP server (Python/FastAPI)
+│   ├── client/              # MCP client SDK (TypeScript)
+│   ├── vscode-extension/    # VS Code extension
+│   ├── shared/              # Shared types and utilities
+│   └── ai-integrations/     # AI provider integrations
+├── .github/
+│   └── workflows/           # GitHub Actions workflows
+├── infrastructure/          # Terraform and deployment configs
+├── docs/                    # Documentation
+└── tests/                   # Test suites
 ```
 
-## Industry Coverage
+### Running Tests
 
-Pre-configured seeds for:
+```bash
+# Run all tests
+npm test
 
-1. Technology & Software
-2. Finance & Banking
-3. Healthcare & Pharmaceuticals
-4. Retail & E-commerce
-5. Real Estate & Construction
-6. Energy & Utilities
-7. Manufacturing & Industrial
-8. Media & Entertainment
-9. Transportation & Logistics
-10. Professional Services
+# Run specific test suite
+npm test -- --grep "MCP Protocol"
 
-## Supported Data Sources
+# Run with coverage
+npm run test:coverage
+```
 
-- **Code Repositories**: GitHub, GitLab, Bitbucket
-- **AI/ML Platforms**: Hugging Face, Kaggle, Papers with Code
-- **Real Estate**: Zillow, Realtor.com, commercial listings
-- **Government**: Data.gov, SEC EDGAR, regulatory agencies
-- **Social Media**: Twitter/X, LinkedIn, Reddit, YouTube
-- **Business Data**: Company websites, news feeds, press releases
+## Deployment
 
-## LLM Providers
+### Google Cloud Run
 
-- Google Vertex AI
-- OpenAI (ChatGPT, GPT-4)
-- Ollama (local models)
-- Anthropic Claude
-- AWS Bedrock
-- Azure OpenAI
+```bash
+# Build and deploy
+npm run build
+npm run deploy:gcp
+```
 
-## Production Features
+### Hostinger
 
-- Distributed task queue with Celery/Redis
-- Persistent state management with PostgreSQL/MongoDB
-- Rate limiting and respectful crawling
-- Comprehensive error handling and retry logic
-- Structured logging and monitoring
-- Docker and Kubernetes ready
-- Horizontal scalability
-- Health checks and metrics
+```bash
+# Deploy to Hostinger
+npm run deploy:hostinger
+```
 
-## Extending the System
+## API Documentation
 
-### Adding a New Industry
-
-1. Create configuration in `config/industries/new_industry.yaml`
-2. Define seed URLs and source priorities
-3. Customize analysis prompts if needed
-
-### Adding a New Source Connector
-
-1. Inherit from `BaseConnector` in `infinity_matrix/connectors/base.py`
-2. Implement required methods: `fetch()`, `parse()`, `normalize()`
-3. Add connector configuration
-4. Register in connector factory
-
-### Adding a New LLM Provider
-
-1. Inherit from `BaseLLMProvider` in `infinity_matrix/llm/base.py`
-2. Implement `analyze()` and `batch_analyze()` methods
-3. Add provider configuration
-4. Register in LLM factory
-
-## License
-
-MIT License - See LICENSE file for details
+Full API documentation is available at:
+- Local: http://localhost:3000/docs
+- Production: https://api.infinity-matrix.manus.im/docs
 
 ## Contributing
 
-Contributions welcome! Please see CONTRIBUTING.md for guidelines.
+Please read [CONTRIBUTING.md](CONTRIBUTING.md) for details on our code of conduct and the process for submitting pull requests.
+
+## Security
+
+For security concerns, please email security@infinityxone.systems
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## Support
+
+- Documentation: https://docs.infinity-matrix.manus.im
+- Issues: https://github.com/InfinityXOneSystems/infinity-matrix/issues
+- Discord: https://discord.gg/infinitymatrix

@@ -1,444 +1,270 @@
-# API Reference
+# API Documentation
 
-## Command-Line Interface
+## Base URL
 
-### Global Options
+- Local Development: `http://localhost:3000`
+- Production: `https://api.infinity-matrix.manus.im`
 
-```bash
-infinity-matrix --config <path> <command>
+## Authentication
+
+Most endpoints require authentication using an API key or JWT token:
+
+```
+Authorization: Bearer YOUR_API_KEY
 ```
 
-**Options:**
-- `--config`: Path to configuration file (default: config/config.yaml)
+## Endpoints
 
-### Commands
+### Health & Status
 
-#### `ingest`
+#### GET /health
+Check server health status
 
-Start data ingestion for specified industry or source.
-
-```bash
-infinity-matrix ingest [--industry INDUSTRY] [--source SOURCE]
+**Response:**
+```json
+{
+  "status": "healthy",
+  "version": "1.0.0"
+}
 ```
 
-**Options:**
-- `--industry`: Industry ID to ingest (e.g., technology, finance)
-- `--source`: Specific source ID to ingest
+#### GET /ready
+Check readiness with dependency checks
 
-**Examples:**
-```bash
-# Ingest all industries
-infinity-matrix ingest
-
-# Ingest specific industry
-infinity-matrix ingest --industry technology
-
-# Ingest specific source
-infinity-matrix ingest --industry technology --source github_tech
+**Response:**
+```json
+{
+  "status": "ready",
+  "checks": {
+    "database": "healthy",
+    "redis": "healthy"
+  }
+}
 ```
 
-#### `normalize`
+### MCP Protocol
 
-Normalize raw data into structured format.
+#### POST /api/v1/mcp/messages
+Send an MCP message
 
-```bash
-infinity-matrix normalize [--industry INDUSTRY] [--limit LIMIT]
+**Request:**
+```json
+{
+  "sender": "vscode_copilot",
+  "recipient": "chatgpt",
+  "message_type": "query",
+  "payload": {
+    "query": "Explain this code pattern"
+  }
+}
 ```
 
-**Options:**
-- `--industry`: Industry ID to normalize
-- `--limit`: Maximum number of items to normalize (default: 100)
-
-**Examples:**
-```bash
-# Normalize all raw data
-infinity-matrix normalize
-
-# Normalize specific industry
-infinity-matrix normalize --industry technology --limit 50
+**Response:**
+```json
+{
+  "status": "success",
+  "message_id": "550e8400-e29b-41d4-a716-446655440000"
+}
 ```
 
-#### `analyze`
+#### GET /api/v1/mcp/stats
+Get MCP statistics
 
-Analyze normalized data using LLM.
-
-```bash
-infinity-matrix analyze [--industry INDUSTRY] [--provider PROVIDER] [--prompt-type TYPE] [--limit LIMIT]
+**Response:**
+```json
+{
+  "active_providers": 3,
+  "total_connections": 5,
+  "queue_size": 0
+}
 ```
 
-**Options:**
-- `--industry`: Industry ID to analyze
-- `--provider`: LLM provider (openai, ollama, anthropic) (default: openai)
-- `--prompt-type`: Prompt template type (insights, summary, categorization) (default: insights)
-- `--limit`: Maximum number of items to analyze (default: 50)
+### Context Synchronization
 
-**Examples:**
-```bash
-# Analyze with OpenAI
-infinity-matrix analyze --industry technology --provider openai
+#### POST /api/v1/context/sync
+Synchronize context across AI providers
 
-# Analyze with Ollama
-infinity-matrix analyze --industry finance --provider ollama --limit 25
-
-# Use summary prompt
-infinity-matrix analyze --prompt-type summary
+**Request:**
+```json
+{
+  "provider": "vscode_copilot",
+  "workspace_id": "file:///path/to/workspace",
+  "code_context": {
+    "fileName": "main.py",
+    "language": "python",
+    "content": "def hello():\n    print('Hello')"
+  },
+  "file_references": ["main.py"],
+  "target_providers": ["vertex_ai", "chatgpt"]
+}
 ```
 
-#### `status`
-
-Show ingestion status and statistics.
-
-```bash
-infinity-matrix status [--industry INDUSTRY]
+**Response:**
+```json
+{
+  "status": "success",
+  "context_id": "ctx_123456",
+  "synced_to": ["vertex_ai", "chatgpt"]
+}
 ```
 
-**Options:**
-- `--industry`: Filter status by industry
+#### GET /api/v1/context/{context_id}
+Retrieve context by ID
 
-**Examples:**
-```bash
-# Overall status
-infinity-matrix status
-
-# Industry-specific status
-infinity-matrix status --industry technology
+**Response:**
+```json
+{
+  "context_id": "ctx_123456",
+  "provider": "vscode_copilot",
+  "code_context": {...},
+  "created_at": "2024-01-01T00:00:00Z"
+}
 ```
 
-#### `list-industries`
+### Intelligence Sharing
 
-List all configured industries.
+#### POST /api/v1/intelligence/share
+Share intelligence across providers
 
-```bash
-infinity-matrix list-industries
+**Request:**
+```json
+{
+  "source_provider": "chatgpt",
+  "intelligence_type": "code_pattern",
+  "content": {
+    "pattern": "dependency_injection",
+    "description": "Use constructor injection for better testability"
+  },
+  "confidence_score": 0.95,
+  "tags": ["best-practice", "python"],
+  "target_providers": ["vertex_ai", "github_copilot"]
+}
 ```
 
-**Output:**
-```
-=== Configured Industries ===
-✓ technology: Technology & Software (Priority: 10)
-   Software development, cloud computing, AI/ML...
-✓ finance: Finance & Banking (Priority: 9)
-   Financial services, banking, fintech...
-```
-
-#### `list-sources`
-
-List all sources for an industry.
-
-```bash
-infinity-matrix list-sources INDUSTRY_ID
+**Response:**
+```json
+{
+  "status": "success",
+  "intelligence_id": "intel_789012",
+  "shared_with": ["vertex_ai", "github_copilot"]
+}
 ```
 
-**Arguments:**
-- `INDUSTRY_ID`: The industry identifier
+### AI Providers
 
-**Examples:**
-```bash
-infinity-matrix list-sources technology
+#### GET /api/v1/providers/
+List all supported AI providers
+
+**Response:**
+```json
+{
+  "providers": [
+    {
+      "id": "vertex_ai",
+      "name": "Vertex AI",
+      "enabled": true
+    },
+    {
+      "id": "chatgpt",
+      "name": "ChatGPT",
+      "enabled": true
+    }
+  ]
+}
 ```
 
-#### `list-seeds`
+#### GET /api/v1/providers/{provider_id}/status
+Get provider status
 
-List all seed URLs for an industry.
-
-```bash
-infinity-matrix list-seeds INDUSTRY_ID
+**Response:**
+```json
+{
+  "provider": "chatgpt",
+  "status": "connected",
+  "latency_ms": 45
+}
 ```
 
-**Arguments:**
-- `INDUSTRY_ID`: The industry identifier
+### GitHub Integration
 
-**Examples:**
-```bash
-infinity-matrix list-seeds technology
+#### POST /api/v1/github/pull-requests
+Create a pull request
+
+**Request:**
+```json
+{
+  "repository": "owner/repo",
+  "title": "Add new feature",
+  "body": "Description of changes",
+  "head_branch": "feature-branch",
+  "base_branch": "main"
+}
 ```
 
-## Python API
-
-### Core Components
-
-#### Config
-
-```python
-from infinity_matrix.core import Config, get_config, set_config
-
-# Load configuration
-config = Config.load("config/config.yaml")
-
-# Access settings
-db_config = config.database
-llm_config = config.llm
-
-# Get global config
-config = get_config()
-
-# Set global config
-set_config(config)
+**Response:**
+```json
+{
+  "status": "success",
+  "pr_number": 42,
+  "url": "https://github.com/owner/repo/pull/42"
+}
 ```
 
-#### SeedManager
+#### POST /api/v1/github/auto-merge
+Auto-merge a pull request
 
-```python
-from infinity_matrix.core import SeedManager
-
-# Initialize
-seed_manager = SeedManager(config_dir="config")
-
-# Get industries
-all_industries = seed_manager.get_all_industries()
-enabled_industries = seed_manager.get_enabled_industries()
-specific_industry = seed_manager.get_industry("technology")
-
-# Get sources
-sources = seed_manager.get_sources_by_industry("technology")
-source = seed_manager.get_source("github_tech")
-
-# Get seeds
-seeds = seed_manager.get_seeds_by_industry("technology")
-all_seeds = seed_manager.get_all_seeds()
+**Request:**
+```json
+{
+  "repository": "owner/repo",
+  "pr_number": 42,
+  "merge_method": "squash"
+}
 ```
 
-#### IngestionEngine
-
-```python
-from infinity_matrix.core import IngestionEngine, SeedManager, StateManager
-from infinity_matrix.connectors import ConnectorFactory
-
-# Initialize
-seed_manager = SeedManager()
-state_manager = StateManager()
-connector_factory = ConnectorFactory()
-
-engine = IngestionEngine(
-    seed_manager=seed_manager,
-    state_manager=state_manager,
-    connector_factory=connector_factory
-)
-
-# Run ingestion
-import asyncio
-stats = asyncio.run(engine.start_ingestion(industry_id="technology"))
-
-print(f"Completed: {stats.completed_tasks}/{stats.total_tasks}")
-print(f"Data collected: {stats.total_data_collected}")
+**Response:**
+```json
+{
+  "status": "success",
+  "pr_number": 42,
+  "merged": true
+}
 ```
 
-#### StateManager
+## WebSocket API
 
-```python
-from infinity_matrix.core import StateManager
+Connect to `ws://localhost:3000/ws` for real-time updates.
 
-# Initialize
-state_manager = StateManager(storage_path="data")
+### Message Format
 
-# Save/load tasks
-await state_manager.save_task(task)
-task = await state_manager.get_task(task_id)
-all_tasks = await state_manager.get_all_tasks()
-
-# Save/load data
-await state_manager.save_raw_data(raw_data)
-await state_manager.save_normalized_data(normalized_data)
-await state_manager.save_analysis_result(analysis)
+```json
+{
+  "message_id": "uuid",
+  "message_type": "context_sync",
+  "sender": "vscode_copilot",
+  "recipient": "chatgpt",
+  "timestamp": "2024-01-01T00:00:00Z",
+  "payload": {...}
+}
 ```
 
-### Connectors
+## Error Responses
 
-#### Creating Custom Connector
+All errors follow this format:
 
-```python
-from infinity_matrix.connectors.base import BaseConnector
-from infinity_matrix.models import DataSource, RawData
-
-class MyConnector(BaseConnector):
-    def can_handle(self, source_type: str) -> bool:
-        return source_type == "my_source_type"
-    
-    async def fetch(self, url: str, source: DataSource) -> List[RawData]:
-        # Implement fetching logic
-        raw_data_list = []
-        # ... fetch and parse data ...
-        return raw_data_list
+```json
+{
+  "error": "ERROR_CODE",
+  "message": "Human-readable error message",
+  "details": {...}
+}
 ```
 
-#### Using ConnectorFactory
+### Error Codes
 
-```python
-from infinity_matrix.connectors import ConnectorFactory
-
-factory = ConnectorFactory()
-
-# Get connector
-connector = factory.get_connector("github")
-
-# Register custom connector
-factory.register_connector(MyConnector())
-
-# List supported types
-types = factory.list_supported_types()
-```
-
-### Pipelines
-
-#### NormalizationPipeline
-
-```python
-from infinity_matrix.pipelines import NormalizationPipeline
-
-pipeline = NormalizationPipeline()
-
-# Normalize data
-normalized = await pipeline.normalize(raw_data)
-
-print(f"Title: {normalized.title}")
-print(f"Quality: {normalized.quality_score}")
-print(f"Keywords: {normalized.keywords}")
-```
-
-### LLM Framework
-
-#### AnalysisFramework
-
-```python
-from infinity_matrix.llm import AnalysisFramework
-from infinity_matrix.core import StateManager
-
-state_manager = StateManager()
-framework = AnalysisFramework(state_manager, provider_name="openai")
-
-# Analyze single item
-result = await framework.analyze_data(
-    normalized_data,
-    prompt_type="insights"
-)
-
-# Batch analyze
-results = await framework.batch_analyze(
-    data_list,
-    prompt_type="summary"
-)
-
-# Custom prompt
-framework.add_custom_prompt("my_prompt", "Analyze: {content}")
-result = await framework.analyze_data(data, custom_prompt="my_prompt")
-```
-
-#### LLM Providers
-
-```python
-from infinity_matrix.llm import LLMFactory, OpenAIProvider, OllamaProvider
-
-# Create provider
-provider = LLMFactory.create_provider("openai", {
-    "api_key": "sk-...",
-    "model": "gpt-4o-mini",
-    "temperature": 0.7
-})
-
-# Use provider
-result = await provider.analyze(normalized_data, prompt_template)
-
-# Register custom provider
-LLMFactory.register_provider("my_llm", MyLLMProvider)
-```
-
-## Data Models
-
-### Industry
-
-```python
-from infinity_matrix.models import Industry, IndustryType
-
-industry = Industry(
-    id="technology",
-    name="Technology & Software",
-    type=IndustryType.TECHNOLOGY,
-    description="Software development...",
-    keywords=["software", "cloud", "AI"],
-    priority=10,
-    enabled=True
-)
-```
-
-### DataSource
-
-```python
-from infinity_matrix.models import DataSource, SourceType
-
-source = DataSource(
-    id="github_tech",
-    name="GitHub Technology",
-    type=SourceType.GITHUB,
-    base_url="https://api.github.com",
-    industry_id="technology",
-    rate_limit=60,
-    authentication_required=False
-)
-```
-
-### CrawlTask
-
-```python
-from infinity_matrix.models import CrawlTask, CrawlStatus
-
-task = CrawlTask(
-    id="task-123",
-    url="https://github.com/tensorflow/tensorflow",
-    source_id="github_tech",
-    industry_id="technology",
-    status=CrawlStatus.PENDING,
-    max_attempts=3
-)
-```
-
-### RawData / NormalizedData / AnalysisResult
-
-See model definitions in `infinity_matrix/models/__init__.py`
-
-## Configuration
-
-### config.yaml Structure
-
-```yaml
-database:
-  type: postgresql
-  host: localhost
-  port: 5432
-  database: infinity_matrix
-
-redis:
-  host: localhost
-  port: 6379
-
-crawler:
-  max_concurrent_requests: 10
-  download_delay: 1.0
-  respect_robots_txt: true
-
-llm:
-  default_provider: openai
-  providers:
-    openai:
-      api_key: ${OPENAI_API_KEY}
-      model: gpt-4o-mini
-```
-
-### Environment Variables
-
-```bash
-# Database
-DB_HOST=localhost
-DB_PORT=5432
-DB_NAME=infinity_matrix
-DB_USER=postgres
-DB_PASSWORD=secret
-
-# Redis
-REDIS_HOST=localhost
-REDIS_PORT=6379
-
-# LLM
-OPENAI_API_KEY=sk-...
-ANTHROPIC_API_KEY=sk-ant-...
-OLLAMA_BASE_URL=http://localhost:11434
-```
+- `AUTHENTICATION_ERROR` (401): Authentication failed
+- `AUTHORIZATION_ERROR` (403): Access denied
+- `VALIDATION_ERROR` (400): Invalid request data
+- `AI_PROVIDER_ERROR` (502): AI provider error
+- `RATE_LIMIT_EXCEEDED` (429): Too many requests
+- `INTERNAL_SERVER_ERROR` (500): Server error

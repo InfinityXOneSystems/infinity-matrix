@@ -1,362 +1,248 @@
 # Contributing to Infinity Matrix
 
-Thank you for your interest in contributing to Infinity Matrix! This document provides guidelines and instructions for contributing.
-
-## Table of Contents
-
-1. [Code of Conduct](#code-of-conduct)
-2. [Getting Started](#getting-started)
-3. [Development Setup](#development-setup)
-4. [Making Contributions](#making-contributions)
-5. [Coding Standards](#coding-standards)
-6. [Testing](#testing)
-7. [Documentation](#documentation)
-8. [Pull Request Process](#pull-request-process)
+Thank you for your interest in contributing to Infinity Matrix! This document provides guidelines for contributing to the project.
 
 ## Code of Conduct
 
+By participating in this project, you agree to abide by our Code of Conduct:
 - Be respectful and inclusive
+- Welcome newcomers and help them learn
 - Focus on constructive feedback
-- Help others learn and grow
-- Follow professional standards
+- Respect differing viewpoints and experiences
 
-## Getting Started
+## How to Contribute
 
-### Prerequisites
+### Reporting Bugs
 
-- Python 3.9 or higher
-- Git
-- Basic understanding of async/await
-- Familiarity with web scraping and APIs
+If you find a bug, please create an issue with:
+- Clear description of the problem
+- Steps to reproduce
+- Expected vs actual behavior
+- Environment details (OS, versions, etc.)
+- Screenshots if applicable
 
-### Areas for Contribution
+### Suggesting Features
 
-We welcome contributions in these areas:
+Feature requests are welcome! Please include:
+- Clear use case and motivation
+- Proposed implementation approach
+- Any alternatives considered
+- Impact on existing functionality
 
-1. **New Connectors**: Add support for more data sources
-2. **LLM Providers**: Integrate additional LLM services
-3. **Industries**: Add new industry configurations
-4. **Documentation**: Improve guides and examples
-5. **Testing**: Add test coverage
-6. **Performance**: Optimize existing code
-7. **Bug Fixes**: Fix reported issues
+### Pull Requests
+
+1. **Fork the repository** and create your branch from `main`
+2. **Make your changes** following our coding standards
+3. **Add tests** for any new functionality
+4. **Update documentation** as needed
+5. **Run the test suite** to ensure nothing breaks
+6. **Submit a pull request** with a clear description
+
+#### PR Guidelines
+
+- One feature/fix per PR
+- Keep PRs focused and reasonably sized
+- Write clear commit messages
+- Reference related issues
+- Respond to review feedback promptly
 
 ## Development Setup
 
-### 1. Fork and Clone
+### Prerequisites
+
+- Node.js 20+
+- Python 3.11+
+- Docker and Docker Compose
+- Git
+
+### Local Development
 
 ```bash
-git clone https://github.com/YOUR-USERNAME/infinity-matrix.git
+# Clone the repository
+git clone https://github.com/InfinityXOneSystems/infinity-matrix.git
 cd infinity-matrix
+
+# Install dependencies
+npm install
+cd packages/server && pip install -r requirements.txt
+
+# Start development environment
+docker-compose up -d
+
+# Run the server
+npm run dev
 ```
 
-### 2. Create Virtual Environment
+### Running Tests
 
 ```bash
-python -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
+# Run all tests
+npm test
+
+# Run specific tests
+npm test -- --grep "MCP Protocol"
+
+# Run with coverage
+npm run test:coverage
 ```
 
-### 3. Install Development Dependencies
+### Code Style
+
+We use automated tools to maintain code quality:
+
+#### TypeScript/JavaScript
+- ESLint for linting
+- Prettier for formatting
+- TypeScript strict mode
 
 ```bash
-pip install -r requirements.txt
-pip install -e .
-pip install pytest pytest-asyncio black ruff mypy
+npm run lint
+npm run format
 ```
 
-### 4. Create Feature Branch
+#### Python
+- Black for formatting
+- Ruff for linting
+- MyPy for type checking
 
 ```bash
-git checkout -b feature/your-feature-name
+cd packages/server
+black .
+ruff check .
+mypy .
 ```
 
-## Making Contributions
+## Project Structure
 
-### Adding a New Connector
-
-1. Create a new file in `infinity_matrix/connectors/`
-2. Inherit from `BaseConnector`
-3. Implement required methods:
-   - `can_handle(source_type: str) -> bool`
-   - `fetch(url: str, source: DataSource) -> List[RawData]`
-4. Register in `ConnectorFactory`
-5. Add tests in `tests/test_connectors.py`
-6. Update documentation
-
-**Example:**
-
-```python
-from infinity_matrix.connectors.base import BaseConnector
-from infinity_matrix.models import DataSource, RawData
-
-class NewConnector(BaseConnector):
-    def can_handle(self, source_type: str) -> bool:
-        return source_type == "new_source_type"
-    
-    async def fetch(self, url: str, source: DataSource) -> List[RawData]:
-        # Implementation
-        pass
 ```
-
-### Adding a New LLM Provider
-
-1. Create a new file in `infinity_matrix/llm/`
-2. Inherit from `BaseLLMProvider`
-3. Implement:
-   - `get_provider_name() -> str`
-   - `analyze(data, prompt_template) -> AnalysisResult`
-   - `validate_config() -> bool`
-4. Register in `LLMFactory`
-5. Add configuration example
-6. Add tests
-
-### Adding a New Industry
-
-1. Create YAML file in `config/industries/`
-2. Define industry metadata
-3. Add seed URLs
-4. Document in README
-
-**Template:**
-
-```yaml
-id: new_industry
-name: New Industry Name
-type: technology  # or appropriate type
-description: Industry description
-keywords:
-  - keyword1
-  - keyword2
-priority: 7
-enabled: true
-
-seeds:
-  - url: https://example.com
-    source_id: source_name
-    priority: 8
-    depth: 2
+infinity-matrix/
+├── packages/
+│   ├── server/              # Python FastAPI server
+│   ├── client/              # TypeScript client SDK
+│   ├── vscode-extension/    # VS Code extension
+│   └── shared/              # Shared utilities
+├── .github/workflows/       # CI/CD pipelines
+├── infrastructure/          # Deployment configs
+├── docs/                    # Documentation
+└── tests/                   # Test suites
 ```
 
 ## Coding Standards
 
-### Style Guide
+### General Principles
 
-We follow PEP 8 with some modifications:
+- Write clean, readable code
+- Follow SOLID principles
+- Keep functions small and focused
+- Use meaningful variable names
+- Add comments for complex logic
+- Write self-documenting code when possible
 
-- Line length: 100 characters
-- Use type hints
-- Use async/await for I/O operations
-- Use descriptive variable names
+### TypeScript
 
-### Code Formatting
+```typescript
+// Use explicit types
+function calculateTotal(items: Item[]): number {
+  return items.reduce((sum, item) => sum + item.price, 0);
+}
 
-Use Black for formatting:
+// Use interfaces for object shapes
+interface UserConfig {
+  apiKey: string;
+  timeout: number;
+}
 
-```bash
-black infinity_matrix/
+// Prefer async/await over callbacks
+async function fetchData(): Promise<Data> {
+  const response = await fetch('/api/data');
+  return response.json();
+}
 ```
 
-Use Ruff for linting:
-
-```bash
-ruff check infinity_matrix/
-```
-
-### Type Checking
-
-Use mypy for type checking:
-
-```bash
-mypy infinity_matrix/
-```
-
-### Best Practices
-
-1. **Error Handling**
-   - Use try-except blocks
-   - Log errors with context
-   - Don't silence exceptions
-
-2. **Async/Await**
-   - Use async for I/O operations
-   - Don't block the event loop
-   - Use asyncio.gather for concurrent tasks
-
-3. **Logging**
-   - Use module-level loggers
-   - Use appropriate log levels
-   - Include context in log messages
-
-4. **Documentation**
-   - Add docstrings to all public methods
-   - Use Google-style docstrings
-   - Include examples where helpful
-
-**Example:**
+### Python
 
 ```python
-async def fetch_data(self, url: str) -> List[RawData]:
-    """Fetch data from the specified URL.
-    
-    Args:
-        url: The URL to fetch from
-        
-    Returns:
-        List of RawData objects
-        
-    Raises:
-        ValueError: If URL is invalid
-        HTTPError: If request fails
-        
-    Example:
-        >>> data = await connector.fetch_data("https://api.example.com")
-        >>> len(data)
-        5
-    """
-    pass
+# Use type hints
+def process_context(context: ContextData) -> Dict[str, Any]:
+    """Process context and return result."""
+    return {"status": "processed"}
+
+# Use dataclasses for data structures
+from dataclasses import dataclass
+
+@dataclass
+class Message:
+    id: str
+    content: str
+    timestamp: datetime
+
+# Follow PEP 8 style guide
+# Use docstrings for functions and classes
 ```
 
-## Testing
+## Testing Guidelines
 
-### Running Tests
+### Unit Tests
 
-Run all tests:
+- Test individual functions and methods
+- Mock external dependencies
+- Aim for high code coverage
+- Test edge cases and error conditions
 
-```bash
-pytest
-```
+### Integration Tests
 
-Run with coverage:
+- Test component interactions
+- Use test databases and services
+- Clean up test data after tests
+- Test realistic scenarios
 
-```bash
-pytest --cov=infinity_matrix --cov-report=html
-```
+### End-to-End Tests
 
-Run specific test:
-
-```bash
-pytest tests/test_connectors.py::test_github_connector
-```
-
-### Writing Tests
-
-1. Create test files in `tests/`
-2. Name test functions with `test_` prefix
-3. Use fixtures from `conftest.py`
-4. Test both success and failure cases
-5. Mock external API calls
-
-**Example:**
-
-```python
-import pytest
-from infinity_matrix.connectors import MyConnector
-
-def test_connector_can_handle():
-    """Test connector source type detection."""
-    connector = MyConnector()
-    assert connector.can_handle("my_type") is True
-    assert connector.can_handle("other_type") is False
-
-@pytest.mark.asyncio
-async def test_connector_fetch():
-    """Test data fetching."""
-    connector = MyConnector()
-    # Implementation
-```
+- Test complete workflows
+- Validate user-facing functionality
+- Test across different environments
+- Automate where possible
 
 ## Documentation
 
-### Types of Documentation
+- Update README.md for user-facing changes
+- Update API.md for API changes
+- Add JSDoc/docstrings for new code
+- Include examples in documentation
+- Keep documentation in sync with code
 
-1. **Code Documentation**: Docstrings in code
-2. **API Documentation**: `docs/API.md`
-3. **Architecture Documentation**: `docs/ARCHITECTURE.md`
-4. **User Guides**: `README.md`, `docs/DEPLOYMENT.md`
-5. **Examples**: `examples/` directory
+## Review Process
 
-### Documentation Standards
+All contributions go through code review:
 
-- Use Markdown format
-- Include code examples
-- Keep up to date with code changes
-- Add diagrams where helpful
-- Link related documents
+1. **Automated Checks**: CI runs linting, tests, security scans
+2. **Code Review**: Maintainers review code quality and design
+3. **Testing**: Reviewers may test functionality
+4. **Approval**: At least one maintainer approval required
+5. **Merge**: Auto-merge or manual merge by maintainer
 
-## Pull Request Process
+## Release Process
 
-### Before Submitting
+We follow semantic versioning (MAJOR.MINOR.PATCH):
 
-1. ✅ Run tests: `pytest`
-2. ✅ Format code: `black .`
-3. ✅ Check linting: `ruff check .`
-4. ✅ Update documentation
-5. ✅ Add tests for new features
-6. ✅ Update CHANGELOG (if exists)
+- **MAJOR**: Breaking changes
+- **MINOR**: New features (backward compatible)
+- **PATCH**: Bug fixes (backward compatible)
 
-### Submitting a PR
+Releases are automated through GitHub Actions.
 
-1. Push to your fork
-2. Create pull request
-3. Fill out PR template
-4. Link related issues
-5. Wait for review
+## Communication
 
-### PR Title Format
-
-Use conventional commits:
-
-- `feat: Add new connector for X`
-- `fix: Resolve issue with Y`
-- `docs: Update API documentation`
-- `test: Add tests for Z`
-- `refactor: Improve performance of W`
-
-### PR Description Template
-
-```markdown
-## Description
-Brief description of changes
-
-## Type of Change
-- [ ] Bug fix
-- [ ] New feature
-- [ ] Breaking change
-- [ ] Documentation update
-
-## Testing
-- [ ] Unit tests added
-- [ ] Integration tests added
-- [ ] Manual testing performed
-
-## Checklist
-- [ ] Code follows style guidelines
-- [ ] Documentation updated
-- [ ] Tests pass
-- [ ] No breaking changes (or documented)
-```
-
-### Review Process
-
-1. Maintainer reviews code
-2. Automated tests run
-3. Changes requested or approved
-4. Contributor addresses feedback
-5. PR merged when approved
-
-## Getting Help
-
-- GitHub Issues: Report bugs or request features
-- GitHub Discussions: Ask questions
-- Documentation: Check docs/ directory
-- Examples: See examples/ directory
+- **GitHub Issues**: Bug reports and feature requests
+- **Pull Requests**: Code contributions and discussion
+- **Discussions**: General questions and ideas
+- **Discord**: Real-time chat and community support
 
 ## Recognition
 
-Contributors will be:
-- Listed in CONTRIBUTORS.md
-- Credited in release notes
-- Acknowledged in documentation
+Contributors are recognized in:
+- CONTRIBUTORS.md file
+- Release notes
+- Project documentation
 
 Thank you for contributing to Infinity Matrix! 🚀
