@@ -1,4 +1,2 @@
-# Placeholder for Python dependencies
-# Add your project dependencies here, e.g.,
-# flask==2.0.3
-# requests==2.26.0
+# Infinity Matrix - Auto-Resolve and Auto-Merge System
+# No external dependencies required - uses Python standard library only

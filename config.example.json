@@ -1,0 +1,31 @@
+{
+  "systems": [
+    {
+      "id": "sys-001",
+      "name": "Core System",
+      "data": {
+        "version": "1.0",
+        "status": "active"
+      },
+      "dependencies": []
+    },
+    {
+      "id": "sys-002",
+      "name": "Database System",
+      "data": {
+        "type": "postgresql",
+        "connections": 10
+      },
+      "dependencies": ["sys-001"]
+    },
+    {
+      "id": "sys-003",
+      "name": "API System",
+      "data": {
+        "endpoints": ["/api/v1", "/api/v2"],
+        "port": 8080
+      },
+      "dependencies": ["sys-001", "sys-002"]
+    }
+  ]
+}
