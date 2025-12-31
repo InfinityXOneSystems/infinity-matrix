@@ -17,16 +17,21 @@ class VoiceAgent:
     """AI-powered voice agent for lead qualification calls"""
 
     def __init__(self):
-        self.openai_client = openai.OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
-        self.twilio_client = Client(
-            os.getenv("TWILIO_ACCOUNT_SID"),
-            os.getenv("TWILIO_AUTH_TOKEN")
-        )
+        # Initialize with graceful degradation for missing API keys
+        openai_key = os.getenv("OPENAI_API_KEY")
+        twilio_sid = os.getenv("TWILIO_ACCOUNT_SID")
+        twilio_token = os.getenv("TWILIO_AUTH_TOKEN")
+        
+        self.openai_client = openai.OpenAI(api_key=openai_key) if openai_key else None
+        self.twilio_client = Client(twilio_sid, twilio_token) if (twilio_sid and twilio_token) else None
         self.twilio_phone = os.getenv("TWILIO_PHONE_NUMBER")
         self.conversation_history: Dict[str, list] = {}
 
     async def initiate_call(self, phone_number: str, callback_url: str) -> Dict[str, Any]:
         """Initiate an outbound call to a lead"""
+        if not self.twilio_client:
+            raise Exception("Twilio client not configured. Please set TWILIO_ACCOUNT_SID and TWILIO_AUTH_TOKEN environment variables.")
+        
         try:
             call = self.twilio_client.calls.create(
                 to=phone_number,
@@ -98,6 +103,14 @@ class VoiceAgent:
         })
 
         # Get AI response
+        if not self.openai_client:
+            return {
+                "response": "I apologize, the AI service is currently unavailable. A team member will call you back shortly.",
+                "extracted_info": {},
+                "conversation_complete": True,
+                "error": "OpenAI client not configured"
+            }
+        
         try:
             completion = self.openai_client.chat.completions.create(
                 model=os.getenv("AI_VOICE_MODEL", "gpt-4-turbo-preview"),
@@ -157,6 +170,9 @@ class VoiceAgent:
     async def _extract_information(self, call_sid: str) -> Dict[str, Any]:
         """Extract structured information from conversation using AI"""
         
+        if not self.openai_client:
+            return {}
+        
         conversation_text = "\n".join([
             f"{msg['role']}: {msg['content']}"
             for msg in self.conversation_history[call_sid]
@@ -206,6 +222,13 @@ class VoiceAgent:
                 "score": 50
             }
 
+        if not self.openai_client:
+            return {
+                "summary": "AI summary unavailable",
+                "sentiment": "neutral",
+                "score": 50
+            }
+
         conversation_text = "\n".join([
             f"{msg['role']}: {msg['content']}"
             for msg in self.conversation_history[call_sid]
@@ -244,6 +267,8 @@ class VoiceAgent:
 
     def get_call_recording_url(self, call_sid: str) -> Optional[str]:
         """Get the URL of the call recording"""
+        if not self.twilio_client:
+            return None
         try:
             recordings = self.twilio_client.recordings.list(call_sid=call_sid, limit=1)
             if recordings:
