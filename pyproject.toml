@@ -1,0 +1,131 @@
+[build-system]
+requires = ["setuptools>=68.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "infinity-matrix"
+version = "0.1.0"
+description = "AI-Powered Universal Application Builder & Orchestrator"
+authors = [
+    {name = "InfinityXOne Systems", email = "hello@infinityxone.systems"}
+]
+readme = "README.md"
+license = {text = "MIT"}
+requires-python = ">=3.9"
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Software Development :: Build Tools",
+    "Topic :: Software Development :: Code Generators",
+]
+keywords = ["ai", "automation", "builder", "templates", "agents", "llm"]
+
+dependencies = [
+    "click>=8.1.0",
+    "jinja2>=3.1.0",
+    "pyyaml>=6.0.0",
+    "pydantic>=2.0.0",
+    "rich>=13.0.0",
+    "httpx>=0.24.0",
+    "python-dotenv>=1.0.0",
+    "gitpython>=3.1.0",
+    "cryptography>=41.0.0",
+    "sqlalchemy>=2.0.0",
+    "alembic>=1.12.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.4.0",
+    "pytest-cov>=4.1.0",
+    "pytest-asyncio>=0.21.0",
+    "black>=23.0.0",
+    "ruff>=0.1.0",
+    "mypy>=1.5.0",
+    "pre-commit>=3.4.0",
+]
+ai = [
+    "openai>=1.0.0",
+    "anthropic>=0.7.0",
+    "langchain>=0.1.0",
+    "langchain-community>=0.0.10",
+    "transformers>=4.35.0",
+]
+cloud = [
+    "boto3>=1.28.0",
+    "google-cloud-storage>=2.10.0",
+    "azure-storage-blob>=12.19.0",
+]
+monitoring = [
+    "prometheus-client>=0.18.0",
+    "opentelemetry-api>=1.20.0",
+    "opentelemetry-sdk>=1.20.0",
+]
+all = [
+    "infinity-matrix[dev,ai,cloud,monitoring]",
+]
+
+[project.scripts]
+infinity-matrix = "infinity_matrix.cli.main:cli"
+im = "infinity_matrix.cli.main:cli"
+
+[project.urls]
+Homepage = "https://infinityxone.systems"
+Documentation = "https://docs.infinityxone.systems"
+Repository = "https://github.com/InfinityXOneSystems/infinity-matrix"
+"Bug Tracker" = "https://github.com/InfinityXOneSystems/infinity-matrix/issues"
+
+[tool.setuptools]
+packages = ["infinity_matrix"]
+
+[tool.setuptools.package-data]
+infinity_matrix = ["templates/**/*", "modules/**/*", "config/**/*"]
+
+[tool.black]
+line-length = 100
+target-version = ['py39', 'py310', 'py311', 'py312']
+include = '\.pyi?$'
+
+[tool.ruff]
+line-length = 100
+target-version = "py39"
+select = [
+    "E",  # pycodestyle errors
+    "W",  # pycodestyle warnings
+    "F",  # pyflakes
+    "I",  # isort
+    "B",  # flake8-bugbear
+    "C4", # flake8-comprehensions
+    "UP", # pyupgrade
+]
+ignore = [
+    "E501",  # line too long, handled by black
+    "B008",  # do not perform function calls in argument defaults
+]
+
+[tool.mypy]
+python_version = "3.9"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true
+disallow_incomplete_defs = true
+check_untyped_defs = true
+no_implicit_optional = true
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+addopts = [
+    "--cov=infinity_matrix",
+    "--cov-report=term-missing",
+    "--cov-report=html",
+    "-v"
+]
