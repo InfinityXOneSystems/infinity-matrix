@@ -1,0 +1,53 @@
+name: python-fastapi-starter
+description: FastAPI-based Python REST API with modern best practices
+category: python
+language: python
+version: 1.0.0
+
+modules:
+  - api
+  - database
+  - auth
+  - logging
+  - testing
+
+parameters:
+  - name: app_name
+    type: string
+    default: my-api
+    description: Application name
+  
+  - name: include_auth
+    type: boolean
+    default: true
+    description: Include authentication module
+  
+  - name: database
+    type: choice
+    choices: [postgresql, mysql, sqlite, mongodb]
+    default: postgresql
+    description: Database to use
+  
+  - name: include_docker
+    type: boolean
+    default: true
+    description: Include Docker configuration
+
+features:
+  - FastAPI framework for high-performance APIs
+  - Pydantic models for data validation
+  - SQLAlchemy ORM integration
+  - JWT authentication (optional)
+  - Async/await support
+  - Comprehensive logging
+  - Docker containerization
+  - CI/CD ready
+
+requirements:
+  python: ">=3.9"
+  
+stack:
+  - FastAPI
+  - SQLAlchemy
+  - Pydantic
+  - Uvicorn
