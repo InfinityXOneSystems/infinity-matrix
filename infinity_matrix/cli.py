@@ -1,266 +1,274 @@
-"""Command-line interface for Infinity Matrix."""
+"""
+Command-line interface for Infinity Matrix Auto-Builder.
+
+Provides commands for:
+- Building projects from prompts or blueprints
+- Checking build status
+- Managing builds
+- Starting the API server
+"""
 
 import asyncio
-import logging
-import sys
+import time
 from pathlib import Path
-import click
+from typing import Optional
 
-from infinity_matrix.core import Config, SeedManager, StateManager, IngestionEngine, get_config
-from infinity_matrix.connectors import ConnectorFactory
-from infinity_matrix.pipelines import NormalizationPipeline
+import typer
+import uvicorn
+import yaml
+from rich.console import Console
+from rich.progress import Progress, SpinnerColumn, TextColumn
+from rich.table import Table
 
-# Configure logging
-logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+from infinity_matrix.core.auto_builder import AutoBuilder
+from infinity_matrix.core.blueprint import Blueprint, ProjectType
+
+app = typer.Typer(
+    name="infinity-builder",
+    help="Infinity Matrix Auto-Builder CLI",
+    add_completion=True,
 )
-logger = logging.getLogger(__name__)
+
+console = Console()
+auto_builder = AutoBuilder()
 
 
-@click.group()
-@click.option('--config', default=None, help='Path to configuration file')
-@click.pass_context
-def cli(ctx, config):
-    """Infinity Matrix - Universal Seed & Ingestion System."""
-    ctx.ensure_object(dict)
-    
-    # Load configuration
-    if config:
-        ctx.obj['config'] = Config.load(config)
-    else:
-        ctx.obj['config'] = get_config()
+@app.command()
+def init(
+    name: str = typer.Argument(..., help="Project name"),
+    template: Optional[str] = typer.Option(None, "--template", "-t", help="Template type"),
+    output: Path = typer.Option(Path("."), "--output", "-o", help="Output directory"),
+) -> None:
+    """Initialize a new project from a template."""
+    console.print(f"[bold green]Initializing project:[/bold green] {name}")
 
-
-@cli.command()
-@click.option('--industry', help='Industry ID to ingest')
-@click.option('--source', help='Source ID to ingest')
-@click.pass_context
-def ingest(ctx, industry, source):
-    """Start data ingestion."""
-    logger.info(f"Starting ingestion for industry={industry}, source={source}")
-    
-    # Initialize components
-    seed_manager = SeedManager()
-    state_manager = StateManager()
-    connector_factory = ConnectorFactory()
-    
-    engine = IngestionEngine(
-        seed_manager=seed_manager,
-        state_manager=state_manager,
-        connector_factory=connector_factory
+    # Create a basic blueprint
+    blueprint = Blueprint(
+        name=name,
+        type=ProjectType.API,
+        description=f"Generated project: {name}",
     )
-    
-    # Run ingestion
-    async def run():
-        stats = await engine.start_ingestion(industry_id=industry, source_id=source)
-        
-        click.echo("\nIngestion completed!")
-        click.echo(f"Total tasks: {stats.total_tasks}")
-        click.echo(f"Completed: {stats.completed_tasks}")
-        click.echo(f"Failed: {stats.failed_tasks}")
-        click.echo(f"Data collected: {stats.total_data_collected}")
-    
-    asyncio.run(run())
+
+    # Trigger build
+    with Progress(
+        SpinnerColumn(),
+        TextColumn("[progress.description]{task.description}"),
+        console=console,
+    ) as progress:
+        task = progress.add_task("Building project...", total=None)
+
+        build_status = asyncio.run(auto_builder.build(blueprint=blueprint))
+
+        progress.update(task, completed=True)
+
+    console.print(f"[bold green]✓[/bold green] Project initialized: {name}")
+    console.print(f"Build ID: {build_status.id}")
 
 
-@cli.command()
-@click.option('--industry', help='Industry ID to normalize')
-@click.option('--limit', default=100, help='Limit number of items to normalize')
-@click.pass_context
-def normalize(ctx, industry, limit):
-    """Normalize raw data."""
-    logger.info(f"Starting normalization for industry={industry}")
-    
-    state_manager = StateManager()
-    pipeline = NormalizationPipeline()
-    
-    async def run():
-        # Get raw data files
-        raw_data_path = Path("data/raw")
-        if industry:
-            raw_data_path = raw_data_path / industry
-        
-        count = 0
-        for json_file in raw_data_path.rglob("*.json"):
-            if count >= limit:
-                break
-            
-            try:
-                # Read and parse raw data
-                import json
-                from infinity_matrix.models import RawData
-                
-                with open(json_file, 'r') as f:
-                    data = json.load(f)
-                    raw_data = RawData(**data)
-                
-                # Normalize
-                normalized = await pipeline.normalize(raw_data)
-                
-                # Save
-                await state_manager.save_normalized_data(normalized)
-                
-                count += 1
-                if count % 10 == 0:
-                    click.echo(f"Normalized {count} items...")
-            
-            except Exception as e:
-                logger.error(f"Error normalizing {json_file}: {e}")
-        
-        click.echo(f"\nNormalization completed! Processed {count} items.")
-    
-    asyncio.run(run())
+@app.command()
+def build(
+    prompt: Optional[str] = typer.Argument(None, help="Natural language prompt"),
+    blueprint: Optional[Path] = typer.Option(None, "--blueprint", "-b", help="Blueprint file"),
+    watch: bool = typer.Option(False, "--watch", "-w", help="Watch build progress"),
+) -> None:
+    """Build a project from a prompt or blueprint."""
+    if not prompt and not blueprint:
+        console.print("[bold red]Error:[/bold red] Must provide either a prompt or blueprint file")
+        raise typer.Exit(1)
+
+    console.print("[bold green]Starting build...[/bold green]")
+
+    with Progress(
+        SpinnerColumn(),
+        TextColumn("[progress.description]{task.description}"),
+        console=console,
+    ) as progress:
+        task = progress.add_task("Building...", total=None)
+
+        build_status = asyncio.run(
+            auto_builder.build(
+                prompt=prompt,
+                blueprint_path=blueprint,
+            )
+        )
+
+        progress.update(task, completed=True)
+
+    console.print(f"[bold green]✓[/bold green] Build created")
+    console.print(f"Build ID: {build_status.id}")
+    console.print(f"Status: {build_status.status}")
+
+    if watch:
+        console.print("\nWatching build progress...")
+        _watch_build(build_status.id)
 
 
-@cli.command()
-@click.option('--industry', help='Industry ID to analyze')
-@click.option('--provider', default='openai', help='LLM provider to use')
-@click.option('--prompt-type', default='insights', help='Prompt type (insights, summary, categorization)')
-@click.option('--limit', default=50, help='Limit number of items to analyze')
-@click.pass_context
-def analyze(ctx, industry, provider, prompt_type, limit):
-    """Analyze normalized data with LLM."""
-    logger.info(f"Starting analysis for industry={industry} with provider={provider}")
-    
-    # Import here to avoid requiring LLM dependencies for other commands
-    from infinity_matrix.llm import AnalysisFramework
-    
-    state_manager = StateManager()
-    framework = AnalysisFramework(state_manager, provider_name=provider)
-    
-    async def run():
-        # Get normalized data files
-        normalized_path = Path("data/normalized")
-        if industry:
-            normalized_path = normalized_path / industry
-        
-        count = 0
-        for json_file in normalized_path.rglob("*.json"):
-            if count >= limit:
-                break
-            
-            try:
-                # Read and parse normalized data
-                import json
-                from infinity_matrix.models import NormalizedData
-                
-                with open(json_file, 'r') as f:
-                    data = json.load(f)
-                    normalized_data = NormalizedData(**data)
-                
-                # Analyze
-                result = await framework.analyze_data(
-                    normalized_data,
-                    prompt_type=prompt_type
-                )
-                
-                if result:
-                    count += 1
-                    if count % 5 == 0:
-                        click.echo(f"Analyzed {count} items...")
-            
-            except Exception as e:
-                logger.error(f"Error analyzing {json_file}: {e}")
-        
-        click.echo(f"\nAnalysis completed! Processed {count} items.")
-    
-    asyncio.run(run())
+@app.command()
+def status(
+    build_id: str = typer.Argument(..., help="Build ID"),
+) -> None:
+    """Check the status of a build."""
+    build_status = asyncio.run(auto_builder.get_build_status(build_id))
+
+    if not build_status:
+        console.print(f"[bold red]Error:[/bold red] Build {build_id} not found")
+        raise typer.Exit(1)
+
+    # Display status
+    table = Table(title=f"Build Status: {build_id}")
+    table.add_column("Property", style="cyan")
+    table.add_column("Value", style="green")
+
+    table.add_row("Name", build_status.name)
+    table.add_row("Status", build_status.status)
+    table.add_row("Progress", f"{build_status.progress}%")
+    table.add_row("Phases", f"{build_status.phases_completed}/{build_status.phases_total}")
+    table.add_row("Created", build_status.created_at)
+
+    if build_status.error:
+        table.add_row("Error", build_status.error, style="bold red")
+
+    console.print(table)
+
+    # Display artifacts if available
+    if build_status.artifacts:
+        console.print("\n[bold]Artifacts:[/bold]")
+        for key, value in build_status.artifacts.items():
+            console.print(f"  {key}: {value}")
 
 
-@cli.command()
-@click.option('--industry', help='Industry ID to show status for')
-@click.pass_context
-def status(ctx, industry):
-    """Show ingestion status."""
-    state_manager = StateManager()
-    
-    async def run():
-        tasks = await state_manager.get_all_tasks()
-        
-        if industry:
-            tasks = [t for t in tasks if t.industry_id == industry]
-        
-        # Count by status
-        from collections import Counter
-        status_counts = Counter(t.status for t in tasks)
-        
-        click.echo("\n=== Ingestion Status ===")
-        click.echo(f"Total tasks: {len(tasks)}")
-        for status_val, count in status_counts.items():
-            click.echo(f"  {status_val}: {count}")
-        
-        # Count data
-        raw_path = Path("data/raw")
-        normalized_path = Path("data/normalized")
-        analyzed_path = Path("data/analyzed")
-        
-        raw_count = len(list(raw_path.rglob("*.json")))
-        normalized_count = len(list(normalized_path.rglob("*.json")))
-        analyzed_count = len(list(analyzed_path.rglob("*.json")))
-        
-        click.echo(f"\nRaw data items: {raw_count}")
-        click.echo(f"Normalized data items: {normalized_count}")
-        click.echo(f"Analyzed data items: {analyzed_count}")
-    
-    asyncio.run(run())
+@app.command()
+def list() -> None:
+    """List all builds."""
+    builds = asyncio.run(auto_builder.list_builds())
+
+    if not builds:
+        console.print("No builds found")
+        return
+
+    table = Table(title="Builds")
+    table.add_column("ID", style="cyan")
+    table.add_column("Name", style="green")
+    table.add_column("Status", style="yellow")
+    table.add_column("Progress", style="blue")
+    table.add_column("Created", style="magenta")
+
+    for build in builds:
+        table.add_row(
+            build.id[:8] + "...",
+            build.name,
+            build.status,
+            f"{build.progress}%",
+            build.created_at,
+        )
+
+    console.print(table)
 
 
-@cli.command()
-def list_industries():
-    """List all configured industries."""
-    seed_manager = SeedManager()
-    industries = seed_manager.get_all_industries()
-    
-    click.echo("\n=== Configured Industries ===")
-    for ind in industries:
-        status = "✓" if ind.enabled else "✗"
-        click.echo(f"{status} {ind.id}: {ind.name} (Priority: {ind.priority})")
-        click.echo(f"   {ind.description}")
-        click.echo()
+@app.command()
+def cancel(
+    build_id: str = typer.Argument(..., help="Build ID"),
+) -> None:
+    """Cancel a running build."""
+    success = asyncio.run(auto_builder.cancel_build(build_id))
+
+    if success:
+        console.print(f"[bold green]✓[/bold green] Build {build_id} cancelled")
+    else:
+        console.print(f"[bold red]Error:[/bold red] Could not cancel build {build_id}")
+        raise typer.Exit(1)
 
 
-@cli.command()
-@click.argument('industry_id')
-def list_sources(industry_id):
-    """List all sources for an industry."""
-    seed_manager = SeedManager()
-    sources = seed_manager.get_sources_by_industry(industry_id)
-    
-    click.echo(f"\n=== Sources for {industry_id} ===")
-    for src in sources:
-        status = "✓" if src.enabled else "✗"
-        click.echo(f"{status} {src.id}: {src.name}")
-        click.echo(f"   Type: {src.type}")
-        click.echo(f"   URL: {src.base_url}")
-        click.echo()
+@app.command()
+def serve(
+    host: str = typer.Option("0.0.0.0", "--host", "-h", help="Host to bind to"),
+    port: int = typer.Option(8000, "--port", "-p", help="Port to bind to"),
+    reload: bool = typer.Option(False, "--reload", "-r", help="Enable auto-reload"),
+) -> None:
+    """Start the API server."""
+    console.print(f"[bold green]Starting API server on {host}:{port}[/bold green]")
+
+    uvicorn.run(
+        "infinity_matrix.api.main:app",
+        host=host,
+        port=port,
+        reload=reload,
+    )
 
 
-@cli.command()
-@click.argument('industry_id')
-def list_seeds(industry_id):
-    """List all seed URLs for an industry."""
-    seed_manager = SeedManager()
-    seeds = seed_manager.get_seeds_by_industry(industry_id)
-    
-    click.echo(f"\n=== Seed URLs for {industry_id} ===")
-    for seed in seeds:
-        click.echo(f"Priority {seed.priority}: {seed.url}")
-        click.echo(f"  Source: {seed.source_id}, Depth: {seed.depth}")
-        click.echo()
+@app.command()
+def agents() -> None:
+    """List all registered agents."""
+    vision_cortex = auto_builder.get_vision_cortex()
+    agents_list = vision_cortex.list_agents()
+
+    table = Table(title="Registered Agents")
+    table.add_column("Type", style="cyan")
+    table.add_column("Status", style="green")
+    table.add_column("Capabilities", style="yellow")
+
+    for agent_info in agents_list:
+        capabilities = ", ".join(agent_info["capabilities"])
+        table.add_row(
+            agent_info["type"],
+            agent_info["status"],
+            capabilities,
+        )
+
+    console.print(table)
 
 
-def main():
-    """Main entry point."""
+@app.command()
+def validate(
+    blueprint_path: Path = typer.Argument(..., help="Path to blueprint file"),
+) -> None:
+    """Validate a blueprint file."""
+    if not blueprint_path.exists():
+        console.print(f"[bold red]Error:[/bold red] File not found: {blueprint_path}")
+        raise typer.Exit(1)
+
     try:
-        cli(obj={})
-    except KeyboardInterrupt:
-        click.echo("\nOperation cancelled by user.")
-        sys.exit(1)
+        with open(blueprint_path) as f:
+            data = yaml.safe_load(f)
+
+        blueprint = Blueprint(**data)
+        console.print("[bold green]✓[/bold green] Blueprint is valid")
+        console.print(f"\nName: {blueprint.name}")
+        console.print(f"Type: {blueprint.type.value}")
+        console.print(f"Description: {blueprint.description}")
+
     except Exception as e:
-        logger.error(f"Error: {e}", exc_info=True)
-        sys.exit(1)
+        console.print(f"[bold red]Error:[/bold red] Invalid blueprint: {str(e)}")
+        raise typer.Exit(1)
+
+
+def _watch_build(build_id: str) -> None:
+    """Watch build progress."""
+    with Progress(console=console) as progress:
+        task = progress.add_task("[cyan]Building...", total=100)
+
+        while True:
+            build_status = asyncio.run(auto_builder.get_build_status(build_id))
+
+            if not build_status:
+                break
+
+            progress.update(task, completed=build_status.progress)
+
+            if build_status.status in ["completed", "failed", "cancelled"]:
+                break
+
+            time.sleep(2)
+
+    build_status = asyncio.run(auto_builder.get_build_status(build_id))
+    if build_status:
+        if build_status.status == "completed":
+            console.print("[bold green]✓[/bold green] Build completed successfully")
+        elif build_status.status == "failed":
+            console.print(f"[bold red]✗[/bold red] Build failed: {build_status.error}")
+        elif build_status.status == "cancelled":
+            console.print("[bold yellow]⚠[/bold yellow] Build cancelled")
 
 
 if __name__ == "__main__":
-    main()
+    app()

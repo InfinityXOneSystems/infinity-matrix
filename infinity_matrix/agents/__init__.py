@@ -1,6 +1,35 @@
-"""Agents package initialization."""
+"""Agent module."""
 
-from infinity_matrix.agents.registry import AgentRegistry, get_registry
-from infinity_matrix.agents.scheduler import AgentScheduler, get_scheduler
+from infinity_matrix.agents.base import (
+    AgentResult,
+    AgentStatus,
+    AgentTask,
+    AgentType,
+    BaseAgent,
+)
+from infinity_matrix.agents.implementations import (
+    CEOAgent,
+    CrawlerAgent,
+    DocumentorAgent,
+    IngestionAgent,
+    OrganizerAgent,
+    PredictorAgent,
+    StrategistAgent,
+    ValidatorAgent,
+)
 
-__all__ = ["AgentRegistry", "get_registry", "AgentScheduler", "get_scheduler"]
+__all__ = [
+    "AgentResult",
+    "AgentStatus",
+    "AgentTask",
+    "AgentType",
+    "BaseAgent",
+    "CEOAgent",
+    "CrawlerAgent",
+    "DocumentorAgent",
+    "IngestionAgent",
+    "OrganizerAgent",
+    "PredictorAgent",
+    "StrategistAgent",
+    "ValidatorAgent",
+]

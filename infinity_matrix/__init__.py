@@ -1,20 +1,16 @@
-"""Infinity Matrix - Universal Seed & Ingestion System.
+"""
+Infinity Matrix Auto-Builder System
 
-Enterprise-grade data collection, normalization, and AI-powered analysis
-across multiple business verticals.
+An enterprise-grade autonomous code generation and deployment system
+powered by Vision Cortex orchestration.
 """
 
-__version__ = "1.0.0"
-__author__ = "InfinityXOneSystems"
+__version__ = "0.1.0"
+__author__ = "InfinityXOne Systems"
+__email__ = "contact@infinityxai.com"
 
-from infinity_matrix.core.config import Config
-from infinity_matrix.core.ingestion_engine import IngestionEngine
-from infinity_matrix.core.seed_manager import SeedManager
+from infinity_matrix.core.auto_builder import AutoBuilder
+from infinity_matrix.core.blueprint import Blueprint
+from infinity_matrix.core.vision_cortex import VisionCortex
 
-__all__ = [
-    "Config",
-    "IngestionEngine",
-    "SeedManager",
-    "__version__",
-    "__author__",
-]
+__all__ = ["AutoBuilder", "Blueprint", "VisionCortex"]

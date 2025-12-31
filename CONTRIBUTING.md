@@ -1,248 +1,161 @@
-# Contributing to Infinity Matrix
+# Contributing to Infinity Matrix Auto-Builder
 
-Thank you for your interest in contributing to Infinity Matrix! This document provides guidelines for contributing to the project.
+Thank you for your interest in contributing to the Infinity Matrix Auto-Builder! This document provides guidelines and instructions for contributing.
 
 ## Code of Conduct
 
-By participating in this project, you agree to abide by our Code of Conduct:
-- Be respectful and inclusive
-- Welcome newcomers and help them learn
-- Focus on constructive feedback
-- Respect differing viewpoints and experiences
+By participating in this project, you agree to maintain a respectful and inclusive environment for all contributors.
 
-## How to Contribute
+## Getting Started
 
-### Reporting Bugs
+1. Fork the repository
+2. Clone your fork: `git clone https://github.com/your-username/infinity-matrix.git`
+3. Create a virtual environment: `python -m venv .venv`
+4. Activate the environment: `source .venv/bin/activate` (or `.venv\Scripts\activate` on Windows)
+5. Install development dependencies: `pip install -e ".[dev]"`
+6. Create a branch for your changes: `git checkout -b feature/your-feature-name`
 
-If you find a bug, please create an issue with:
-- Clear description of the problem
-- Steps to reproduce
-- Expected vs actual behavior
-- Environment details (OS, versions, etc.)
-- Screenshots if applicable
-
-### Suggesting Features
-
-Feature requests are welcome! Please include:
-- Clear use case and motivation
-- Proposed implementation approach
-- Any alternatives considered
-- Impact on existing functionality
-
-### Pull Requests
-
-1. **Fork the repository** and create your branch from `main`
-2. **Make your changes** following our coding standards
-3. **Add tests** for any new functionality
-4. **Update documentation** as needed
-5. **Run the test suite** to ensure nothing breaks
-6. **Submit a pull request** with a clear description
-
-#### PR Guidelines
-
-- One feature/fix per PR
-- Keep PRs focused and reasonably sized
-- Write clear commit messages
-- Reference related issues
-- Respond to review feedback promptly
-
-## Development Setup
-
-### Prerequisites
-
-- Node.js 20+
-- Python 3.11+
-- Docker and Docker Compose
-- Git
-
-### Local Development
-
-```bash
-# Clone the repository
-git clone https://github.com/InfinityXOneSystems/infinity-matrix.git
-cd infinity-matrix
-
-# Install dependencies
-npm install
-cd packages/server && pip install -r requirements.txt
-
-# Start development environment
-docker-compose up -d
-
-# Run the server
-npm run dev
-```
-
-### Running Tests
-
-```bash
-# Run all tests
-npm test
-
-# Run specific tests
-npm test -- --grep "MCP Protocol"
-
-# Run with coverage
-npm run test:coverage
-```
+## Development Workflow
 
 ### Code Style
 
-We use automated tools to maintain code quality:
+We follow PEP 8 and use automated tools to ensure code quality:
 
-#### TypeScript/JavaScript
-- ESLint for linting
-- Prettier for formatting
-- TypeScript strict mode
+- **Black**: Code formatting
+- **Ruff**: Linting
+- **Mypy**: Type checking
 
-```bash
-npm run lint
-npm run format
-```
-
-#### Python
-- Black for formatting
-- Ruff for linting
-- MyPy for type checking
+Run these tools before committing:
 
 ```bash
-cd packages/server
-black .
-ruff check .
-mypy .
+# Format code
+black infinity_matrix/
+
+# Lint code
+ruff check infinity_matrix/
+
+# Type check
+mypy infinity_matrix/
 ```
 
-## Project Structure
+### Testing
 
-```
-infinity-matrix/
-├── packages/
-│   ├── server/              # Python FastAPI server
-│   ├── client/              # TypeScript client SDK
-│   ├── vscode-extension/    # VS Code extension
-│   └── shared/              # Shared utilities
-├── .github/workflows/       # CI/CD pipelines
-├── infrastructure/          # Deployment configs
-├── docs/                    # Documentation
-└── tests/                   # Test suites
-```
+We use pytest for testing. Write tests for all new features and bug fixes.
 
-## Coding Standards
+```bash
+# Run all tests
+pytest
 
-### General Principles
+# Run with coverage
+pytest --cov=infinity_matrix
 
-- Write clean, readable code
-- Follow SOLID principles
-- Keep functions small and focused
-- Use meaningful variable names
-- Add comments for complex logic
-- Write self-documenting code when possible
-
-### TypeScript
-
-```typescript
-// Use explicit types
-function calculateTotal(items: Item[]): number {
-  return items.reduce((sum, item) => sum + item.price, 0);
-}
-
-// Use interfaces for object shapes
-interface UserConfig {
-  apiKey: string;
-  timeout: number;
-}
-
-// Prefer async/await over callbacks
-async function fetchData(): Promise<Data> {
-  const response = await fetch('/api/data');
-  return response.json();
-}
+# Run specific test file
+pytest tests/test_core.py
 ```
 
-### Python
+### Commit Messages
+
+Follow conventional commit format:
+
+- `feat:` New feature
+- `fix:` Bug fix
+- `docs:` Documentation changes
+- `test:` Test changes
+- `refactor:` Code refactoring
+- `style:` Code style changes
+- `chore:` Build/tooling changes
+
+Example: `feat: add support for GraphQL API generation`
+
+## Pull Request Process
+
+1. Ensure all tests pass
+2. Update documentation if needed
+3. Add an entry to CHANGELOG.md (if applicable)
+4. Submit a pull request with a clear description of changes
+5. Request review from maintainers
+6. Address any feedback
+
+## Areas for Contribution
+
+### High Priority
+
+- Additional agent implementations
+- More template types
+- Integration with external services
+- Performance optimizations
+- Documentation improvements
+
+### Agent Development
+
+When adding new agents:
+
+1. Inherit from `BaseAgent`
+2. Implement the `execute()` method
+3. Add agent type to `AgentType` enum
+4. Register agent in `VisionCortex`
+5. Add comprehensive tests
+6. Document capabilities
+
+Example:
 
 ```python
-# Use type hints
-def process_context(context: ContextData) -> Dict[str, Any]:
-    """Process context and return result."""
-    return {"status": "processed"}
+from infinity_matrix.agents.base import BaseAgent, AgentType, AgentTask, AgentResult
 
-# Use dataclasses for data structures
-from dataclasses import dataclass
-
-@dataclass
-class Message:
-    id: str
-    content: str
-    timestamp: datetime
-
-# Follow PEP 8 style guide
-# Use docstrings for functions and classes
+class MyCustomAgent(BaseAgent):
+    def __init__(self, config=None):
+        super().__init__(AgentType.CUSTOM, config)
+    
+    async def execute(self, task: AgentTask) -> AgentResult:
+        # Implementation here
+        pass
+    
+    def get_capabilities(self):
+        return ["capability1", "capability2"]
 ```
 
-## Testing Guidelines
+### Template Development
 
-### Unit Tests
+Add new templates to the `templates/` directory:
 
-- Test individual functions and methods
-- Mock external dependencies
-- Aim for high code coverage
-- Test edge cases and error conditions
+```
+templates/
+  my-template/
+    README.md
+    pyproject.toml
+    src/
+      __init__.py
+      main.py
+```
 
-### Integration Tests
+### Blueprint Examples
 
-- Test component interactions
-- Use test databases and services
-- Clean up test data after tests
-- Test realistic scenarios
+Add blueprint examples to `blueprints/`:
 
-### End-to-End Tests
-
-- Test complete workflows
-- Validate user-facing functionality
-- Test across different environments
-- Automate where possible
+```yaml
+name: my-project
+version: 1.0.0
+type: microservice
+description: Description here
+requirements:
+  - requirement1
+  - requirement2
+# ... more configuration
+```
 
 ## Documentation
 
 - Update README.md for user-facing changes
-- Update API.md for API changes
-- Add JSDoc/docstrings for new code
-- Include examples in documentation
-- Keep documentation in sync with code
+- Add docstrings to all public functions/classes
+- Create examples in `examples/` directory
+- Update API documentation
 
-## Review Process
+## Questions?
 
-All contributions go through code review:
+- Open an issue for bug reports or feature requests
+- Use discussions for questions and general discussions
+- Contact maintainers for security issues
 
-1. **Automated Checks**: CI runs linting, tests, security scans
-2. **Code Review**: Maintainers review code quality and design
-3. **Testing**: Reviewers may test functionality
-4. **Approval**: At least one maintainer approval required
-5. **Merge**: Auto-merge or manual merge by maintainer
+## License
 
-## Release Process
-
-We follow semantic versioning (MAJOR.MINOR.PATCH):
-
-- **MAJOR**: Breaking changes
-- **MINOR**: New features (backward compatible)
-- **PATCH**: Bug fixes (backward compatible)
-
-Releases are automated through GitHub Actions.
-
-## Communication
-
-- **GitHub Issues**: Bug reports and feature requests
-- **Pull Requests**: Code contributions and discussion
-- **Discussions**: General questions and ideas
-- **Discord**: Real-time chat and community support
-
-## Recognition
-
-Contributors are recognized in:
-- CONTRIBUTORS.md file
-- Release notes
-- Project documentation
-
-Thank you for contributing to Infinity Matrix! 🚀
+By contributing, you agree that your contributions will be licensed under the MIT License.

@@ -1,277 +1,295 @@
-# Infinity Matrix - Autonomous CD System
+# Infinity Matrix Auto-Builder
 
-[![Autonomous CD Pipeline](https://github.com/InfinityXOneSystems/infinity-matrix/actions/workflows/autonomous-pipeline.yml/badge.svg)](https://github.com/InfinityXOneSystems/infinity-matrix/actions/workflows/autonomous-pipeline.yml)
-[![Health Monitor](https://github.com/InfinityXOneSystems/infinity-matrix/actions/workflows/health-monitor.yml/badge.svg)](https://github.com/InfinityXOneSystems/infinity-matrix/actions/workflows/health-monitor.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Python 3.9+](https://img.shields.io/badge/python-3.9+-blue.svg)](https://www.python.org/downloads/)
 
-**A fully autonomous, FAANG-level continuous delivery, validation, and observability system with self-healing capabilities.**
+The Infinity Matrix Auto-Builder is an enterprise-grade autonomous code generation and deployment system powered by Vision Cortex orchestration. It enables zero-human hands-on operation for building projects, systems, apps, and workflows from natural language prompts, blueprints, or internal ideas.
 
 ## 🚀 Features
 
-### ✅ Fully Operational
-
-- **🤖 Agent Health Monitoring**: Real-time monitoring of all system agents with automatic status tracking
-- **📊 Stub/TODO Scanning**: Automated codebase scanning for incomplete implementations
-- **🔄 PR Automation**: Automatic PR creation, review, approval, and merge workflows
-- **🏥 Self-Healing**: Automatic issue detection and resolution without manual intervention
-- **⚡ Zero-Intervention Triggers**: Automated action triggers based on system conditions
-- **📝 Audit Logging**: Persistent audit trail of all operations and events
-- **🌐 Web Dashboard**: Real-time web-based monitoring dashboard
-- **💻 CLI Dashboard**: Command-line interface for system management
-- **📄 Multi-Format Export**: Export reports in Markdown, CSV, and JSON formats
-- **📈 Workflow Tracking**: Comprehensive workflow execution monitoring
-- **🔍 Compliance Tracking**: Gap analysis and operational status reporting
-- **💾 Proof Artifacts**: Persistent proof and audit artifacts storage
-
-## 🏗️ Architecture
-
-```
-infinity-matrix/
-├── .github/workflows/          # CI/CD automation
-│   ├── autonomous-pipeline.yml # Main pipeline workflow
-│   └── health-monitor.yml      # Health monitoring workflow
-├── .prooftest/                 # Audit and proof artifacts
-│   ├── logs/                   # System logs and events
-│   ├── reports/                # Exported reports
-│   └── artifacts/              # Pipeline artifacts
-├── src/
-│   ├── agents/                 # Autonomous agents
-│   │   ├── health.py          # Health monitoring
-│   │   ├── scanner.py         # Code scanning
-│   │   ├── pr_automation.py   # PR management
-│   │   ├── self_healing.py    # Self-healing logic
-│   │   └── orchestrator.py    # Main orchestrator
-│   ├── dashboard/             # Monitoring dashboards
-│   │   ├── web_server.py      # Web dashboard
-│   │   ├── cli.py             # CLI dashboard
-│   │   └── templates/         # Web templates
-│   └── exporters/             # Data exporters
-│       └── artifact_exporter.py
-└── requirements.txt            # Python dependencies
-```
+- **Vision Cortex Orchestration**: High-level AI brain coordinating multiple specialized agents
+- **Multi-Agent Architecture**: Integration with crawler, ingestion, predictor, CEO, strategist, organizer, validator, and documentor agents
+- **Blueprint-Driven Development**: Use structured blueprints to define project specifications
+- **Autonomous Code Generation**: Automatically generate code, docs, config files, and onboarding instructions
+- **CI/CD Integration**: Seamless integration with GitHub Actions, auto-merge, and validation workflows
+- **Multiple Interfaces**: REST API, CLI, and WebSocket support for flexible triggering
+- **Repository Management**: Automated Git operations, branch management, and PR creation
+- **Enterprise Standards**: FAANG-level code quality, security, and documentation practices
 
 ## 📦 Installation
+
+### From Source
 
 ```bash
 # Clone the repository
 git clone https://github.com/InfinityXOneSystems/infinity-matrix.git
 cd infinity-matrix
 
-# Install dependencies
-pip install -r requirements.txt
-
-# Optional: Install in development mode
+# Install in development mode
 pip install -e .
+
+# Or install with development dependencies
+pip install -e ".[dev]"
 ```
 
-## 🎯 Quick Start
-
-### Run the Autonomous Pipeline
+### Using pip
 
 ```bash
-# Run the full autonomous CD pipeline
-export PYTHONPATH="${PYTHONPATH}:$(pwd)/src"
-python -m agents.orchestrator
-
-# Or using the CLI
-infinity-matrix run
+pip install infinity-matrix
 ```
 
-### Launch the Web Dashboard
+## 🔧 Quick Start
+
+### CLI Usage
 
 ```bash
-# Start the web server
-export PYTHONPATH="${PYTHONPATH}:$(pwd)/src"
-python -m dashboard.web_server
+# Initialize a new project
+infinity-builder init my-project --template web-api
 
-# Access at http://localhost:5000
+# Build from a prompt
+infinity-builder build "Create a REST API for user management with authentication"
+
+# Build from a blueprint
+infinity-builder build --blueprint ./blueprints/microservice.yaml
+
+# Check build status
+infinity-builder status <build-id>
+
+# Deploy a build
+infinity-builder deploy <build-id> --environment production
 ```
 
-### Monitor System Status (CLI)
+### API Usage
+
+```python
+from infinity_matrix import AutoBuilder, Blueprint
+
+# Initialize the auto-builder
+builder = AutoBuilder()
+
+# Create a blueprint
+blueprint = Blueprint(
+    name="user-service",
+    type="microservice",
+    description="User management microservice with REST API",
+    requirements=["authentication", "database", "caching"]
+)
+
+# Trigger a build
+build = await builder.build(blueprint)
+
+# Monitor progress
+status = await builder.get_build_status(build.id)
+print(f"Build status: {status.state}")
+```
+
+### REST API
+
+Start the API server:
 
 ```bash
-# Real-time monitoring (refreshes every 10 seconds)
-infinity-matrix monitor
+# Start the server
+infinity-builder serve --port 8000
 
-# Show current status
-infinity-matrix status
-
-# List all agents
-infinity-matrix agents
-
-# View recent workflows
-infinity-matrix workflows
-
-# Generate compliance report
-infinity-matrix compliance
+# Or with uvicorn directly
+uvicorn infinity_matrix.api.main:app --reload
 ```
 
-### Export Reports
+Example API requests:
 
 ```bash
-# Export in specific format
-infinity-matrix export markdown
-infinity-matrix export csv
-infinity-matrix export json
+# Create a build from a prompt
+curl -X POST http://localhost:8000/api/v1/builds \
+  -H "Content-Type: application/json" \
+  -d '{"prompt": "Create a Python web scraper with async support"}'
 
-# Export all formats
-infinity-matrix export all
+# Get build status
+curl http://localhost:8000/api/v1/builds/{build_id}
+
+# List all builds
+curl http://localhost:8000/api/v1/builds
 ```
 
-## 📊 Dashboard Features
+## 📋 Blueprint Format
 
-### Web Dashboard (http://localhost:5000)
+Blueprints define the specifications for your project:
 
-- **Real-time System Overview**: Live agent health metrics
-- **Compliance Status**: Visual progress tracking
-- **Agent Monitoring**: Detailed agent status and history
-- **Workflow Execution**: Recent pipeline runs
-- **One-Click Actions**: Run pipelines, export data
-- **Auto-refresh**: Updates every 10 seconds
+```yaml
+# blueprints/example.yaml
+name: user-authentication-service
+version: 1.0.0
+type: microservice
 
-### CLI Dashboard
+description: |
+  User authentication service with JWT tokens,
+  OAuth2 support, and rate limiting.
 
-- **Real-time Monitoring**: Live console updates
-- **Rich Formatting**: Color-coded status indicators
-- **Agent Details**: Comprehensive agent information
-- **Workflow History**: Recent execution logs
-- **Export Commands**: Generate reports from terminal
+requirements:
+  - authentication
+  - database
+  - caching
+  - api-documentation
 
-## 🔧 Configuration
+components:
+  - name: auth-api
+    type: rest-api
+    framework: fastapi
+    features:
+      - jwt-tokens
+      - oauth2
+      - rate-limiting
+  
+  - name: user-database
+    type: database
+    engine: postgresql
+    features:
+      - migrations
+      - connection-pooling
 
-The system is designed to work out-of-the-box with minimal configuration. All data is stored in the `.prooftest/` directory:
+deployment:
+  platform: kubernetes
+  replicas: 3
+  environment:
+    - name: DATABASE_URL
+      secret: true
+    - name: JWT_SECRET
+      secret: true
 
-- **Logs**: `.prooftest/logs/` - Agent health, events, repairs
-- **Reports**: `.prooftest/reports/` - Exported compliance and audit reports
-- **Artifacts**: `.prooftest/artifacts/` - Pipeline execution artifacts
+testing:
+  unit-tests: true
+  integration-tests: true
+  coverage-threshold: 80
 
-## 🤖 Agents
+documentation:
+  api-docs: openapi
+  readme: true
+  architecture-diagram: true
+```
 
-### CD Orchestrator
-Main coordinator for all autonomous operations. Manages the complete pipeline from scanning to merge.
+## 🏗️ Architecture
 
-### Health Monitor
-Tracks agent health, records successes/failures, and maintains operational status.
+The Infinity Matrix Auto-Builder follows a multi-agent architecture:
 
-### Stub/TODO Scanner
-Scans the codebase for incomplete implementations, TODOs, FIXMEs, and stubs.
+```
+┌─────────────────────────────────────────┐
+│         Vision Cortex (Orchestrator)     │
+│    High-level planning & coordination    │
+└─────────────────┬───────────────────────┘
+                  │
+    ┌─────────────┼─────────────┐
+    │             │             │
+┌───▼───┐   ┌────▼────┐   ┌───▼────┐
+│Crawler│   │Ingestion│   │Predictor│
+└───────┘   └─────────┘   └────────┘
+    │             │             │
+    └─────────────┼─────────────┘
+                  │
+    ┌─────────────┼─────────────┐
+    │             │             │
+┌───▼──┐   ┌─────▼─────┐   ┌──▼────┐
+│ CEO  │   │ Strategist │   │Organizer│
+└──────┘   └───────────┘   └────────┘
+    │             │             │
+    └─────────────┼─────────────┘
+                  │
+         ┌────────┴────────┐
+         │                 │
+    ┌────▼────┐      ┌────▼─────┐
+    │Validator│      │Documentor│
+    └─────────┘      └──────────┘
+```
 
-### PR Automation Agent
-Handles PR creation, review, approval, and merging workflows.
+### Agent Responsibilities
 
-### Self-Healing Agent
-Automatically detects and resolves issues, resets error counts, and escalates when necessary.
+- **Vision Cortex**: Orchestrates all agents, manages build lifecycle, coordinates workflows
+- **Crawler**: Analyzes existing codebases, documentation, and templates
+- **Ingestion**: Processes blueprints, prompts, and requirements into structured data
+- **Predictor**: Predicts optimal architectures, technologies, and patterns
+- **CEO**: Makes high-level decisions on project structure and technologies
+- **Strategist**: Plans implementation strategy and phasing
+- **Organizer**: Manages project structure, file organization, and dependencies
+- **Validator**: Validates generated code, runs tests, performs security checks
+- **Documentor**: Generates documentation, READMEs, and API docs
 
-### Zero-Intervention Trigger
-Monitors conditions and triggers automated actions without human intervention.
+## 🔌 Integration
 
-## 📈 Compliance & Reporting
+### GitHub Integration
 
-### Feature Compliance
+The auto-builder integrates with GitHub for:
+- Creating branches and pull requests
+- Running CI/CD workflows
+- Auto-merging validated changes
+- Managing issues and project boards
 
-Run `infinity-matrix compliance` to see:
-- Total features implemented
-- Operational vs missing features
-- Compliance percentage
-- Detailed feature breakdown
+### External Services
 
-### Audit Reports
+Connect to external services via webhooks:
 
-Generate comprehensive audit reports in multiple formats:
+```yaml
+# config/integrations.yaml
+integrations:
+  - name: infinityxai-web
+    type: webhook
+    url: https://infinityxai.com/api/builder/webhook
+    events: [build.started, build.completed, build.failed]
+  
+  - name: vscode-extension
+    type: extension
+    protocol: lsp
+  
+  - name: chatgpt-plugin
+    type: plugin
+    api_version: v1
+```
+
+## 🔐 Security
+
+- JWT-based authentication for API access
+- Secret management for sensitive configurations
+- Code scanning and vulnerability detection
+- Rate limiting and access controls
+- Audit logging for all operations
+
+## 🧪 Testing
+
+Run tests:
 
 ```bash
-# Markdown report with system overview
-infinity-matrix export markdown
+# Run all tests
+pytest
 
-# CSV export for data analysis
-infinity-matrix export csv
+# Run with coverage
+pytest --cov=infinity_matrix
 
-# JSON export for API integration
-infinity-matrix export json
+# Run specific test suite
+pytest tests/test_vision_cortex.py
 ```
 
-## 🔄 CI/CD Integration
+## 📖 Documentation
 
-GitHub Actions workflows run automatically:
-
-- **Autonomous Pipeline**: Runs hourly and on every push
-- **Health Monitor**: Runs every 15 minutes
-- **Artifact Upload**: All reports uploaded as workflow artifacts
-
-## 🛡️ Self-Healing
-
-The system includes self-healing capabilities:
-
-1. **Automatic Error Recovery**: Agents auto-reset after transient failures
-2. **Health Monitoring**: Continuous health checks with degradation detection
-3. **Escalation**: Manual intervention requested only when necessary
-4. **Repair Logging**: All healing actions logged for audit
-
-## 📝 Logging & Audit Trail
-
-All operations are logged with:
-- **Timestamp**: ISO 8601 format
-- **Agent ID**: Which agent performed the action
-- **Event Type**: Category of event
-- **Details**: Comprehensive event information
-
-Access logs in `.prooftest/logs/`:
-- `agent_health.json` - Agent status
-- `workflows.json` - Workflow history
-- `repairs.jsonl` - Self-healing actions
-- `events_YYYYMMDD.jsonl` - Daily event logs
-
-## 🌟 Key Differentiators
-
-✅ **Zero Manual Intervention**: Fully autonomous operation
-✅ **Real-time Observability**: Live dashboards (web & CLI)
-✅ **Self-Healing**: Automatic issue detection and resolution
-✅ **Comprehensive Auditing**: Full audit trail with proof artifacts
-✅ **Multi-Format Export**: Markdown, CSV, JSON, API-ready
-✅ **Compliance Tracking**: Gap analysis and operational reporting
-✅ **FAANG-Level Quality**: Production-ready, enterprise-grade
-
-## 🚦 System Status
-
-Check system health:
-- All agents operational: ✅
-- Workflows executing: ✅
-- Self-healing active: ✅
-- Dashboards running: ✅
-- Audit logs persisting: ✅
-
-## 📚 API Endpoints (Web Dashboard)
-
-- `GET /` - Main dashboard UI
-- `GET /api/status` - System status
-- `GET /api/agents` - All agents
-- `GET /api/workflows` - Recent workflows
-- `GET /api/compliance` - Compliance report
-- `GET /api/export/{format}` - Export data
-- `POST /api/pipeline/run` - Trigger pipeline
-- `GET /api/health` - Health check
+- [Architecture Guide](docs/architecture.md)
+- [API Reference](docs/api.md)
+- [Blueprint Specification](docs/blueprints.md)
+- [Agent Development](docs/agents.md)
+- [Deployment Guide](docs/deployment.md)
 
 ## 🤝 Contributing
 
-This is an autonomous system that manages itself. For manual contributions:
-
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Run the pipeline: `python -m agents.orchestrator`
-5. Submit a pull request
+Contributions are welcome! Please read our [Contributing Guidelines](CONTRIBUTING.md) first.
 
 ## 📄 License
 
-MIT License - See LICENSE file for details
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 ## 🔗 Links
 
-- **Repository**: https://github.com/InfinityXOneSystems/infinity-matrix
-- **Issues**: https://github.com/InfinityXOneSystems/infinity-matrix/issues
-- **Workflows**: https://github.com/InfinityXOneSystems/infinity-matrix/actions
+- Website: https://infinityxai.com
+- Documentation: https://github.com/InfinityXOneSystems/infinity-matrix/wiki
+- Issues: https://github.com/InfinityXOneSystems/infinity-matrix/issues
 
----
+## 💬 Support
 
-**Built with ❤️ by Infinity Matrix Autonomous Systems**
-
-*Last Updated: 2025-12-31*
+For questions and support, please use:
+- GitHub Issues for bug reports and feature requests
+- Discussions for questions and community support
+- Email: support@infinityxai.com for enterprise inquiries

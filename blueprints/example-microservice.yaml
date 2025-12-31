@@ -1,0 +1,89 @@
+name: user-authentication-service
+version: 1.0.0
+type: microservice
+
+description: |
+  User authentication service with JWT tokens, OAuth2 support,
+  and rate limiting for secure user management.
+
+requirements:
+  - authentication
+  - database
+  - caching
+  - api-documentation
+
+components:
+  - name: auth-api
+    type: rest-api
+    framework: fastapi
+    language: python
+    features:
+      - jwt-tokens
+      - oauth2
+      - rate-limiting
+      - password-hashing
+    dependencies:
+      - fastapi
+      - pydantic
+      - python-jose
+      - passlib
+
+  - name: user-database
+    type: database
+    framework: postgresql
+    features:
+      - migrations
+      - connection-pooling
+      - indexes
+
+  - name: redis-cache
+    type: cache
+    framework: redis
+    features:
+      - session-storage
+      - rate-limit-tracking
+
+deployment:
+  platform: kubernetes
+  replicas: 3
+  resources:
+    cpu: "500m"
+    memory: "512Mi"
+  environment:
+    - name: DATABASE_URL
+      secret: true
+      required: true
+    - name: JWT_SECRET
+      secret: true
+      required: true
+    - name: REDIS_URL
+      secret: true
+      required: true
+  health_check:
+    path: /health
+    interval: 30
+    timeout: 5
+
+testing:
+  unit_tests: true
+  integration_tests: true
+  e2e_tests: true
+  coverage_threshold: 80
+  frameworks:
+    - pytest
+    - pytest-asyncio
+
+documentation:
+  api_docs: openapi
+  readme: true
+  architecture_diagram: true
+  deployment_guide: true
+  contributing_guide: true
+
+tags:
+  - authentication
+  - microservice
+  - rest-api
+  - jwt
+
+license: MIT
