@@ -1,295 +1,178 @@
-# Infinity Matrix Auto-Builder
+# Infinity Matrix
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Python 3.9+](https://img.shields.io/badge/python-3.9+-blue.svg)](https://www.python.org/downloads/)
+A fully autonomous multi-agent system combining enterprise-grade AI, automation, and orchestration capabilities.
 
-The Infinity Matrix Auto-Builder is an enterprise-grade autonomous code generation and deployment system powered by Vision Cortex orchestration. It enables zero-human hands-on operation for building projects, systems, apps, and workflows from natural language prompts, blueprints, or internal ideas.
+## Overview
 
-## 🚀 Features
+Infinity Matrix is a FAANG-level enterprise platform that provides:
 
-- **Vision Cortex Orchestration**: High-level AI brain coordinating multiple specialized agents
-- **Multi-Agent Architecture**: Integration with crawler, ingestion, predictor, CEO, strategist, organizer, validator, and documentor agents
-- **Blueprint-Driven Development**: Use structured blueprints to define project specifications
-- **Autonomous Code Generation**: Automatically generate code, docs, config files, and onboarding instructions
-- **CI/CD Integration**: Seamless integration with GitHub Actions, auto-merge, and validation workflows
-- **Multiple Interfaces**: REST API, CLI, and WebSocket support for flexible triggering
-- **Repository Management**: Automated Git operations, branch management, and PR creation
-- **Enterprise Standards**: FAANG-level code quality, security, and documentation practices
+- **Multi-Agent System**: Autonomous agent orchestration and collaboration
+- **Vision Cortex**: AI-powered visual processing and analysis
+- **Auto-Builder**: Intelligent CI/CD and build automation
+- **Evolution Doc System**: Automated documentation generation and maintenance
+- **Index System**: Semantic code search and knowledge graphs
+- **Taxonomy**: Intelligent classification and organization
+- **PR/Merge Engine**: Automated code review, approval, and merge workflows
+- **Real-time ETL**: Web scraping, crawling, and data pipeline automation
 
-## 📦 Installation
+## Architecture
 
-### From Source
+```
+infinity-matrix/
+├── src/
+│   ├── core/           # Core system components
+│   ├── agents/         # Agent implementations
+│   ├── vision/         # Vision Cortex system
+│   ├── builder/        # Auto-Builder system
+│   ├── docs/           # Evolution Doc system
+│   ├── index/          # Index & search system
+│   ├── taxonomy/       # Classification system
+│   ├── pr_engine/      # PR/merge automation
+│   ├── etl/            # Scraping/ETL pipelines
+│   └── integrations/   # External service integrations
+├── workflows/          # GitHub Actions workflows
+├── tests/              # Test suites
+└── docs/               # Documentation
+```
+
+## Features
+
+### Multi-Agent System
+- Dynamic agent registration and discovery
+- Agent lifecycle management
+- Inter-agent communication and coordination
+- Task delegation and parallel execution
+
+### Vision Cortex
+- Image and video analysis
+- OCR and document processing
+- Visual testing and validation
+- UI/UX analysis
+
+### Auto-Builder
+- Intelligent build orchestration
+- Dependency resolution
+- Artifact management
+- Multi-platform support
+
+### Evolution Doc System
+- Auto-generation from code
+- Version tracking
+- Quality metrics
+- Multi-format output
+
+### Index & Taxonomy
+- Semantic code search
+- Knowledge graph construction
+- AI-powered classification
+- Contextual recommendations
+
+### PR/Merge/Sync Engine
+- Automated PR creation
+- Intelligent code review
+- Merge conflict resolution
+- Approval workflow orchestration
+
+### Real-time ETL
+- Web scraping framework
+- Distributed crawling
+- Data validation and cleaning
+- Stream processing
+
+## Integrations
+
+- **GitHub**: Full API integration, Actions, webhooks
+- **Google Cloud**: GCP services, Cloud Functions, Storage
+- **Hostinger**: Hosting automation and deployment
+- **VS Code**: Extension integration and LSP support
+
+## Quick Start
 
 ```bash
-# Clone the repository
-git clone https://github.com/InfinityXOneSystems/infinity-matrix.git
-cd infinity-matrix
-
-# Install in development mode
+# Install dependencies
 pip install -e .
 
-# Or install with development dependencies
+# Initialize the system
+infinity-matrix init
+
+# Start the agent system
+infinity-matrix start
+
+# Check system status
+infinity-matrix status
+```
+
+## Configuration
+
+Create a `config.yaml` file:
+
+```yaml
+infinity_matrix:
+  agents:
+    max_concurrent: 10
+    registry_backend: "postgresql"
+  
+  vision:
+    models:
+      - "gpt-4-vision"
+      - "claude-3-opus"
+  
+  builder:
+    platforms:
+      - "python"
+      - "node"
+      - "go"
+  
+  integrations:
+    github:
+      token: "${GITHUB_TOKEN}"
+    gcp:
+      project_id: "${GCP_PROJECT_ID}"
+```
+
+## Development
+
+```bash
+# Install development dependencies
 pip install -e ".[dev]"
-```
 
-### Using pip
-
-```bash
-pip install infinity-matrix
-```
-
-## 🔧 Quick Start
-
-### CLI Usage
-
-```bash
-# Initialize a new project
-infinity-builder init my-project --template web-api
-
-# Build from a prompt
-infinity-builder build "Create a REST API for user management with authentication"
-
-# Build from a blueprint
-infinity-builder build --blueprint ./blueprints/microservice.yaml
-
-# Check build status
-infinity-builder status <build-id>
-
-# Deploy a build
-infinity-builder deploy <build-id> --environment production
-```
-
-### API Usage
-
-```python
-from infinity_matrix import AutoBuilder, Blueprint
-
-# Initialize the auto-builder
-builder = AutoBuilder()
-
-# Create a blueprint
-blueprint = Blueprint(
-    name="user-service",
-    type="microservice",
-    description="User management microservice with REST API",
-    requirements=["authentication", "database", "caching"]
-)
-
-# Trigger a build
-build = await builder.build(blueprint)
-
-# Monitor progress
-status = await builder.get_build_status(build.id)
-print(f"Build status: {status.state}")
-```
-
-### REST API
-
-Start the API server:
-
-```bash
-# Start the server
-infinity-builder serve --port 8000
-
-# Or with uvicorn directly
-uvicorn infinity_matrix.api.main:app --reload
-```
-
-Example API requests:
-
-```bash
-# Create a build from a prompt
-curl -X POST http://localhost:8000/api/v1/builds \
-  -H "Content-Type: application/json" \
-  -d '{"prompt": "Create a Python web scraper with async support"}'
-
-# Get build status
-curl http://localhost:8000/api/v1/builds/{build_id}
-
-# List all builds
-curl http://localhost:8000/api/v1/builds
-```
-
-## 📋 Blueprint Format
-
-Blueprints define the specifications for your project:
-
-```yaml
-# blueprints/example.yaml
-name: user-authentication-service
-version: 1.0.0
-type: microservice
-
-description: |
-  User authentication service with JWT tokens,
-  OAuth2 support, and rate limiting.
-
-requirements:
-  - authentication
-  - database
-  - caching
-  - api-documentation
-
-components:
-  - name: auth-api
-    type: rest-api
-    framework: fastapi
-    features:
-      - jwt-tokens
-      - oauth2
-      - rate-limiting
-  
-  - name: user-database
-    type: database
-    engine: postgresql
-    features:
-      - migrations
-      - connection-pooling
-
-deployment:
-  platform: kubernetes
-  replicas: 3
-  environment:
-    - name: DATABASE_URL
-      secret: true
-    - name: JWT_SECRET
-      secret: true
-
-testing:
-  unit-tests: true
-  integration-tests: true
-  coverage-threshold: 80
-
-documentation:
-  api-docs: openapi
-  readme: true
-  architecture-diagram: true
-```
-
-## 🏗️ Architecture
-
-The Infinity Matrix Auto-Builder follows a multi-agent architecture:
-
-```
-┌─────────────────────────────────────────┐
-│         Vision Cortex (Orchestrator)     │
-│    High-level planning & coordination    │
-└─────────────────┬───────────────────────┘
-                  │
-    ┌─────────────┼─────────────┐
-    │             │             │
-┌───▼───┐   ┌────▼────┐   ┌───▼────┐
-│Crawler│   │Ingestion│   │Predictor│
-└───────┘   └─────────┘   └────────┘
-    │             │             │
-    └─────────────┼─────────────┘
-                  │
-    ┌─────────────┼─────────────┐
-    │             │             │
-┌───▼──┐   ┌─────▼─────┐   ┌──▼────┐
-│ CEO  │   │ Strategist │   │Organizer│
-└──────┘   └───────────┘   └────────┘
-    │             │             │
-    └─────────────┼─────────────┘
-                  │
-         ┌────────┴────────┐
-         │                 │
-    ┌────▼────┐      ┌────▼─────┐
-    │Validator│      │Documentor│
-    └─────────┘      └──────────┘
-```
-
-### Agent Responsibilities
-
-- **Vision Cortex**: Orchestrates all agents, manages build lifecycle, coordinates workflows
-- **Crawler**: Analyzes existing codebases, documentation, and templates
-- **Ingestion**: Processes blueprints, prompts, and requirements into structured data
-- **Predictor**: Predicts optimal architectures, technologies, and patterns
-- **CEO**: Makes high-level decisions on project structure and technologies
-- **Strategist**: Plans implementation strategy and phasing
-- **Organizer**: Manages project structure, file organization, and dependencies
-- **Validator**: Validates generated code, runs tests, performs security checks
-- **Documentor**: Generates documentation, READMEs, and API docs
-
-## 🔌 Integration
-
-### GitHub Integration
-
-The auto-builder integrates with GitHub for:
-- Creating branches and pull requests
-- Running CI/CD workflows
-- Auto-merging validated changes
-- Managing issues and project boards
-
-### External Services
-
-Connect to external services via webhooks:
-
-```yaml
-# config/integrations.yaml
-integrations:
-  - name: infinityxai-web
-    type: webhook
-    url: https://infinityxai.com/api/builder/webhook
-    events: [build.started, build.completed, build.failed]
-  
-  - name: vscode-extension
-    type: extension
-    protocol: lsp
-  
-  - name: chatgpt-plugin
-    type: plugin
-    api_version: v1
-```
-
-## 🔐 Security
-
-- JWT-based authentication for API access
-- Secret management for sensitive configurations
-- Code scanning and vulnerability detection
-- Rate limiting and access controls
-- Audit logging for all operations
-
-## 🧪 Testing
-
-Run tests:
-
-```bash
-# Run all tests
+# Run tests
 pytest
 
-# Run with coverage
-pytest --cov=infinity_matrix
+# Run linters
+ruff check .
+mypy src/
 
-# Run specific test suite
-pytest tests/test_vision_cortex.py
+# Build documentation
+mkdocs build
 ```
 
-## 📖 Documentation
+## Testing
 
-- [Architecture Guide](docs/architecture.md)
-- [API Reference](docs/api.md)
-- [Blueprint Specification](docs/blueprints.md)
-- [Agent Development](docs/agents.md)
-- [Deployment Guide](docs/deployment.md)
+```bash
+# Unit tests
+pytest tests/unit/
 
-## 🤝 Contributing
+# Integration tests
+pytest tests/integration/
 
-Contributions are welcome! Please read our [Contributing Guidelines](CONTRIBUTING.md) first.
+# End-to-end tests
+pytest tests/e2e/
+```
 
-## 📄 License
+## Documentation
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+Full documentation available at [https://infinityxonesystems.github.io/infinity-matrix/](https://infinityxonesystems.github.io/infinity-matrix/)
 
-## 🔗 Links
+## License
 
-- Website: https://infinityxai.com
-- Documentation: https://github.com/InfinityXOneSystems/infinity-matrix/wiki
-- Issues: https://github.com/InfinityXOneSystems/infinity-matrix/issues
+MIT License - see LICENSE file for details
 
-## 💬 Support
+## Contributing
 
-For questions and support, please use:
-- GitHub Issues for bug reports and feature requests
-- Discussions for questions and community support
-- Email: support@infinityxai.com for enterprise inquiries
+See CONTRIBUTING.md for guidelines.
+
+## Support
+
+- Issues: [GitHub Issues](https://github.com/InfinityXOneSystems/infinity-matrix/issues)
+- Discussions: [GitHub Discussions](https://github.com/InfinityXOneSystems/infinity-matrix/discussions)

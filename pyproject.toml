@@ -1,47 +1,55 @@
 [build-system]
-requires = ["setuptools>=68.0.0", "wheel"]
+requires = ["setuptools>=68.0", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
 name = "infinity-matrix"
 version = "0.1.0"
-description = "Auto-Builder system with Vision Cortex orchestration for autonomous code generation and deployment"
+description = "A fully autonomous multi-agent system for enterprise automation"
 readme = "README.md"
-requires-python = ">=3.9"
+requires-python = ">=3.10"
 license = {text = "MIT"}
 authors = [
-    {name = "InfinityXOne Systems", email = "contact@infinityxai.com"}
+    {name = "InfinityXOne Systems", email = "contact@infinityxone.com"}
 ]
-keywords = ["automation", "code-generation", "orchestration", "ai", "auto-builder"]
+keywords = [
+    "ai",
+    "automation",
+    "agents",
+    "multi-agent",
+    "orchestration",
+    "cicd",
+    "etl"
+]
 classifiers = [
-    "Development Status :: 3 - Alpha",
+    "Development Status :: 4 - Beta",
     "Intended Audience :: Developers",
     "License :: OSI Approved :: MIT License",
     "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Topic :: System :: Distributed Computing",
 ]
 
 dependencies = [
-    "fastapi>=0.104.0",
-    "uvicorn[standard]>=0.24.0",
-    "pydantic>=2.5.0",
-    "pydantic-settings>=2.1.0",
-    "click>=8.1.0",
-    "jinja2>=3.1.0",
+    "pydantic>=2.0.0",
+    "pydantic-settings>=2.0.0",
     "pyyaml>=6.0",
-    "gitpython>=3.1.40",
     "aiohttp>=3.9.0",
+    "asyncio>=3.4.3",
+    "click>=8.1.0",
+    "rich>=13.0.0",
     "httpx>=0.25.0",
-    "python-multipart>=0.0.6",
-    "websockets>=12.0",
-    "python-jose[cryptography]>=3.3.0",
-    "passlib[bcrypt]>=1.7.4",
+    "tenacity>=8.2.0",
     "python-dotenv>=1.0.0",
-    "rich>=13.7.0",
-    "typer>=0.9.0",
+    "sqlalchemy>=2.0.0",
+    "alembic>=1.12.0",
+    "redis>=5.0.0",
+    "celery>=5.3.0",
+    "structlog>=23.0.0",
+    "prometheus-client>=0.19.0",
 ]
 
 [project.optional-dependencies]
@@ -49,46 +57,106 @@ dev = [
     "pytest>=7.4.0",
     "pytest-asyncio>=0.21.0",
     "pytest-cov>=4.1.0",
-    "black>=23.12.0",
-    "ruff>=0.1.0",
+    "pytest-mock>=3.12.0",
     "mypy>=1.7.0",
+    "ruff>=0.1.0",
+    "black>=23.0.0",
+    "isort>=5.12.0",
     "pre-commit>=3.5.0",
+]
+vision = [
+    "pillow>=10.0.0",
+    "opencv-python>=4.8.0",
+    "pytesseract>=0.3.10",
+    "transformers>=4.35.0",
+    "torch>=2.1.0",
+]
+builder = [
+    "docker>=6.1.0",
+    "kubernetes>=28.0.0",
+    "ansible>=8.0.0",
+]
+docs = [
+    "mkdocs>=1.5.0",
+    "mkdocs-material>=9.4.0",
+    "mkdocstrings[python]>=0.24.0",
+]
+etl = [
+    "scrapy>=2.11.0",
+    "beautifulsoup4>=4.12.0",
+    "selenium>=4.15.0",
+    "pandas>=2.1.0",
+    "apache-airflow>=2.7.0",
+]
+cloud = [
+    "google-cloud-storage>=2.10.0",
+    "google-cloud-functions>=1.13.0",
+    "boto3>=1.29.0",
+]
+github = [
+    "pygithub>=2.1.0",
+    "githubkit>=0.11.0",
 ]
 
 [project.scripts]
-infinity-builder = "infinity_matrix.cli:app"
+infinity-matrix = "infinity_matrix.cli:main"
 
 [project.urls]
-Homepage = "https://infinityxai.com"
+Homepage = "https://github.com/InfinityXOneSystems/infinity-matrix"
+Documentation = "https://infinityxonesystems.github.io/infinity-matrix/"
 Repository = "https://github.com/InfinityXOneSystems/infinity-matrix"
-Documentation = "https://github.com/InfinityXOneSystems/infinity-matrix/wiki"
+Issues = "https://github.com/InfinityXOneSystems/infinity-matrix/issues"
 
 [tool.setuptools.packages.find]
-where = ["."]
+where = ["src"]
 include = ["infinity_matrix*"]
-exclude = ["tests*"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
-python_files = ["test_*.py"]
+python_files = ["test_*.py", "*_test.py"]
 python_classes = ["Test*"]
 python_functions = ["test_*"]
+addopts = "-v --cov=infinity_matrix --cov-report=html --cov-report=term-missing"
 asyncio_mode = "auto"
-addopts = "-v --cov=infinity_matrix --cov-report=term-missing"
-
-[tool.black]
-line-length = 100
-target-version = ["py39", "py310", "py311", "py312"]
-include = '\.pyi?$'
-
-[tool.ruff]
-line-length = 100
-target-version = "py39"
-select = ["E", "F", "I", "N", "W", "UP"]
-ignore = ["E501"]
 
 [tool.mypy]
-python_version = "3.9"
+python_version = "3.10"
 warn_return_any = true
 warn_unused_configs = true
 disallow_untyped_defs = true
+disallow_incomplete_defs = true
+check_untyped_defs = true
+strict_optional = true
+warn_redundant_casts = true
+warn_unused_ignores = true
+warn_no_return = true
+
+[tool.ruff]
+target-version = "py310"
+line-length = 100
+select = [
+    "E",  # pycodestyle errors
+    "W",  # pycodestyle warnings
+    "F",  # pyflakes
+    "I",  # isort
+    "B",  # flake8-bugbear
+    "C4",  # flake8-comprehensions
+    "UP",  # pyupgrade
+]
+ignore = [
+    "E501",  # line too long, handled by black
+    "B008",  # do not perform function calls in argument defaults
+]
+
+[tool.ruff.per-file-ignores]
+"__init__.py" = ["F401"]
+
+[tool.black]
+line-length = 100
+target-version = ['py310', 'py311', 'py312']
+include = '\.pyi?$'
+
+[tool.isort]
+profile = "black"
+line_length = 100
+multi_line_output = 3
