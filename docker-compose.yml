@@ -1,0 +1,101 @@
+version: '3.8'
+
+services:
+  vision-cortex:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: infinity-matrix-vision-cortex
+    ports:
+      - "8000:8000"
+    environment:
+      - ENVIRONMENT=development
+      - LOG_LEVEL=INFO
+      - REDIS_URL=redis://redis:6379/0
+    env_file:
+      - .env
+    volumes:
+      - ./data:/app/data
+      - ./ai_stack:/app/ai_stack
+      - ./gateway_stack:/app/gateway_stack
+    depends_on:
+      - redis
+    restart: unless-stopped
+    networks:
+      - infinity-network
+
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: infinity-matrix-api
+    command: uvicorn gateway_stack.api.main:app --host 0.0.0.0 --port 8000 --reload
+    ports:
+      - "8001:8000"
+    environment:
+      - ENVIRONMENT=development
+      - LOG_LEVEL=DEBUG
+      - REDIS_URL=redis://redis:6379/0
+    env_file:
+      - .env
+    volumes:
+      - ./gateway_stack:/app/gateway_stack
+      - ./data:/app/data
+    depends_on:
+      - redis
+    restart: unless-stopped
+    networks:
+      - infinity-network
+
+  redis:
+    image: redis:7-alpine
+    container_name: infinity-matrix-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    restart: unless-stopped
+    networks:
+      - infinity-network
+
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: infinity-matrix-prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./monitoring/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus-data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+    restart: unless-stopped
+    networks:
+      - infinity-network
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: infinity-matrix-grafana
+    ports:
+      - "3001:3000"
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+      - GF_USERS_ALLOW_SIGN_UP=false
+    volumes:
+      - ./monitoring/grafana/dashboards:/etc/grafana/provisioning/dashboards
+      - ./monitoring/grafana/datasources:/etc/grafana/provisioning/datasources
+      - grafana-data:/var/lib/grafana
+    depends_on:
+      - prometheus
+    restart: unless-stopped
+    networks:
+      - infinity-network
+
+volumes:
+  redis-data:
+  prometheus-data:
+  grafana-data:
+
+networks:
+  infinity-network:
+    driver: bridge
