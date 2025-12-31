@@ -1,275 +1,134 @@
-# Infinity Matrix - Automated PR System
+# Infinity Matrix
 
-![Auto-Fix](https://img.shields.io/badge/auto--fix-enabled-brightgreen)
-![Auto-Resolve](https://img.shields.io/badge/auto--resolve-enabled-blue)
-![Auto-Merge](https://img.shields.io/badge/auto--merge-enabled-purple)
+[![Documentation](https://img.shields.io/badge/docs-latest-blue.svg)](docs/)
+[![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
+[![Status](https://img.shields.io/badge/status-active-success.svg)]()
 
-An intelligent GitHub automation system that automatically fixes, resolves, and merges pull requests.
+> Enterprise-grade distributed system with comprehensive documentation, automated workflows, and operational excellence.
 
-## 🚀 Features
+## 📚 Documentation Portal
 
-### 1. Auto-Fix (`auto-fix.yml`)
-Automatically fixes common code issues in pull requests:
-- **Code Formatting**: Applies Black formatter to Python code
-- **Import Sorting**: Organizes imports with isort
-- **Style Fixes**: Applies autopep8 for PEP 8 compliance
-- **Whitespace Cleanup**: Removes trailing whitespace
-- **Line Endings**: Normalizes line endings
+Welcome to the Infinity Matrix documentation hub. This portal provides comprehensive access to all system documentation, operational guides, and proof artifacts.
 
-**Triggers**: Runs on PR open, synchronize, or reopened events
+### 🏗️ Architecture & Design
 
-### 2. Auto-Resolve (`auto-resolve.yml`)
-Automatically resolves merge conflicts and validates PRs:
-- **Conflict Detection**: Identifies merge conflicts with base branch
-- **Smart Resolution**: Attempts automatic conflict resolution
-- **Validation**: Runs checks after resolution
-- **Status Monitoring**: Tracks PR status and checks
-- **Labeling**: Adds `ready-to-merge` label when PR is ready
+- [**Architecture Overview**](docs/architecture/README.md) - System architecture, design patterns, and component relationships
+- [**System Manifest**](docs/architecture/MANIFEST.md) - Complete technical inventory and system roadmap
+- [**Design Decisions**](docs/architecture/DECISIONS.md) - Architectural decision records (ADRs)
 
-**Triggers**: Runs on PR open, synchronize, or reopened events
+### 🚀 Getting Started
 
-### 3. Auto-Merge (`auto-merge.yml`)
-Automatically merges PRs when all criteria are met:
-- **Criteria Checking**: Validates merge requirements
-- **Status Verification**: Ensures all checks pass
-- **Review Validation**: Checks for approvals and requested changes
-- **Conflict Prevention**: Verifies PR is mergeable
-- **Safe Merging**: Only merges when all conditions are satisfied
+- [**Quick Start Guide**](docs/guides/QUICK_START.md) - Get up and running in minutes
+- [**Onboarding**](docs/guides/ONBOARDING.md) - Complete onboarding guide for new team members
+- [**Setup Instructions**](docs/guides/SETUP.md) - Detailed environment setup and configuration
 
-**Triggers**: Runs on PR events, reviews, check completions, or manually
+### 👥 User & Administrator Guides
 
-## 📋 Merge Criteria
+- [**User Manual**](docs/guides/USER_MANUAL.md) - End-user documentation and workflows
+- [**Administrator Manual**](docs/guides/ADMIN_MANUAL.md) - System administration and management
+- [**Agent Workflows**](docs/agents/WORKFLOWS.md) - Complete agent orchestration guides
+- [**Error Handling & Auto-Healing**](docs/guides/ERROR_HANDLING.md) - Troubleshooting and recovery procedures
 
-A PR will be automatically merged when:
-- ✅ All status checks pass
-- ✅ No merge conflicts exist
-- ✅ PR is not in draft mode
-- ✅ No blocking labels (`do-not-merge`, `wip`, `work-in-progress`, `needs-review`)
-- ✅ No changes requested in reviews
-- ✅ All required checks complete
+### 🤖 Agent Registry
 
-## 🔧 Configuration
+- [**Agent Registry**](docs/agents/REGISTRY.md) - Complete catalog of available agents
+- [**Agent Invocation Guide**](docs/agents/INVOCATION.md) - Sample invocations and usage patterns
+- [**Agent Development**](docs/agents/DEVELOPMENT.md) - Guide for creating custom agents
 
-### Workflow Permissions
-All workflows require:
-```yaml
-permissions:
-  contents: write
-  pull-requests: write
-  checks: read
-```
+### 📖 API Documentation
 
-### Merge Method
-By default, PRs are merged using the **squash** method. To change this, edit `.github/workflows/auto-merge.yml`:
+- [**API Overview**](docs/api/README.md) - API documentation hub
+- [**Python API Reference**](docs/api/python/) - Auto-generated Python API documentation
+- [**TypeScript API Reference**](docs/api/typescript/) - Auto-generated TypeScript API documentation
+- [**REST API Documentation**](docs/api/REST_API.md) - REST endpoints and specifications
 
-```yaml
-merge_method: 'squash'  # Options: 'merge', 'squash', 'rebase'
-```
+### 🛠️ Operations & Runbooks
 
-### Blocking Labels
-To prevent auto-merge, add any of these labels to your PR:
-- `do-not-merge`
-- `wip`
-- `work-in-progress`
-- `needs-review`
+- [**Operational Runbooks**](docs/runbooks/README.md) - Step-by-step operational procedures
+- [**Deployment Runbook**](docs/runbooks/DEPLOYMENT.md) - Deployment procedures and rollback
+- [**Monitoring & Alerting**](docs/runbooks/MONITORING.md) - System monitoring and alert response
+- [**Incident Response**](docs/runbooks/INCIDENT_RESPONSE.md) - Incident management procedures
+- [**SOPs**](docs/runbooks/SOPS.md) - Standard Operating Procedures
 
-## 🛠️ Setup Instructions
+### 📋 Compliance & Audit
 
-1. **Enable GitHub Actions**
-   - Go to your repository settings
-   - Navigate to Actions → General
-   - Enable "Allow all actions and reusable workflows"
+- [**Compliance Overview**](docs/compliance/README.md) - Compliance framework and requirements
+- [**Audit Trail Templates**](docs/compliance/AUDIT_TRAIL.md) - Audit logging and trail management
+- [**Compliance Checklists**](docs/compliance/CHECKLISTS.md) - Regulatory compliance verification
+- [**Security Standards**](docs/compliance/SECURITY.md) - Security policies and standards
 
-2. **Configure Branch Protection** (Optional but Recommended)
-   - Go to Settings → Branches
-   - Add rules for your main branch:
-     - Require pull request reviews before merging
-     - Require status checks to pass before merging
-     - Require conversation resolution before merging
+### 🔍 Proof & Demo Artifacts
 
-3. **Set Up Secrets** (if needed)
-   - The workflows use `GITHUB_TOKEN` which is automatically provided
-   - No additional secrets are required for basic functionality
+Our commitment to operational excellence includes verifiable proof of all functionality:
 
-## 📝 Usage
+- [**Demo Workflows**](.prooftest/demos/) - Live demonstrations of system capabilities
+- [**Status Dashboard**](.prooftest/DASHBOARD.md) - Real-time system status and metrics
+- [**Execution Logs**](.prooftest/logs/) - Complete audit trail of workflow executions
+- [**Proof Artifacts**](.prooftest/README.md) - Exportable proof of operational status
 
-### For Pull Request Authors
+#### Export Capabilities
 
-1. **Create a Pull Request**
-   - Open a PR as usual
-   - The auto-fix workflow will automatically run and fix formatting issues
-   - Auto-resolve will check for conflicts and attempt to resolve them
+All proof artifacts can be exported in multiple formats:
+- 📄 **Markdown** - Human-readable documentation format
+- 📊 **PDF** - Professional reports for stakeholders
+- 📈 **CSV** - Data analysis and audit compliance
 
-2. **Monitor Automation**
-   - Check PR comments for automation status
-   - Review auto-fix commits if any were made
-   - Ensure all checks pass
+Export scripts available in [`.prooftest/exports/`](.prooftest/exports/)
 
-3. **Prevent Auto-Merge** (if needed)
-   - Mark PR as draft, OR
-   - Add a blocking label (`do-not-merge`, `wip`, etc.)
+### 📊 Reports & Tracking
 
-### For Repository Maintainers
+- [**Changelogs**](docs/reports/CHANGELOG.md) - Complete version history and changes
+- [**Feature Roadmap**](docs/reports/ROADMAP.md) - Planned features and development timeline
+- [**Feature Gap Analysis**](docs/reports/FEATURE_GAPS.md) - Known limitations and planned improvements
+- [**Audit Reports**](docs/reports/AUDIT.md) - System audit reports and compliance status
 
-1. **Review Automated Changes**
-   - Auto-fix commits are clearly labeled
-   - Review the changes before merging (if auto-merge is not desired)
+## 🔄 Documentation Updates
 
-2. **Customize Workflows**
-   - Edit workflow files in `.github/workflows/`
-   - Adjust merge criteria in `auto-merge.yml`
-   - Modify fix tools in `auto-fix.yml`
+Our documentation system is fully automated:
 
-3. **Monitor Workflow Runs**
-   - Check Actions tab for workflow status
-   - Review logs for any issues
-   - Adjust configurations as needed
+- ✅ **Auto-generated API docs** - Updates on every commit
+- ✅ **CI/CD Integration** - Automated builds and deployments
+- ✅ **Version Control** - Full history tracking
+- ✅ **Quality Assurance** - Automated validation and testing
 
-## 🔍 Workflow Details
+See [Documentation Automation](.github/workflows/docs.yml) for details.
 
-### Auto-Fix Workflow
-```yaml
-Trigger: pull_request [opened, synchronize, reopened]
-Steps:
-  1. Checkout code
-  2. Setup Python environment
-  3. Install formatting tools
-  4. Run Black formatter
-  5. Run isort
-  6. Run autopep8
-  7. Fix whitespace and line endings
-  8. Commit and push fixes (if any)
-  9. Comment on PR
-```
+## 🎯 Quick Navigation
 
-### Auto-Resolve Workflow
-```yaml
-Trigger: pull_request [opened, synchronize, reopened]
-Steps:
-  1. Checkout code
-  2. Fetch base branch
-  3. Check for conflicts
-  4. Attempt automatic resolution
-  5. Run validation checks
-  6. Add ready-to-merge label
-  7. Comment on PR with results
-```
-
-### Auto-Merge Workflow
-```yaml
-Trigger: pull_request, pull_request_review, check_suite, workflow_dispatch
-Steps:
-  1. Get PR details
-  2. Check merge criteria:
-     - PR state and draft status
-     - Merge conflicts
-     - Blocking labels
-     - Status checks
-     - Reviews
-  3. Merge PR (if criteria met)
-  4. Comment on PR with results
-```
-
-## ⚙️ Advanced Configuration
-
-### Custom Validation Checks
-Add your project-specific checks to `auto-resolve.yml`:
-
-```yaml
-- name: Run validation checks
-  run: |
-    # Python tests
-    pytest tests/
-    
-    # JavaScript tests
-    npm test
-    
-    # Linting
-    flake8 .
-    
-    # Type checking
-    mypy .
-```
-
-### Customize Auto-Fix Tools
-Modify `auto-fix.yml` to add or remove formatting tools:
-
-```yaml
-- name: Run additional formatter
-  run: |
-    # Add your custom formatting commands
-    prettier --write "**/*.js"
-    eslint --fix "**/*.js"
-```
-
-### Change Merge Strategy
-In `auto-merge.yml`, modify the merge method:
-
-```yaml
-merge_method: 'merge'    # Standard merge commit
-merge_method: 'squash'   # Squash and merge (default)
-merge_method: 'rebase'   # Rebase and merge
-```
-
-## 🚦 Status Indicators
-
-The workflows will comment on PRs with status indicators:
-- ✅ Success: Action completed successfully
-- ⚠️ Warning: Action completed with warnings or unable to complete
-- ❌ Error: Action failed
-
-## 🔒 Security Considerations
-
-1. **Token Permissions**: Workflows use `GITHUB_TOKEN` with minimal required permissions
-2. **Branch Protection**: Enable branch protection rules to prevent unwanted merges
-3. **Review Requirements**: Configure required approvals for sensitive repositories
-4. **Workflow Approval**: Consider requiring approval for workflows from first-time contributors
-
-## 📊 Monitoring and Debugging
-
-### View Workflow Runs
-1. Go to the "Actions" tab in your repository
-2. Select the workflow you want to inspect
-3. Click on a specific run to view logs
-
-### Common Issues
-
-**Auto-fix not running**
-- Verify GitHub Actions are enabled
-- Check workflow file syntax
-- Ensure Python files exist in the repository
-
-**Auto-merge not working**
-- Check merge criteria are met
-- Verify no blocking labels are present
-- Ensure all status checks pass
-- Review branch protection rules
-
-**Conflicts not resolving**
-- Complex conflicts may require manual resolution
-- Check auto-resolve comments for details
-- Review merge strategy settings
+| Need to... | Go to... |
+|------------|----------|
+| Start using the system | [Quick Start Guide](docs/guides/QUICK_START.md) |
+| Understand architecture | [Architecture Overview](docs/architecture/README.md) |
+| Find an agent | [Agent Registry](docs/agents/REGISTRY.md) |
+| Troubleshoot issues | [Error Handling Guide](docs/guides/ERROR_HANDLING.md) |
+| Deploy to production | [Deployment Runbook](docs/runbooks/DEPLOYMENT.md) |
+| Check compliance | [Compliance Checklists](docs/compliance/CHECKLISTS.md) |
+| View system status | [Status Dashboard](.prooftest/DASHBOARD.md) |
+| Export audit logs | [Export Scripts](.prooftest/exports/) |
 
 ## 🤝 Contributing
 
-To improve these workflows:
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Test with a pull request
-5. Submit your improvements
+We maintain high documentation standards. See our [Contribution Guidelines](docs/CONTRIBUTING.md) for how to:
+
+- Submit documentation improvements
+- Report issues or gaps
+- Propose new features
+- Review documentation changes
+
+## 📞 Support
+
+- **Documentation Issues**: [File an issue](https://github.com/InfinityXOneSystems/infinity-matrix/issues)
+- **Operational Support**: See [Support Guide](docs/guides/SUPPORT.md)
+- **Emergency Response**: See [Incident Response Runbook](docs/runbooks/INCIDENT_RESPONSE.md)
 
 ## 📄 License
 
-This automation system is part of the infinity-matrix project.
-
-## 🆘 Support
-
-For issues or questions:
-- Open an issue in the repository
-- Check workflow logs in the Actions tab
-- Review GitHub Actions documentation
+This project and its documentation are licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 ---
 
-**Note**: These workflows are designed to be safe and conservative. They will never force-merge a PR that doesn't meet the criteria or has active concerns from reviewers.
+**Documentation Version**: 1.0.0  
+**Last Updated**: 2025-12-31  
+**Status**: ✅ Active Development
+
+*All features are backed by operational proof and exported artifacts. No feature is marked complete until verified.*
