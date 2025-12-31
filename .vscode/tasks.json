@@ -1,0 +1,99 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Setup: Install Dependencies",
+      "type": "shell",
+      "command": "pip install -r requirements.txt",
+      "problemMatcher": [],
+      "group": "build"
+    },
+    {
+      "label": "Setup: Run System Audit",
+      "type": "shell",
+      "command": "python scripts/setup/system_auditor.py",
+      "problemMatcher": [],
+      "group": "build"
+    },
+    {
+      "label": "Start: Vision Cortex",
+      "type": "shell",
+      "command": "python ai_stack/vision_cortex/vision_cortex.py",
+      "problemMatcher": [],
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      }
+    },
+    {
+      "label": "Start: API Server",
+      "type": "shell",
+      "command": "uvicorn gateway_stack.api.main:app --reload --host 0.0.0.0 --port 8000",
+      "problemMatcher": [],
+      "group": "build"
+    },
+    {
+      "label": "Test: Run All Tests",
+      "type": "shell",
+      "command": "pytest tests/ -v --cov=. --cov-report=html",
+      "problemMatcher": [],
+      "group": "test"
+    },
+    {
+      "label": "Test: Run Specific Test",
+      "type": "shell",
+      "command": "pytest ${file} -v",
+      "problemMatcher": [],
+      "group": "test"
+    },
+    {
+      "label": "Lint: Black",
+      "type": "shell",
+      "command": "black .",
+      "problemMatcher": [],
+      "group": "build"
+    },
+    {
+      "label": "Lint: Flake8",
+      "type": "shell",
+      "command": "flake8 .",
+      "problemMatcher": [],
+      "group": "build"
+    },
+    {
+      "label": "Lint: MyPy",
+      "type": "shell",
+      "command": "mypy .",
+      "problemMatcher": [],
+      "group": "build"
+    },
+    {
+      "label": "Docker: Build",
+      "type": "shell",
+      "command": "docker-compose build",
+      "problemMatcher": [],
+      "group": "build"
+    },
+    {
+      "label": "Docker: Up",
+      "type": "shell",
+      "command": "docker-compose up -d",
+      "problemMatcher": [],
+      "group": "build"
+    },
+    {
+      "label": "Docker: Down",
+      "type": "shell",
+      "command": "docker-compose down",
+      "problemMatcher": [],
+      "group": "build"
+    },
+    {
+      "label": "Deploy: GCP",
+      "type": "shell",
+      "command": "bash scripts/deploy/deploy_gcp.sh",
+      "problemMatcher": [],
+      "group": "build"
+    }
+  ]
+}

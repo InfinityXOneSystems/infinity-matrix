@@ -1,0 +1,31 @@
+id: energy
+name: Energy & Utilities
+type: energy
+description: Energy management, renewable energy, smart grid, utilities, sustainability
+keywords:
+  - energy
+  - renewable energy
+  - solar
+  - wind
+  - utilities
+  - smart grid
+  - energy storage
+  - sustainability
+  - power generation
+  - energy efficiency
+priority: 8
+enabled: true
+
+seeds:
+  - url: https://github.com/openenergymonitor
+    source_id: github_energy
+    priority: 8
+    depth: 2
+  - url: https://github.com/pypsa/pypsa
+    source_id: github_energy
+    priority: 7
+    depth: 2
+  - url: https://github.com/gridium
+    source_id: github_energy
+    priority: 7
+    depth: 2

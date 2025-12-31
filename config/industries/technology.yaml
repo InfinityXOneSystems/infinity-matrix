@@ -1,0 +1,51 @@
+id: technology
+name: Technology & Software
+type: technology
+description: Software development, cloud computing, AI/ML, SaaS, developer tools, and technology platforms
+keywords:
+  - software
+  - cloud
+  - artificial intelligence
+  - machine learning
+  - SaaS
+  - developer tools
+  - API
+  - open source
+  - programming
+  - infrastructure
+priority: 10
+enabled: true
+
+seeds:
+  - url: https://github.com/tensorflow/tensorflow
+    source_id: github_tech
+    priority: 10
+    depth: 2
+  - url: https://github.com/openai
+    source_id: github_tech
+    priority: 10
+    depth: 2
+  - url: https://github.com/microsoft/vscode
+    source_id: github_tech
+    priority: 9
+    depth: 2
+  - url: https://github.com/kubernetes/kubernetes
+    source_id: github_tech
+    priority: 9
+    depth: 2
+  - url: https://github.com/pytorch/pytorch
+    source_id: github_tech
+    priority: 9
+    depth: 2
+  - url: https://github.com/facebook/react
+    source_id: github_tech
+    priority: 9
+    depth: 2
+  - url: https://github.com/vercel/next.js
+    source_id: github_tech
+    priority: 8
+    depth: 2
+  - url: https://github.com/rust-lang/rust
+    source_id: github_tech
+    priority: 8
+    depth: 2

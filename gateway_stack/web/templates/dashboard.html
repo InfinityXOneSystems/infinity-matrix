@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Infinity-Matrix Admin Dashboard</title>
+    <link rel="stylesheet" href="/static/css/dashboard.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🌌 Infinity-Matrix Autonomous System</h1>
+            <div class="status-badge" id="system-status">
+                <span class="indicator"></span>
+                <span>System Operational</span>
+            </div>
+        </header>
+
+        <nav>
+            <ul>
+                <li><a href="/" class="active">Dashboard</a></li>
+                <li><a href="/agents">Agents</a></li>
+                <li><a href="/events">Events</a></li>
+                <li><a href="/metrics">Metrics</a></li>
+                <li><a href="/docs">Documentation</a></li>
+                <li><a href="/console">Console</a></li>
+            </ul>
+        </nav>
+
+        <main>
+            <section class="overview">
+                <div class="card">
+                    <h3>System Health</h3>
+                    <div class="metric">
+                        <span class="value">98.5%</span>
+                        <span class="label">Uptime</span>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3>Active Agents</h3>
+                    <div class="metric">
+                        <span class="value" id="active-agents">8</span>
+                        <span class="label">Running</span>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3>Executions Today</h3>
+                    <div class="metric">
+                        <span class="value" id="executions">1,234</span>
+                        <span class="label">Tasks</span>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3>Success Rate</h3>
+                    <div class="metric">
+                        <span class="value">99.2%</span>
+                        <span class="label">All Agents</span>
+                    </div>
+                </div>
+            </section>
+
+            <section class="agents">
+                <h2>Agent Status</h2>
+                <div class="agent-grid" id="agent-grid">
+                    <div class="agent-card">
+                        <div class="agent-header">
+                            <h4>Crawler</h4>
+                            <span class="status idle">Idle</span>
+                        </div>
+                        <p class="agent-type">Data Collection</p>
+                        <div class="agent-stats">
+                            <span>Executions: 156</span>
+                            <span>Success: 98%</span>
+                        </div>
+                    </div>
+
+                    <div class="agent-card">
+                        <div class="agent-header">
+                            <h4>Ingestion</h4>
+                            <span class="status idle">Idle</span>
+                        </div>
+                        <p class="agent-type">Data Processing</p>
+                        <div class="agent-stats">
+                            <span>Executions: 142</span>
+                            <span>Success: 99%</span>
+                        </div>
+                    </div>
+
+                    <div class="agent-card">
+                        <div class="agent-header">
+                            <h4>Predictor</h4>
+                            <span class="status running">Running</span>
+                        </div>
+                        <p class="agent-type">Analytics</p>
+                        <div class="agent-stats">
+                            <span>Executions: 89</span>
+                            <span>Success: 97%</span>
+                        </div>
+                    </div>
+
+                    <div class="agent-card">
+                        <div class="agent-header">
+                            <h4>CEO</h4>
+                            <span class="status idle">Idle</span>
+                        </div>
+                        <p class="agent-type">Executive</p>
+                        <div class="agent-stats">
+                            <span>Decisions: 34</span>
+                            <span>Approved: 100%</span>
+                        </div>
+                    </div>
+
+                    <div class="agent-card">
+                        <div class="agent-header">
+                            <h4>Strategist</h4>
+                            <span class="status idle">Idle</span>
+                        </div>
+                        <p class="agent-type">Planning</p>
+                        <div class="agent-stats">
+                            <span>Plans: 28</span>
+                            <span>Success: 96%</span>
+                        </div>
+                    </div>
+
+                    <div class="agent-card">
+                        <div class="agent-header">
+                            <h4>Organizer</h4>
+                            <span class="status idle">Idle</span>
+                        </div>
+                        <p class="agent-type">Task Management</p>
+                        <div class="agent-stats">
+                            <span>Tasks: 456</span>
+                            <span>Completed: 94%</span>
+                        </div>
+                    </div>
+
+                    <div class="agent-card">
+                        <div class="agent-header">
+                            <h4>Validator</h4>
+                            <span class="status idle">Idle</span>
+                        </div>
+                        <p class="agent-type">Quality Assurance</p>
+                        <div class="agent-stats">
+                            <span>Validations: 234</span>
+                            <span>Pass: 92%</span>
+                        </div>
+                    </div>
+
+                    <div class="agent-card">
+                        <div class="agent-header">
+                            <h4>Documentor</h4>
+                            <span class="status running">Running</span>
+                        </div>
+                        <p class="agent-type">Documentation</p>
+                        <div class="agent-stats">
+                            <span>Docs: 178</span>
+                            <span>Updated: 100%</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="recent-events">
+                <h2>Recent Events</h2>
+                <div class="events-list" id="events-list">
+                    <div class="event">
+                        <span class="event-time">2 minutes ago</span>
+                        <span class="event-type">system</span>
+                        <span class="event-message">System health check completed successfully</span>
+                    </div>
+                    <div class="event">
+                        <span class="event-time">15 minutes ago</span>
+                        <span class="event-type">agent</span>
+                        <span class="event-message">Predictor agent completed analysis task</span>
+                    </div>
+                    <div class="event">
+                        <span class="event-time">1 hour ago</span>
+                        <span class="event-type">decision</span>
+                        <span class="event-message">CEO agent approved strategic plan</span>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <footer>
+            <p>&copy; 2024 InfinityXOne Systems. All rights reserved.</p>
+            <p>Version 1.0.0 | <a href="/docs">Documentation</a> | <a href="/api/v1/docs">API</a></p>
+        </footer>
+    </div>
+
+    <script src="/static/js/dashboard.js"></script>
+</body>
+</html>
