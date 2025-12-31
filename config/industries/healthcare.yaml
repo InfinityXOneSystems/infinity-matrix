@@ -1,0 +1,31 @@
+id: healthcare
+name: Healthcare & Pharmaceuticals
+type: healthcare
+description: Healthcare technology, medical devices, pharmaceuticals, telemedicine, health informatics
+keywords:
+  - healthcare
+  - medical
+  - pharmaceuticals
+  - telemedicine
+  - health informatics
+  - medical devices
+  - clinical research
+  - biotech
+  - diagnostics
+  - patient care
+priority: 9
+enabled: true
+
+seeds:
+  - url: https://github.com/smart-on-fhir
+    source_id: github_healthcare
+    priority: 9
+    depth: 2
+  - url: https://github.com/openmrs/openmrs-core
+    source_id: github_healthcare
+    priority: 8
+    depth: 2
+  - url: https://github.com/projectcalico
+    source_id: github_healthcare
+    priority: 7
+    depth: 2

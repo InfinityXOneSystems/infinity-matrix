@@ -1,0 +1,250 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Vision Cortex Document Schema",
+  "description": "Standard schema for Vision Cortex workflow documentation",
+  "type": "object",
+  "properties": {
+    "timestamp": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO 8601 timestamp of workflow execution",
+      "example": "2025-12-30T21:00:00Z"
+    },
+    "workflow_id": {
+      "type": "string",
+      "description": "Unique identifier for the workflow run",
+      "example": "vision_cortex_run_20251230"
+    },
+    "agents": {
+      "type": "array",
+      "description": "List of agents involved in the workflow",
+      "items": {
+        "type": "string",
+        "enum": [
+          "crawler",
+          "ingestion",
+          "predictor",
+          "ceo",
+          "strategist",
+          "organizer",
+          "validator",
+          "documentor"
+        ]
+      },
+      "default": [
+        "crawler",
+        "ingestion",
+        "predictor",
+        "ceo",
+        "strategist",
+        "organizer",
+        "validator",
+        "documentor"
+      ]
+    },
+    "input": {
+      "type": "object",
+      "description": "Input parameters for the workflow",
+      "properties": {
+        "signal": {
+          "type": "string",
+          "description": "Input signal to guide workflow execution"
+        },
+        "config": {
+          "type": "object",
+          "description": "Agent configuration overrides"
+        },
+        "mode": {
+          "type": "string",
+          "enum": ["full", "analysis", "dry-run"],
+          "description": "Execution mode"
+        }
+      }
+    },
+    "output": {
+      "type": "object",
+      "description": "Workflow execution results",
+      "properties": {
+        "status": {
+          "type": "string",
+          "enum": ["completed", "failed", "partial"],
+          "description": "Overall workflow status"
+        },
+        "stages": {
+          "type": "object",
+          "description": "Results from each agent stage",
+          "properties": {
+            "crawler": {
+              "$ref": "#/definitions/stageResult"
+            },
+            "ingestion": {
+              "$ref": "#/definitions/stageResult"
+            },
+            "predictor": {
+              "$ref": "#/definitions/stageResult"
+            },
+            "ceo": {
+              "$ref": "#/definitions/stageResult"
+            },
+            "strategist": {
+              "$ref": "#/definitions/stageResult"
+            },
+            "organizer": {
+              "$ref": "#/definitions/stageResult"
+            },
+            "validator": {
+              "$ref": "#/definitions/stageResult"
+            },
+            "documentor": {
+              "$ref": "#/definitions/stageResult"
+            }
+          }
+        },
+        "documentation": {
+          "type": "object",
+          "description": "Generated documentation artifacts",
+          "properties": {
+            "paths": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "description": "File paths of generated documents"
+            },
+            "formats": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": ["markdown", "json", "html", "pdf"]
+              }
+            }
+          }
+        },
+        "metrics": {
+          "type": "object",
+          "description": "Execution metrics",
+          "properties": {
+            "duration_seconds": {
+              "type": "number",
+              "description": "Total execution time"
+            },
+            "quality_score": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1,
+              "description": "Overall quality score"
+            },
+            "agents_completed": {
+              "type": "integer",
+              "description": "Number of agents successfully completed"
+            }
+          }
+        }
+      },
+      "required": ["status", "stages"]
+    },
+    "metadata": {
+      "type": "object",
+      "description": "Additional metadata about the workflow",
+      "properties": {
+        "version": {
+          "type": "string",
+          "description": "Vision Cortex version"
+        },
+        "environment": {
+          "type": "string",
+          "enum": ["development", "staging", "production"],
+          "description": "Execution environment"
+        },
+        "triggered_by": {
+          "type": "string",
+          "description": "User or system that triggered the workflow"
+        }
+      }
+    }
+  },
+  "required": ["timestamp", "workflow_id", "agents", "output"],
+  "definitions": {
+    "stageResult": {
+      "type": "object",
+      "properties": {
+        "status": {
+          "type": "string",
+          "enum": ["completed", "failed", "skipped"],
+          "description": "Stage execution status"
+        },
+        "output": {
+          "type": "object",
+          "description": "Stage-specific output data"
+        },
+        "duration_seconds": {
+          "type": "number",
+          "description": "Stage execution time"
+        },
+        "error": {
+          "type": "string",
+          "description": "Error message if stage failed"
+        }
+      },
+      "required": ["status"]
+    }
+  },
+  "examples": [
+    {
+      "timestamp": "2025-12-30T21:00:00Z",
+      "workflow_id": "vision_cortex_genesis_001",
+      "agents": [
+        "crawler",
+        "ingestion",
+        "predictor",
+        "ceo",
+        "strategist",
+        "organizer",
+        "validator",
+        "documentor"
+      ],
+      "input": {
+        "signal": "market_analysis",
+        "mode": "full"
+      },
+      "output": {
+        "status": "completed",
+        "stages": {
+          "crawler": {
+            "status": "completed",
+            "output": {
+              "sources_crawled": 15,
+              "data_items": 250
+            },
+            "duration_seconds": 12.5
+          },
+          "documentor": {
+            "status": "completed",
+            "output": {
+              "documents_generated": 3
+            },
+            "duration_seconds": 2.1
+          }
+        },
+        "documentation": {
+          "paths": [
+            "docs/output/auto_generated_doc.md",
+            "docs/output/summary_report.md",
+            "docs/output/metadata.json"
+          ],
+          "formats": ["markdown", "json"]
+        },
+        "metrics": {
+          "duration_seconds": 45.8,
+          "quality_score": 0.92,
+          "agents_completed": 8
+        }
+      },
+      "metadata": {
+        "version": "1.0.0",
+        "environment": "production",
+        "triggered_by": "github_actions"
+      }
+    }
+  ]
+}

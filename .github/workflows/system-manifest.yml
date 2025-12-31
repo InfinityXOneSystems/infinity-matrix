@@ -1,0 +1,74 @@
+name: System Manifest Update
+
+on:
+  schedule:
+    - cron: '0 0 * * *'  # Daily at midnight UTC
+  workflow_dispatch:
+    inputs:
+      sync_to_cloud:
+        description: 'Sync manifest to cloud storage'
+        required: false
+        default: 'true'
+
+jobs:
+  generate-manifest:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      
+      - name: Generate System Manifest
+        run: |
+          chmod +x scripts/generate_manifest.sh
+          ./scripts/generate_manifest.sh
+      
+      - name: Display Manifest Summary
+        run: |
+          if command -v jq &> /dev/null; then
+            echo "## System Manifest Summary"
+            echo "Hostname: $(jq -r '.metadata.hostname' system_manifest.json)"
+            echo "Generated: $(jq -r '.metadata.generated_at' system_manifest.json)"
+            echo "Manifest ID: $(jq -r '.metadata.manifest_id' system_manifest.json)"
+            echo ""
+            echo "Applications found: $(jq '.applications | length' system_manifest.json)"
+            echo ""
+            echo "### Applications:"
+            jq -r '.applications[] | "  - \(.name): \(.version)"' system_manifest.json
+          else
+            echo "Manifest generated (install jq for detailed view)"
+          fi
+      
+      - name: Upload Manifest as Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: system-manifest
+          path: system_manifest.json
+          retention-days: 90
+      
+      - name: Sync to Cloud Storage
+        if: github.event.inputs.sync_to_cloud == 'true' || github.event_name == 'schedule'
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+          GCP_PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
+        run: |
+          chmod +x scripts/sync_manifest_to_cloud.sh
+          ./scripts/sync_manifest_to_cloud.sh || echo "Warning: Cloud sync failed"
+      
+      - name: Create Issue on Failure
+        if: failure()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: 'System Manifest Generation Failed',
+              body: `The system manifest generation workflow failed.
+              
+              **Workflow Run**: ${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}
+              
+              Please investigate and fix the issue.`,
+              labels: ['bug', 'automation']
+            })

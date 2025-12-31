@@ -1,0 +1,15 @@
+{
+  "title": "Fix 8 TODOs/Stubs - 2025-12-31",
+  "description": "## Automated TODO/Stub Resolution\n\nThis PR addresses 8 TODOs and stubs found in the codebase.\n\n### Summary by Severity\n\n- \ud83d\udd34 High: 4\n- \ud83d\udfe1 Medium: 2\n- \ud83d\udfe2 Low: 2\n\n### Files Affected\n\n- `src/agents/scanner.py` (8 issues)\n\n### Next Steps\n\n- \u2705 Automated review completed\n- \u2705 Tests passing\n- \ud83d\udd04 Ready for auto-merge\n",
+  "labels": [
+    "automated",
+    "todo-cleanup",
+    "stub-resolution"
+  ],
+  "files_affected": [
+    "src/agents/scanner.py"
+  ],
+  "finding_count": 8,
+  "created_at": "2025-12-31T03:00:06.517136",
+  "status": "pending"
+}
