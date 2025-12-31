@@ -1,0 +1,98 @@
+apiVersion: infinity.systems/v1
+kind: IndustryConfig
+metadata:
+  name: real-estate
+  version: 1.0.0
+
+spec:
+  agents:
+    - id: real-estate-intelligence
+      enabled: true
+      config:
+        mls_integration: true
+        property_analysis: true
+        market_trends: true
+    
+    - id: property-valuation
+      enabled: true
+      config:
+        valuation_models:
+          - comparative_market_analysis
+          - income_approach
+          - cost_approach
+    
+    - id: lead-generation
+      enabled: true
+      config:
+        sources:
+          - website
+          - social_media
+          - referrals
+        qualification_rules:
+          - budget_min: 100000
+          - prequalified: true
+
+  integrations:
+    mls:
+      enabled: true
+      provider: ${MLS_PROVIDER}
+      api_key: ${MLS_API_KEY}
+    
+    crm:
+      enabled: true
+      provider: salesforce
+      credentials:
+        client_id: ${CRM_CLIENT_ID}
+        client_secret: ${CRM_CLIENT_SECRET}
+    
+    document_storage:
+      enabled: true
+      provider: aws_s3
+      bucket: ${S3_BUCKET}
+    
+    payment:
+      enabled: true
+      provider: stripe
+      api_key: ${STRIPE_API_KEY}
+
+  workflows:
+    - name: property_listing
+      trigger: manual
+      steps:
+        - validate_property_data
+        - upload_photos
+        - create_listing
+        - notify_agents
+    
+    - name: lead_qualification
+      trigger: form_submission
+      steps:
+        - extract_lead_data
+        - qualify_lead
+        - assign_to_agent
+        - send_welcome_email
+
+  data_sources:
+    - name: mls_feed
+      type: api
+      schedule: "*/15 * * * *"  # Every 15 minutes
+    
+    - name: market_data
+      type: api
+      schedule: "0 0 * * *"  # Daily
+
+  compliance:
+    - fair_housing_act
+    - real_estate_settlement_procedures_act
+    - truth_in_lending_act
+
+  reporting:
+    - name: monthly_sales
+      schedule: "0 0 1 * *"
+      recipients:
+        - management@company.com
+    
+    - name: market_analysis
+      schedule: "0 0 * * 0"
+      recipients:
+        - team@company.com

@@ -1,0 +1,261 @@
+apiVersion: infinity.systems/v1
+kind: AgentRegistry
+metadata:
+  name: agent-registry
+  version: 1.0.0
+  description: Centralized registry of all available agents
+  
+spec:
+  agents:
+    # Intelligence Agents
+    - id: intelligence-crawler
+      name: Intelligence Crawler Agent
+      type: crawler
+      version: 1.0.0
+      category: intelligence
+      description: Autonomous web crawler for intelligence gathering
+      capabilities:
+        - web-scraping
+        - data-extraction
+        - content-analysis
+      manifest: manifests/agents/intelligence-crawler.yaml
+      source: src/agents/intelligence/crawler.ts
+      status: active
+      
+    - id: intelligence-processor
+      name: Intelligence Processor Agent
+      type: processor
+      version: 1.0.0
+      category: intelligence
+      description: Processes and enriches intelligence data
+      capabilities:
+        - data-processing
+        - entity-extraction
+        - relationship-mapping
+      manifest: manifests/agents/intelligence-processor.yaml
+      source: src/agents/intelligence/processor.ts
+      status: active
+
+    # Gateway Agents
+    - id: api-gateway-agent
+      name: API Gateway Agent
+      type: gateway
+      version: 1.0.0
+      category: gateway
+      description: HTTP/REST API gateway with routing and security
+      capabilities:
+        - http-routing
+        - authentication
+        - rate-limiting
+        - load-balancing
+      manifest: manifests/agents/api-gateway.yaml
+      source: src/gateways/api-gateway.ts
+      status: active
+      
+    - id: mcp-gateway-agent
+      name: MCP Gateway Agent
+      type: gateway
+      version: 1.0.0
+      category: gateway
+      description: Model Context Protocol gateway for agent communication
+      capabilities:
+        - mcp-protocol
+        - agent-discovery
+        - message-routing
+      manifest: manifests/agents/mcp-gateway.yaml
+      source: src/gateways/mcp-gateway.ts
+      status: active
+
+    # Orchestration Agents
+    - id: workflow-orchestrator
+      name: Workflow Orchestrator Agent
+      type: orchestrator
+      version: 1.0.0
+      category: orchestration
+      description: Coordinates multi-agent workflows
+      capabilities:
+        - workflow-execution
+        - dependency-resolution
+        - parallel-processing
+        - error-handling
+      manifest: manifests/agents/workflow-orchestrator.yaml
+      source: src/orchestration/orchestrator.ts
+      status: active
+      
+    - id: task-scheduler
+      name: Task Scheduler Agent
+      type: scheduler
+      version: 1.0.0
+      category: orchestration
+      description: Schedules and manages recurring tasks
+      capabilities:
+        - cron-scheduling
+        - event-triggers
+        - task-queue-management
+      manifest: manifests/agents/task-scheduler.yaml
+      source: src/orchestration/scheduler.ts
+      status: active
+
+    # Monitoring Agents
+    - id: health-monitor
+      name: Health Monitor Agent
+      type: monitor
+      version: 1.0.0
+      category: monitoring
+      description: Monitors system and agent health
+      capabilities:
+        - health-checks
+        - metrics-collection
+        - alerting
+      manifest: manifests/agents/health-monitor.yaml
+      source: src/monitoring/health.ts
+      status: active
+      
+    - id: audit-logger
+      name: Audit Logger Agent
+      type: logger
+      version: 1.0.0
+      category: monitoring
+      description: Tracks and logs all system activities for compliance
+      capabilities:
+        - audit-logging
+        - compliance-reporting
+        - forensic-analysis
+      manifest: manifests/agents/audit-logger.yaml
+      source: src/monitoring/audit.ts
+      status: active
+
+    # Communication Agents
+    - id: message-broker
+      name: Message Broker Agent
+      type: broker
+      version: 1.0.0
+      category: communication
+      description: Handles inter-agent messaging
+      capabilities:
+        - pub-sub
+        - message-queuing
+        - event-routing
+      manifest: manifests/agents/message-broker.yaml
+      source: src/agents/communication/broker.ts
+      status: active
+      
+    - id: notification-service
+      name: Notification Service Agent
+      type: notifier
+      version: 1.0.0
+      category: communication
+      description: Sends notifications via multiple channels
+      capabilities:
+        - email
+        - sms
+        - webhook
+        - push-notification
+      manifest: manifests/agents/notification-service.yaml
+      source: src/agents/communication/notifier.ts
+      status: active
+
+    # Industry-Specific Agents
+    - id: real-estate-agent
+      name: Real Estate Intelligence Agent
+      type: industry-specific
+      version: 1.0.0
+      category: real-estate
+      description: Real estate market analysis and property intelligence
+      capabilities:
+        - property-analysis
+        - market-trends
+        - valuation
+        - lead-generation
+      manifest: manifests/agents/real-estate.yaml
+      source: src/agents/industries/real-estate.ts
+      status: active
+      
+    - id: healthcare-agent
+      name: Healthcare Management Agent
+      type: industry-specific
+      version: 1.0.0
+      category: healthcare
+      description: Healthcare operations and patient management
+      capabilities:
+        - patient-tracking
+        - appointment-scheduling
+        - compliance-monitoring
+      manifest: manifests/agents/healthcare.yaml
+      source: src/agents/industries/healthcare.ts
+      status: inactive
+      
+    - id: finance-agent
+      name: Financial Services Agent
+      type: industry-specific
+      version: 1.0.0
+      category: finance
+      description: Financial analysis and transaction processing
+      capabilities:
+        - transaction-processing
+        - fraud-detection
+        - risk-analysis
+        - reporting
+      manifest: manifests/agents/finance.yaml
+      source: src/agents/industries/finance.ts
+      status: inactive
+
+    # Automation Agents
+    - id: auto-builder
+      name: Auto Builder Agent
+      type: builder
+      version: 1.0.0
+      category: automation
+      description: Automatically generates code and configurations
+      capabilities:
+        - code-generation
+        - template-processing
+        - scaffolding
+      manifest: manifests/agents/auto-builder.yaml
+      source: src/agents/automation/builder.ts
+      status: active
+      
+    - id: deployment-agent
+      name: Deployment Agent
+      type: deployer
+      version: 1.0.0
+      category: automation
+      description: Handles application deployment and rollback
+      capabilities:
+        - blue-green-deployment
+        - canary-deployment
+        - rollback
+        - health-validation
+      manifest: manifests/agents/deployment.yaml
+      source: src/agents/automation/deployer.ts
+      status: active
+
+  discovery:
+    enabled: true
+    scan_paths:
+      - src/agents/
+      - plugins/agents/
+    auto_register: true
+    validation: strict
+
+  deployment:
+    default_strategy: rolling
+    health_check_required: true
+    rollback_on_failure: true
+
+  communication:
+    protocol: mcp
+    message_format: json
+    encryption: true
+    compression: true
+
+  lifecycle:
+    auto_restart: true
+    max_restarts: 3
+    grace_period: 30s
+    cleanup_on_removal: true
+
+  metrics:
+    enabled: true
+    collection_interval: 30s
+    retention_days: 90

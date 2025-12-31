@@ -1,0 +1,108 @@
+version: '3.8'
+
+services:
+  infinity-matrix:
+    build: .
+    container_name: infinity-matrix
+    ports:
+      - "3000:3000"   # Main API
+      - "3100:3100"   # WebSocket
+      - "8080:8080"   # Health Check
+      - "9090:9090"   # Metrics
+    environment:
+      - NODE_ENV=production
+      - DATABASE_URL=postgresql://infinity:password@postgres:5432/infinity_matrix
+      - REDIS_URL=redis://redis:6379
+      - ELASTICSEARCH_URL=http://elasticsearch:9200
+    depends_on:
+      - postgres
+      - redis
+      - elasticsearch
+    volumes:
+      - ./config:/app/config
+      - ./manifests:/app/manifests
+      - ./logs:/app/logs
+      - ./backups:/app/backups
+    restart: unless-stopped
+    networks:
+      - infinity-network
+
+  postgres:
+    image: postgres:16-alpine
+    container_name: infinity-postgres
+    environment:
+      - POSTGRES_DB=infinity_matrix
+      - POSTGRES_USER=infinity
+      - POSTGRES_PASSWORD=password
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    restart: unless-stopped
+    networks:
+      - infinity-network
+
+  redis:
+    image: redis:7-alpine
+    container_name: infinity-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    restart: unless-stopped
+    networks:
+      - infinity-network
+
+  elasticsearch:
+    image: elasticsearch:8.15.0
+    container_name: infinity-elasticsearch
+    environment:
+      - discovery.type=single-node
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+      - xpack.security.enabled=false
+    ports:
+      - "9200:9200"
+    volumes:
+      - elasticsearch-data:/usr/share/elasticsearch/data
+    restart: unless-stopped
+    networks:
+      - infinity-network
+
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: infinity-prometheus
+    ports:
+      - "9091:9090"
+    volumes:
+      - ./config/prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus-data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+    restart: unless-stopped
+    networks:
+      - infinity-network
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: infinity-grafana
+    ports:
+      - "3001:3000"
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+    volumes:
+      - grafana-data:/var/lib/grafana
+    restart: unless-stopped
+    networks:
+      - infinity-network
+
+volumes:
+  postgres-data:
+  redis-data:
+  elasticsearch-data:
+  prometheus-data:
+  grafana-data:
+
+networks:
+  infinity-network:
+    driver: bridge

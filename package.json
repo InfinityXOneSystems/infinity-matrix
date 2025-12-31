@@ -1,0 +1,84 @@
+{
+  "name": "@infinityxone/infinity-matrix",
+  "version": "1.0.0",
+  "description": "Universal Enterprise Operating System - Integrated InfinityXOneSystems Platform",
+  "main": "dist/index.js",
+  "type": "module",
+  "scripts": {
+    "start": "node dist/index.js",
+    "dev": "tsx watch src/index.ts",
+    "build": "tsc && npm run build:manifests",
+    "build:manifests": "node scripts/build-manifests.js",
+    "test": "jest",
+    "lint": "eslint src --ext .ts,.js",
+    "format": "prettier --write \"src/**/*.{ts,js,json}\"",
+    "bootstrap": "node dist/cli/bootstrap.js",
+    "agent:list": "node dist/cli/agent-list.js",
+    "agent:deploy": "node dist/cli/agent-deploy.js",
+    "agent:remove": "node dist/cli/agent-remove.js",
+    "agent:logs": "node dist/cli/agent-logs.js",
+    "status": "node dist/cli/status.js",
+    "health": "node dist/cli/health.js",
+    "audit": "node dist/cli/audit.js",
+    "backup": "node dist/cli/backup.js",
+    "restore": "node dist/cli/restore.js",
+    "docker:build": "docker-compose build",
+    "docker:up": "docker-compose up -d",
+    "docker:down": "docker-compose down",
+    "docker:logs": "docker-compose logs -f"
+  },
+  "keywords": [
+    "enterprise",
+    "automation",
+    "agents",
+    "orchestration",
+    "gateway",
+    "mcp",
+    "intelligence",
+    "business",
+    "vertical",
+    "production"
+  ],
+  "author": "InfinityXOneSystems",
+  "license": "MIT",
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.32.0",
+    "@modelcontextprotocol/sdk": "^1.0.0",
+    "axios": "^1.7.0",
+    "dotenv": "^16.4.0",
+    "express": "^4.19.0",
+    "ws": "^8.18.0",
+    "ioredis": "^5.4.0",
+    "pg": "^8.13.0",
+    "zod": "^3.24.0",
+    "winston": "^3.16.0",
+    "prom-client": "^15.1.0",
+    "js-yaml": "^4.1.0",
+    "commander": "^12.1.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "@types/express": "^5.0.0",
+    "@types/ws": "^8.5.0",
+    "@typescript-eslint/eslint-plugin": "^8.0.0",
+    "@typescript-eslint/parser": "^8.0.0",
+    "eslint": "^9.0.0",
+    "prettier": "^3.4.0",
+    "typescript": "^5.6.0",
+    "tsx": "^4.19.0",
+    "jest": "^29.7.0",
+    "@types/jest": "^29.5.0"
+  },
+  "engines": {
+    "node": ">=20.0.0",
+    "npm": ">=10.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/InfinityXOneSystems/infinity-matrix.git"
+  },
+  "bugs": {
+    "url": "https://github.com/InfinityXOneSystems/infinity-matrix/issues"
+  },
+  "homepage": "https://github.com/InfinityXOneSystems/infinity-matrix#readme"
+}
