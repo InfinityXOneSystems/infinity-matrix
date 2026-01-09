@@ -1,0 +1,13 @@
+
+<svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <rect width="512" height="512" fill="#000000"/>
+  
+  <!-- Blue Triangle -->
+  <path d="M256 80 L456 380 H56 Z" fill="#0066FF"/>
+  
+  <!-- Branding Text -->
+  <text x="256" y="460" font-family="'Arial', sans-serif" font-weight="900" font-size="48" text-anchor="middle" fill="#FFFFFF" letter-spacing="8">INFINITY</text>
+  
+  <!-- Optional Neon Glow Effect Filter definition could go here, but kept clean for broad compatibility -->
+</svg>
