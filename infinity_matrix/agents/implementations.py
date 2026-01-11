@@ -1,7 +1,7 @@
 """Agent implementations for the auto-builder system."""
 
-from datetime import datetime, timezone
-from typing import Any, Optional
+from datetime import UTC, datetime
+from typing import Any
 
 from infinity_matrix.agents.base import AgentResult, AgentStatus, AgentTask, AgentType, BaseAgent
 
@@ -11,13 +11,13 @@ class CrawlerAgent(BaseAgent):
     Crawler agent analyzes existing codebases, documentation, and templates.
     """
 
-    def __init__(self, config: Optional[dict[str, Any]] = None):
+    def __init__(self, config: dict[str, Any] | None = None):
         super().__init__(AgentType.CRAWLER, config)
 
     async def execute(self, task: AgentTask) -> AgentResult:
         """Execute crawler task."""
         self.status = AgentStatus.RUNNING
-        started_at = datetime.now(timezone.utc)
+        started_at = datetime.now(UTC)
 
         try:
             action = task.action
@@ -49,7 +49,7 @@ class CrawlerAgent(BaseAgent):
                 }
 
             self.status = AgentStatus.COMPLETED
-            completed_at = datetime.now(timezone.utc)
+            completed_at = datetime.now(UTC)
 
             return AgentResult(
                 task_id=task.id,
@@ -71,23 +71,23 @@ class CrawlerAgent(BaseAgent):
                 started_at=started_at,
             )
 
-    def _analyze_structure(self, repo_path: Optional[str]) -> dict[str, Any]:
+    def _analyze_structure(self, repo_path: str | None) -> dict[str, Any]:
         """Analyze repository structure."""
         return {"status": "analyzed", "path": repo_path}
 
-    def _detect_patterns(self, repo_path: Optional[str]) -> list[str]:
+    def _detect_patterns(self, repo_path: str | None) -> list[str]:
         """Detect code patterns."""
         return ["mvc", "repository-pattern", "dependency-injection"]
 
-    def _extract_dependencies(self, repo_path: Optional[str]) -> dict[str, Any]:
+    def _extract_dependencies(self, repo_path: str | None) -> dict[str, Any]:
         """Extract dependencies."""
         return {"dependencies": []}
 
-    def _scan_templates(self, templates_path: Optional[str]) -> list[dict[str, Any]]:
+    def _scan_templates(self, templates_path: str | None) -> list[dict[str, Any]]:
         """Scan templates."""
         return []
 
-    def _analyze_documentation(self, docs_path: Optional[str]) -> dict[str, Any]:
+    def _analyze_documentation(self, docs_path: str | None) -> dict[str, Any]:
         """Analyze documentation."""
         return {"status": "analyzed"}
 
@@ -100,13 +100,13 @@ class IngestionAgent(BaseAgent):
     Ingestion agent processes blueprints, prompts, and requirements.
     """
 
-    def __init__(self, config: Optional[dict[str, Any]] = None):
+    def __init__(self, config: dict[str, Any] | None = None):
         super().__init__(AgentType.INGESTION, config)
 
     async def execute(self, task: AgentTask) -> AgentResult:
         """Execute ingestion task."""
         self.status = AgentStatus.RUNNING
-        started_at = datetime.now(timezone.utc)
+        started_at = datetime.now(UTC)
 
         try:
             action = task.action
@@ -136,7 +136,7 @@ class IngestionAgent(BaseAgent):
                 }
 
             self.status = AgentStatus.COMPLETED
-            completed_at = datetime.now(timezone.utc)
+            completed_at = datetime.now(UTC)
 
             return AgentResult(
                 task_id=task.id,
@@ -162,7 +162,7 @@ class IngestionAgent(BaseAgent):
         """Parse blueprint."""
         return {"parsed": True, "data": blueprint_data}
 
-    def _process_prompt(self, prompt: Optional[str]) -> dict[str, Any]:
+    def _process_prompt(self, prompt: str | None) -> dict[str, Any]:
         """Process prompt."""
         return {"requirements": [], "components": [], "technologies": []}
 
@@ -179,13 +179,13 @@ class PredictorAgent(BaseAgent):
     Predictor agent predicts optimal architectures and technologies.
     """
 
-    def __init__(self, config: Optional[dict[str, Any]] = None):
+    def __init__(self, config: dict[str, Any] | None = None):
         super().__init__(AgentType.PREDICTOR, config)
 
     async def execute(self, task: AgentTask) -> AgentResult:
         """Execute predictor task."""
         self.status = AgentStatus.RUNNING
-        started_at = datetime.now(timezone.utc)
+        started_at = datetime.now(UTC)
 
         try:
             action = task.action
@@ -212,7 +212,7 @@ class PredictorAgent(BaseAgent):
                 }
 
             self.status = AgentStatus.COMPLETED
-            completed_at = datetime.now(timezone.utc)
+            completed_at = datetime.now(UTC)
 
             return AgentResult(
                 task_id=task.id,
@@ -242,7 +242,7 @@ class PredictorAgent(BaseAgent):
             "components": [],
         }
 
-    def _recommend_technologies(self, project_type: Optional[str]) -> list[str]:
+    def _recommend_technologies(self, project_type: str | None) -> list[str]:
         """Recommend technologies."""
         return ["python", "fastapi", "postgresql", "redis", "docker"]
 
@@ -259,13 +259,13 @@ class CEOAgent(BaseAgent):
     CEO agent makes high-level decisions on project structure and technologies.
     """
 
-    def __init__(self, config: Optional[dict[str, Any]] = None):
+    def __init__(self, config: dict[str, Any] | None = None):
         super().__init__(AgentType.CEO, config)
 
     async def execute(self, task: AgentTask) -> AgentResult:
         """Execute CEO task."""
         self.status = AgentStatus.RUNNING
-        started_at = datetime.now(timezone.utc)
+        started_at = datetime.now(UTC)
 
         try:
             action = task.action
@@ -293,7 +293,7 @@ class CEOAgent(BaseAgent):
                 }
 
             self.status = AgentStatus.COMPLETED
-            completed_at = datetime.now(timezone.utc)
+            completed_at = datetime.now(UTC)
 
             return AgentResult(
                 task_id=task.id,
@@ -336,13 +336,13 @@ class StrategistAgent(BaseAgent):
     Strategist agent plans implementation strategy and phasing.
     """
 
-    def __init__(self, config: Optional[dict[str, Any]] = None):
+    def __init__(self, config: dict[str, Any] | None = None):
         super().__init__(AgentType.STRATEGIST, config)
 
     async def execute(self, task: AgentTask) -> AgentResult:
         """Execute strategist task."""
         self.status = AgentStatus.RUNNING
-        started_at = datetime.now(timezone.utc)
+        started_at = datetime.now(UTC)
 
         try:
             action = task.action
@@ -369,7 +369,7 @@ class StrategistAgent(BaseAgent):
                 }
 
             self.status = AgentStatus.COMPLETED
-            completed_at = datetime.now(timezone.utc)
+            completed_at = datetime.now(UTC)
 
             return AgentResult(
                 task_id=task.id,
@@ -420,13 +420,13 @@ class OrganizerAgent(BaseAgent):
     Organizer agent manages project structure and organization.
     """
 
-    def __init__(self, config: Optional[dict[str, Any]] = None):
+    def __init__(self, config: dict[str, Any] | None = None):
         super().__init__(AgentType.ORGANIZER, config)
 
     async def execute(self, task: AgentTask) -> AgentResult:
         """Execute organizer task."""
         self.status = AgentStatus.RUNNING
-        started_at = datetime.now(timezone.utc)
+        started_at = datetime.now(UTC)
 
         try:
             action = task.action
@@ -453,7 +453,7 @@ class OrganizerAgent(BaseAgent):
                 }
 
             self.status = AgentStatus.COMPLETED
-            completed_at = datetime.now(timezone.utc)
+            completed_at = datetime.now(UTC)
 
             return AgentResult(
                 task_id=task.id,
@@ -475,7 +475,7 @@ class OrganizerAgent(BaseAgent):
                 started_at=started_at,
             )
 
-    def _organize_structure(self, project_type: Optional[str]) -> dict[str, Any]:
+    def _organize_structure(self, project_type: str | None) -> dict[str, Any]:
         """Organize structure."""
         return {
             "directories": ["src", "tests", "docs", "config"],
@@ -499,13 +499,13 @@ class ValidatorAgent(BaseAgent):
     Validator agent validates generated code and runs tests.
     """
 
-    def __init__(self, config: Optional[dict[str, Any]] = None):
+    def __init__(self, config: dict[str, Any] | None = None):
         super().__init__(AgentType.VALIDATOR, config)
 
     async def execute(self, task: AgentTask) -> AgentResult:
         """Execute validator task."""
         self.status = AgentStatus.RUNNING
-        started_at = datetime.now(timezone.utc)
+        started_at = datetime.now(UTC)
 
         try:
             action = task.action
@@ -532,7 +532,7 @@ class ValidatorAgent(BaseAgent):
                 }
 
             self.status = AgentStatus.COMPLETED
-            completed_at = datetime.now(timezone.utc)
+            completed_at = datetime.now(UTC)
 
             return AgentResult(
                 task_id=task.id,
@@ -558,11 +558,11 @@ class ValidatorAgent(BaseAgent):
         """Validate code."""
         return {"valid": True, "issues": []}
 
-    def _run_tests(self, test_path: Optional[str]) -> dict[str, Any]:
+    def _run_tests(self, test_path: str | None) -> dict[str, Any]:
         """Run tests."""
         return {"passed": True, "total": 0, "failures": 0}
 
-    def _check_security(self, project_path: Optional[str]) -> dict[str, Any]:
+    def _check_security(self, project_path: str | None) -> dict[str, Any]:
         """Check security."""
         return {"vulnerabilities": [], "score": 100}
 
@@ -575,13 +575,13 @@ class DocumentorAgent(BaseAgent):
     Documentor agent generates documentation.
     """
 
-    def __init__(self, config: Optional[dict[str, Any]] = None):
+    def __init__(self, config: dict[str, Any] | None = None):
         super().__init__(AgentType.DOCUMENTOR, config)
 
     async def execute(self, task: AgentTask) -> AgentResult:
         """Execute documentor task."""
         self.status = AgentStatus.RUNNING
-        started_at = datetime.now(timezone.utc)
+        started_at = datetime.now(UTC)
 
         try:
             action = task.action
@@ -608,7 +608,7 @@ class DocumentorAgent(BaseAgent):
                 }
 
             self.status = AgentStatus.COMPLETED
-            completed_at = datetime.now(timezone.utc)
+            completed_at = datetime.now(UTC)
 
             return AgentResult(
                 task_id=task.id,

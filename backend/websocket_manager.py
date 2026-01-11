@@ -1,18 +1,17 @@
 """WebSocket manager for real-time updates"""
 
-import json
-from typing import Dict, List, Set
-from fastapi import WebSocket
 from datetime import datetime
-import asyncio
+from typing import dict, list
+
+from fastapi import WebSocket
 
 
 class ConnectionManager:
     """Manages WebSocket connections and broadcasts"""
 
     def __init__(self):
-        self.active_connections: List[WebSocket] = []
-        self.connection_ids: Dict[WebSocket, str] = {}
+        self.active_connections: list[WebSocket] = []
+        self.connection_ids: dict[WebSocket, str] = {}
 
     async def connect(self, websocket: WebSocket, client_id: str = None):
         """Accept and register a new WebSocket connection"""
@@ -20,7 +19,7 @@ class ConnectionManager:
         self.active_connections.append(websocket)
         if client_id:
             self.connection_ids[websocket] = client_id
-        
+
         # Send connection confirmation
         await self.send_personal_message(
             {
@@ -55,7 +54,7 @@ class ConnectionManager:
             except Exception as e:
                 print(f"Error broadcasting to client: {e}")
                 disconnected.append(connection)
-        
+
         # Clean up disconnected clients
         for connection in disconnected:
             self.disconnect(connection)

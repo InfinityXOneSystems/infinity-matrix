@@ -1,7 +1,7 @@
 """Base classes for Infinity Matrix components."""
 
 from abc import ABC, abstractmethod
-from typing import Any, Dict, Optional
+from typing import Any, dict
 from uuid import uuid4
 
 from pydantic import BaseModel, Field
@@ -16,8 +16,8 @@ class Task(BaseModel):
 
     id: str = Field(default_factory=lambda: str(uuid4()))
     type: str
-    input: Dict[str, Any]
-    metadata: Dict[str, Any] = Field(default_factory=dict)
+    input: dict[str, Any]
+    metadata: dict[str, Any] = Field(default_factory=dict)
 
 
 class TaskResult(BaseModel):
@@ -25,9 +25,9 @@ class TaskResult(BaseModel):
 
     task_id: str
     status: str  # success, failure, partial
-    output: Dict[str, Any]
-    error: Optional[str] = None
-    metadata: Dict[str, Any] = Field(default_factory=dict)
+    output: dict[str, Any]
+    error: str | None = None
+    metadata: dict[str, Any] = Field(default_factory=dict)
 
 
 class Component(ABC):
@@ -43,17 +43,14 @@ class Component(ABC):
     @abstractmethod
     async def initialize(self) -> None:
         """Initialize component."""
-        pass
 
     @abstractmethod
     async def shutdown(self) -> None:
         """Shutdown component."""
-        pass
 
     @abstractmethod
-    async def health_check(self) -> Dict[str, Any]:
+    async def health_check(self) -> dict[str, Any]:
         """Perform health check."""
-        pass
 
     def __repr__(self) -> str:
         """String representation."""
@@ -66,12 +63,10 @@ class BaseProcessor(Component):
     @abstractmethod
     async def process(self, task: Task) -> TaskResult:
         """Process a task."""
-        pass
 
     @abstractmethod
     async def validate(self, task: Task) -> bool:
         """Validate task input."""
-        pass
 
 
 class BaseService(Component):
@@ -100,7 +95,7 @@ class BaseService(Component):
         self._initialized = False
         self.logger.info("service_shutdown_complete")
 
-    async def health_check(self) -> Dict[str, Any]:
+    async def health_check(self) -> dict[str, Any]:
         """Perform health check."""
         return {
             "name": self.name,
@@ -112,12 +107,10 @@ class BaseService(Component):
     @abstractmethod
     async def _initialize(self) -> None:
         """Internal initialization logic."""
-        pass
 
     @abstractmethod
     async def _shutdown(self) -> None:
         """Internal shutdown logic."""
-        pass
 
     @property
     def is_initialized(self) -> bool:

@@ -4,7 +4,7 @@ Model Context Protocol implementation
 from dataclasses import dataclass, field
 from datetime import datetime
 from enum import Enum
-from typing import Any, Dict, List, Optional
+from typing import Any, dict, list
 from uuid import uuid4
 
 
@@ -34,13 +34,13 @@ class MCPMessage:
     message_id: str = field(default_factory=lambda: str(uuid4()))
     message_type: MessageType = MessageType.CONTEXT_SYNC
     sender: AIProvider = AIProvider.CUSTOM
-    recipient: Optional[AIProvider] = None
+    recipient: AIProvider | None = None
     timestamp: datetime = field(default_factory=datetime.utcnow)
-    payload: Dict[str, Any] = field(default_factory=dict)
-    metadata: Dict[str, Any] = field(default_factory=dict)
-    correlation_id: Optional[str] = None
-    
-    def to_dict(self) -> Dict[str, Any]:
+    payload: dict[str, Any] = field(default_factory=dict)
+    metadata: dict[str, Any] = field(default_factory=dict)
+    correlation_id: str | None = None
+
+    def to_dict(self) -> dict[str, Any]:
         """Convert message to dictionary"""
         return {
             "message_id": self.message_id,
@@ -52,9 +52,9 @@ class MCPMessage:
             "metadata": self.metadata,
             "correlation_id": self.correlation_id,
         }
-    
+
     @classmethod
-    def from_dict(cls, data: Dict[str, Any]) -> "MCPMessage":
+    def from_dict(cls, data: dict[str, Any]) -> "MCPMessage":
         """Create message from dictionary"""
         return cls(
             message_id=data.get("message_id", str(uuid4())),
@@ -73,19 +73,19 @@ class ContextData:
     """Context data structure for AI synchronization"""
     context_id: str = field(default_factory=lambda: str(uuid4()))
     provider: AIProvider = AIProvider.CUSTOM
-    conversation_id: Optional[str] = None
-    user_id: Optional[str] = None
-    workspace_id: Optional[str] = None
-    code_context: Dict[str, Any] = field(default_factory=dict)
-    conversation_history: List[Dict[str, Any]] = field(default_factory=list)
-    file_references: List[str] = field(default_factory=list)
-    symbol_references: List[Dict[str, Any]] = field(default_factory=list)
-    preferences: Dict[str, Any] = field(default_factory=dict)
-    metadata: Dict[str, Any] = field(default_factory=dict)
+    conversation_id: str | None = None
+    user_id: str | None = None
+    workspace_id: str | None = None
+    code_context: dict[str, Any] = field(default_factory=dict)
+    conversation_history: list[dict[str, Any]] = field(default_factory=list)
+    file_references: list[str] = field(default_factory=list)
+    symbol_references: list[dict[str, Any]] = field(default_factory=list)
+    preferences: dict[str, Any] = field(default_factory=dict)
+    metadata: dict[str, Any] = field(default_factory=dict)
     created_at: datetime = field(default_factory=datetime.utcnow)
     updated_at: datetime = field(default_factory=datetime.utcnow)
-    
-    def to_dict(self) -> Dict[str, Any]:
+
+    def to_dict(self) -> dict[str, Any]:
         """Convert context to dictionary"""
         return {
             "context_id": self.context_id,
@@ -110,14 +110,14 @@ class IntelligenceShare:
     intelligence_id: str = field(default_factory=lambda: str(uuid4()))
     source_provider: AIProvider = AIProvider.CUSTOM
     intelligence_type: str = "general"
-    content: Dict[str, Any] = field(default_factory=dict)
+    content: dict[str, Any] = field(default_factory=dict)
     confidence_score: float = 1.0
-    tags: List[str] = field(default_factory=list)
-    applicable_to: List[AIProvider] = field(default_factory=list)
-    metadata: Dict[str, Any] = field(default_factory=dict)
+    tags: list[str] = field(default_factory=list)
+    applicable_to: list[AIProvider] = field(default_factory=list)
+    metadata: dict[str, Any] = field(default_factory=dict)
     created_at: datetime = field(default_factory=datetime.utcnow)
-    
-    def to_dict(self) -> Dict[str, Any]:
+
+    def to_dict(self) -> dict[str, Any]:
         """Convert intelligence to dictionary"""
         return {
             "intelligence_id": self.intelligence_id,
@@ -134,12 +134,12 @@ class IntelligenceShare:
 
 class MCPProtocol:
     """MCP protocol handler"""
-    
+
     @staticmethod
     def create_context_sync_message(
         context: ContextData,
         sender: AIProvider,
-        recipient: Optional[AIProvider] = None,
+        recipient: AIProvider | None = None,
     ) -> MCPMessage:
         """Create context synchronization message"""
         return MCPMessage(
@@ -148,13 +148,13 @@ class MCPProtocol:
             recipient=recipient,
             payload=context.to_dict(),
         )
-    
+
     @staticmethod
     def create_intelligence_share_message(
         intelligence: IntelligenceShare,
         sender: AIProvider,
-        recipients: List[AIProvider],
-    ) -> List[MCPMessage]:
+        recipients: list[AIProvider],
+    ) -> list[MCPMessage]:
         """Create intelligence sharing messages"""
         messages = []
         for recipient in recipients:
@@ -166,13 +166,13 @@ class MCPProtocol:
             )
             messages.append(message)
         return messages
-    
+
     @staticmethod
     def create_query_message(
         query: str,
         sender: AIProvider,
         recipient: AIProvider,
-        context: Optional[Dict[str, Any]] = None,
+        context: dict[str, Any] | None = None,
     ) -> MCPMessage:
         """Create query message"""
         return MCPMessage(
@@ -184,7 +184,7 @@ class MCPProtocol:
                 "context": context or {},
             },
         )
-    
+
     @staticmethod
     def create_response_message(
         response: Any,
@@ -200,13 +200,13 @@ class MCPProtocol:
             payload={"response": response},
             correlation_id=correlation_id,
         )
-    
+
     @staticmethod
     def create_error_message(
         error: str,
         sender: AIProvider,
-        recipient: Optional[AIProvider] = None,
-        correlation_id: Optional[str] = None,
+        recipient: AIProvider | None = None,
+        correlation_id: str | None = None,
     ) -> MCPMessage:
         """Create error message"""
         return MCPMessage(

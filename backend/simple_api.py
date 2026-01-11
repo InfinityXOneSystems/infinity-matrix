@@ -2,19 +2,20 @@
 Infinity Matrix - Complete Backend API
 Integrates Manus Core, Agent Endpoints, and Admin Control Plane
 """
+import logging
+import os
+import sys
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-import logging
-import sys
-import os
 
 # Add current directory to path for imports
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 # Import routers
-from manus_core import router as manus_router
-from agent_endpoints import router as agent_router
 from admin_control_plane import router as admin_router
+from agent_endpoints import router as agent_router
+from manus_core import router as manus_router
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)

@@ -1,6 +1,7 @@
 """Tests for core configuration."""
 
 import pytest
+
 from infinity_matrix.core.config import Settings, get_settings
 
 

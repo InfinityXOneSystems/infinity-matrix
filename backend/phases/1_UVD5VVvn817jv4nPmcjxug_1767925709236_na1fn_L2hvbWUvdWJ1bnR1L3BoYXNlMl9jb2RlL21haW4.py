@@ -1,10 +1,11 @@
 
-import firebase_admin
-from firebase_admin import credentials, auth, firestore
-from firebase_admin.exceptions import FirebaseError
-import functions_framework
 import datetime
 import logging
+
+import firebase_admin
+import functions_framework
+from firebase_admin import auth, credentials, firestore
+from firebase_admin.exceptions import FirebaseError
 
 # Initialize Firebase Admin SDK
 try:
@@ -22,7 +23,7 @@ logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(
 
 def _add_firestore_metadata(data, provenance):
     """Adds schema_version, created_at, updated_at, and provenance to Firestore document."""
-    now = datetime.datetime.now(datetime.timezone.utc)
+    now = datetime.datetime.now(datetime.UTC)
     data['schema_version'] = 1  # Initial schema version
     data['created_at'] = now
     data['updated_at'] = now
@@ -31,7 +32,7 @@ def _add_firestore_metadata(data, provenance):
 
 def _update_firestore_metadata(data, provenance):
     """Updates updated_at and provenance for Firestore document."""
-    now = datetime.datetime.now(datetime.timezone.utc)
+    now = datetime.datetime.now(datetime.UTC)
     data['updated_at'] = now
     data['provenance'] = provenance
     return data

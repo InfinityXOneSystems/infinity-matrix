@@ -1,8 +1,8 @@
 """
 Opportunity Analyzer - Identifies gaps and opportunities
 """
-from typing import Dict, Any, List
 import logging
+from typing import Any, dict, list
 
 logger = logging.getLogger(__name__)
 
@@ -10,7 +10,7 @@ logger = logging.getLogger(__name__)
 class OpportunityAnalyzer:
     """
     Identifies gaps, opportunities, and blind spots.
-    
+
     Analyzes:
     - Capability gaps
     - Market opportunities
@@ -18,16 +18,16 @@ class OpportunityAnalyzer:
     - Strategic opportunities
     - Innovation opportunities
     """
-    
+
     async def detect_gaps(
         self,
-        business_analysis: Dict[str, Any],
-        competitive_analysis: Dict[str, Any],
-        market_analysis: Dict[str, Any]
-    ) -> Dict[str, Any]:
+        business_analysis: dict[str, Any],
+        competitive_analysis: dict[str, Any],
+        market_analysis: dict[str, Any]
+    ) -> dict[str, Any]:
         """Detect gaps in capabilities, market coverage, and strategy"""
         logger.info("Detecting gaps and blind spots")
-        
+
         gaps = {
             "capability_gaps": self._identify_capability_gaps(business_analysis, competitive_analysis),
             "market_coverage_gaps": self._identify_market_gaps(business_analysis, market_analysis),
@@ -40,17 +40,17 @@ class OpportunityAnalyzer:
                 market_analysis
             )
         }
-        
+
         return gaps
-    
+
     async def identify_opportunities(
         self,
-        gap_analysis: Dict[str, Any],
-        market_analysis: Dict[str, Any]
-    ) -> Dict[str, Any]:
+        gap_analysis: dict[str, Any],
+        market_analysis: dict[str, Any]
+    ) -> dict[str, Any]:
         """Identify strategic opportunities"""
         logger.info("Identifying strategic opportunities")
-        
+
         opportunities = {
             "immediate_opportunities": self._identify_immediate_opportunities(
                 gap_analysis,
@@ -71,14 +71,14 @@ class OpportunityAnalyzer:
                 market_analysis
             )
         }
-        
+
         return opportunities
-    
+
     def _identify_capability_gaps(
         self,
-        business_analysis: Dict[str, Any],
-        competitive_analysis: Dict[str, Any]
-    ) -> List[Dict[str, Any]]:
+        business_analysis: dict[str, Any],
+        competitive_analysis: dict[str, Any]
+    ) -> list[dict[str, Any]]:
         """Identify capability gaps"""
         return [
             {
@@ -106,12 +106,12 @@ class OpportunityAnalyzer:
                 "recommendation": "Develop vertical industry solutions and expertise"
             }
         ]
-    
+
     def _identify_market_gaps(
         self,
-        business_analysis: Dict[str, Any],
-        market_analysis: Dict[str, Any]
-    ) -> List[Dict[str, Any]]:
+        business_analysis: dict[str, Any],
+        market_analysis: dict[str, Any]
+    ) -> list[dict[str, Any]]:
         """Identify market coverage gaps"""
         return [
             {
@@ -133,12 +133,12 @@ class OpportunityAnalyzer:
                 "priority": "High"
             }
         ]
-    
+
     def _identify_competitive_gaps(
         self,
-        business_analysis: Dict[str, Any],
-        competitive_analysis: Dict[str, Any]
-    ) -> List[Dict[str, Any]]:
+        business_analysis: dict[str, Any],
+        competitive_analysis: dict[str, Any]
+    ) -> list[dict[str, Any]]:
         """Identify competitive positioning gaps"""
         return [
             {
@@ -160,12 +160,12 @@ class OpportunityAnalyzer:
                 "opportunity": "Focused product development"
             }
         ]
-    
+
     def _identify_technology_gaps(
         self,
-        business_analysis: Dict[str, Any],
-        market_analysis: Dict[str, Any]
-    ) -> List[Dict[str, Any]]:
+        business_analysis: dict[str, Any],
+        market_analysis: dict[str, Any]
+    ) -> list[dict[str, Any]]:
         """Identify technology gaps"""
         return [
             {
@@ -190,11 +190,11 @@ class OpportunityAnalyzer:
                 "effort": "High"
             }
         ]
-    
+
     def _identify_operational_gaps(
         self,
-        business_analysis: Dict[str, Any]
-    ) -> List[Dict[str, Any]]:
+        business_analysis: dict[str, Any]
+    ) -> list[dict[str, Any]]:
         """Identify operational gaps"""
         return [
             {
@@ -213,13 +213,13 @@ class OpportunityAnalyzer:
                 "recommendation": "Implement analytics and dashboards"
             }
         ]
-    
+
     def _identify_blind_spots(
         self,
-        business_analysis: Dict[str, Any],
-        competitive_analysis: Dict[str, Any],
-        market_analysis: Dict[str, Any]
-    ) -> List[Dict[str, Any]]:
+        business_analysis: dict[str, Any],
+        competitive_analysis: dict[str, Any],
+        market_analysis: dict[str, Any]
+    ) -> list[dict[str, Any]]:
         """Identify critical blind spots"""
         return [
             {
@@ -247,12 +247,12 @@ class OpportunityAnalyzer:
                 "mitigation": "Proactive compliance program"
             }
         ]
-    
+
     def _identify_immediate_opportunities(
         self,
-        gap_analysis: Dict[str, Any],
-        market_analysis: Dict[str, Any]
-    ) -> List[Dict[str, Any]]:
+        gap_analysis: dict[str, Any],
+        market_analysis: dict[str, Any]
+    ) -> list[dict[str, Any]]:
         """Identify immediate opportunities (0-6 months)"""
         return [
             {
@@ -277,12 +277,12 @@ class OpportunityAnalyzer:
                 "roi": "High"
             }
         ]
-    
+
     def _identify_strategic_opportunities(
         self,
-        gap_analysis: Dict[str, Any],
-        market_analysis: Dict[str, Any]
-    ) -> List[Dict[str, Any]]:
+        gap_analysis: dict[str, Any],
+        market_analysis: dict[str, Any]
+    ) -> list[dict[str, Any]]:
         """Identify strategic opportunities (6-18 months)"""
         return [
             {
@@ -307,12 +307,12 @@ class OpportunityAnalyzer:
                 "market_demand": "High"
             }
         ]
-    
+
     def _identify_innovation_opportunities(
         self,
-        gap_analysis: Dict[str, Any],
-        market_analysis: Dict[str, Any]
-    ) -> List[str]:
+        gap_analysis: dict[str, Any],
+        market_analysis: dict[str, Any]
+    ) -> list[str]:
         """Identify innovation opportunities"""
         return [
             "AI agents for autonomous business process execution",
@@ -322,11 +322,11 @@ class OpportunityAnalyzer:
             "Automated AI model optimization and tuning",
             "Cross-functional AI workflow orchestration"
         ]
-    
+
     def _identify_partnership_opportunities(
         self,
-        gap_analysis: Dict[str, Any]
-    ) -> List[Dict[str, str]]:
+        gap_analysis: dict[str, Any]
+    ) -> list[dict[str, str]]:
         """Identify partnership opportunities"""
         return [
             {
@@ -345,11 +345,11 @@ class OpportunityAnalyzer:
                 "value": "Domain expertise and credibility"
             }
         ]
-    
+
     def _identify_expansion_opportunities(
         self,
-        market_analysis: Dict[str, Any]
-    ) -> List[Dict[str, str]]:
+        market_analysis: dict[str, Any]
+    ) -> list[dict[str, str]]:
         """Identify market expansion opportunities"""
         return [
             {
@@ -371,12 +371,12 @@ class OpportunityAnalyzer:
                 "barriers": "Competitive intensity"
             }
         ]
-    
+
     def _prioritize_opportunities(
         self,
-        gap_analysis: Dict[str, Any],
-        market_analysis: Dict[str, Any]
-    ) -> List[Dict[str, Any]]:
+        gap_analysis: dict[str, Any],
+        market_analysis: dict[str, Any]
+    ) -> list[dict[str, Any]]:
         """Prioritize opportunities by impact and feasibility"""
         return [
             {

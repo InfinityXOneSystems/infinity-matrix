@@ -10,11 +10,10 @@ Handles:
 
 import asyncio
 import logging
-from typing import Dict, List, Optional, Any, Callable
+from collections.abc import Callable, dict, list, Optional, Any, 
 from datetime import datetime
 from dataclasses import dataclass, field
 from collections import defaultdict
-import json
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -26,8 +25,8 @@ class Message:
     """Pub/Sub message."""
     message_id: str
     topic: str
-    data: Dict[str, Any]
-    attributes: Dict[str, str] = field(default_factory=dict)
+    data: dict[str, Any]
+    attributes: dict[str, str] = field(default_factory=dict)
     published_at: datetime = field(default_factory=datetime.utcnow)
 
 
@@ -37,7 +36,7 @@ class Subscription:
     subscription_id: str
     topic: str
     callback: Callable
-    filter_attributes: Dict[str, str] = field(default_factory=dict)
+    filter_attributes: dict[str, str] = field(default_factory=dict)
     created_at: datetime = field(default_factory=datetime.utcnow)
 
 
@@ -46,9 +45,9 @@ class PubSubIntegration:
     
     def __init__(self, project_id: Optional[str] = None):
         self.project_id = project_id or "infinity-matrix-default"
-        self.topics: Dict[str, List[Message]] = defaultdict(list)
-        self.subscriptions: Dict[str, Subscription] = {}
-        self.topic_subscribers: Dict[str, List[str]] = defaultdict(list)
+        self.topics: dict[str, list[Message]] = defaultdict(list)
+        self.subscriptions: dict[str, Subscription] = {}
+        self.topic_subscribers: dict[str, list[str]] = defaultdict(list)
         self.message_counter = 0
         self.is_connected = False
         logger.info(f"Pub/Sub Integration initialized (project: {self.project_id})")
@@ -97,8 +96,8 @@ class PubSubIntegration:
     async def publish(
         self,
         topic: str,
-        data: Dict[str, Any],
-        attributes: Optional[Dict[str, str]] = None
+        data: dict[str, Any],
+        attributes: Optional[dict[str, str]] = None
     ) -> str:
         """Publish a message to a topic."""
         if not self.is_connected:
@@ -132,7 +131,7 @@ class PubSubIntegration:
         subscription_id: str,
         topic: str,
         callback: Callable,
-        filter_attributes: Optional[Dict[str, str]] = None
+        filter_attributes: Optional[dict[str, str]] = None
     ) -> bool:
         """Subscribe to a topic."""
         if not self.is_connected:
@@ -206,7 +205,7 @@ class PubSubIntegration:
         self,
         subscription_id: str,
         max_messages: int = 10
-    ) -> List[Message]:
+    ) -> list[Message]:
         """Pull messages from a subscription."""
         if subscription_id not in self.subscriptions:
             logger.warning(f"Subscription not found: {subscription_id}")
@@ -223,17 +222,17 @@ class PubSubIntegration:
         logger.info(f"Pulled {len(messages)} messages from {subscription_id}")
         return messages
     
-    def list_topics(self) -> List[str]:
-        """List all topics."""
+    def list_topics(self) -> list[str]:
+        """list all topics."""
         return list(self.topics.keys())
     
-    def list_subscriptions(self, topic: Optional[str] = None) -> List[str]:
-        """List subscriptions, optionally filtered by topic."""
+    def list_subscriptions(self, topic: Optional[str] = None) -> list[str]:
+        """list subscriptions, optionally filtered by topic."""
         if topic:
             return self.topic_subscribers.get(topic, [])
         return list(self.subscriptions.keys())
     
-    def get_topic_stats(self, topic: str) -> Optional[Dict[str, Any]]:
+    def get_topic_stats(self, topic: str) -> Optional[dict[str, Any]]:
         """Get statistics for a topic."""
         if topic not in self.topics:
             return None
@@ -248,7 +247,7 @@ class PubSubIntegration:
             )
         }
     
-    def get_status(self) -> Dict[str, Any]:
+    def get_status(self) -> dict[str, Any]:
         """Get integration status."""
         total_messages = sum(len(msgs) for msgs in self.topics.values())
         

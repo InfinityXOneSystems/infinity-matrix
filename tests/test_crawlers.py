@@ -1,6 +1,7 @@
 """Tests for crawler modules."""
 
 import pytest
+
 from infinity_matrix.crawlers import HeadlessCrawler, ScrapingAgent
 
 
@@ -18,11 +19,11 @@ async def test_scraping_agent_crawl():
     """Test scraping agent crawl."""
     agent = ScrapingAgent()
     await agent.initialize()
-    
+
     result = await agent.crawl("https://example.com")
-    
+
     await agent.shutdown()
-    
+
     assert result is not None
     assert "url" in result
     assert result["success"] is True

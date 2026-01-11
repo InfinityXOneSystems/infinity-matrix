@@ -1,6 +1,7 @@
 """Tests for sentiment analysis module."""
 
 import pytest
+
 from infinity_matrix.analytics.sentiment import SentimentAnalyzer
 
 
@@ -15,12 +16,12 @@ async def test_sentiment_analyzer_initialization():
 async def test_analyze_positive_sentiment():
     """Test positive sentiment analysis."""
     analyzer = SentimentAnalyzer()
-    
+
     result = await analyzer.analyze_text(
         "This is absolutely wonderful and amazing!",
         method="vader"
     )
-    
+
     assert result is not None
     assert result["success"] is True
     assert result["score"] > 0
@@ -31,12 +32,12 @@ async def test_analyze_positive_sentiment():
 async def test_analyze_negative_sentiment():
     """Test negative sentiment analysis."""
     analyzer = SentimentAnalyzer()
-    
+
     result = await analyzer.analyze_text(
         "This is terrible and awful.",
         method="vader"
     )
-    
+
     assert result is not None
     assert result["success"] is True
     assert result["score"] < 0
@@ -47,11 +48,11 @@ async def test_analyze_negative_sentiment():
 async def test_analyze_neutral_sentiment():
     """Test neutral sentiment analysis."""
     analyzer = SentimentAnalyzer()
-    
+
     result = await analyzer.analyze_text(
         "This is a statement.",
         method="vader"
     )
-    
+
     assert result is not None
     assert result["success"] is True

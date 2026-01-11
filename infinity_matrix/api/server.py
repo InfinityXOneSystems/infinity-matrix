@@ -1,11 +1,10 @@
 """FastAPI server for Infinity Matrix platform."""
 
 from contextlib import asynccontextmanager
-from typing import Any, Dict, List
+from typing import Any, dict, list
 
 from fastapi import FastAPI, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse
 from pydantic import BaseModel
 
 from infinity_matrix.core.config import settings
@@ -33,7 +32,7 @@ class LeadCriteria(BaseModel):
 class CampaignRequest(BaseModel):
     """Campaign creation request."""
     name: str
-    lead_ids: List[str]
+    lead_ids: list[str]
     template: str
     channel: str = "email"
 
@@ -66,7 +65,7 @@ app.add_middleware(
 
 
 @app.get("/")
-async def root() -> Dict[str, Any]:
+async def root() -> dict[str, Any]:
     """Root endpoint."""
     return {
         "name": "Infinity Matrix API",
@@ -76,16 +75,16 @@ async def root() -> Dict[str, Any]:
 
 
 @app.get("/health")
-async def health_check() -> Dict[str, str]:
+async def health_check() -> dict[str, str]:
     """Health check endpoint."""
     return {"status": "healthy"}
 
 
 # Financial Analysis Endpoints
 @app.post("/api/v1/finance/analyze")
-async def analyze_financial(request: AnalysisRequest) -> Dict[str, Any]:
+async def analyze_financial(request: AnalysisRequest) -> dict[str, Any]:
     """Analyze financial instrument."""
-    from infinity_matrix.industries.finance import FinancialAnalyzer, CryptoAnalyzer
+    from infinity_matrix.industries.finance import CryptoAnalyzer, FinancialAnalyzer
 
     try:
         if request.analysis_type == "crypto":
@@ -109,8 +108,8 @@ async def analyze_financial(request: AnalysisRequest) -> Dict[str, Any]:
 
 @app.get("/api/v1/finance/market-sentiment")
 async def get_market_sentiment(
-    symbols: List[str] = Query(..., description="List of stock symbols")
-) -> Dict[str, Any]:
+    symbols: list[str] = Query(..., description="list of stock symbols")
+) -> dict[str, Any]:
     """Get market sentiment for symbols."""
     from infinity_matrix.industries.finance import FinancialAnalyzer
 
@@ -129,14 +128,14 @@ async def get_market_sentiment(
 
 # Real Estate Endpoints
 @app.post("/api/v1/real-estate/discover-leads")
-async def discover_real_estate_leads(criteria: LeadCriteria) -> Dict[str, Any]:
+async def discover_real_estate_leads(criteria: LeadCriteria) -> dict[str, Any]:
     """Discover real estate leads."""
     from infinity_matrix.industries.real_estate import RealEstateEngine
 
     try:
         engine = RealEstateEngine()
         await engine.initialize()
-        
+
         leads = await engine.discover_leads(
             location=criteria.location,
             criteria={
@@ -145,7 +144,7 @@ async def discover_real_estate_leads(criteria: LeadCriteria) -> Dict[str, Any]:
                 "property_type": criteria.property_type,
             }
         )
-        
+
         await engine.shutdown()
 
         return {
@@ -163,7 +162,7 @@ async def discover_real_estate_leads(criteria: LeadCriteria) -> Dict[str, Any]:
 async def analyze_real_estate_market(
     location: str = Query(..., description="Location to analyze"),
     property_type: str = Query("residential", description="Property type")
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     """Analyze real estate market."""
     from infinity_matrix.industries.real_estate import RealEstateEngine
 
@@ -186,20 +185,20 @@ async def discover_loan_leads(
     loan_type: str = Query(..., description="Loan type"),
     min_amount: int = Query(0, description="Minimum loan amount"),
     max_amount: int = Query(1000000, description="Maximum loan amount"),
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     """Discover loan leads."""
     from infinity_matrix.industries.loans import LoanLeadGenerator
 
     try:
         generator = LoanLeadGenerator()
         await generator.initialize()
-        
+
         leads = await generator.discover_leads({
             "loan_type": loan_type,
             "min_amount": min_amount,
             "max_amount": max_amount,
         })
-        
+
         await generator.shutdown()
 
         return {
@@ -218,7 +217,7 @@ async def discover_loan_leads(
 async def get_economic_indicator(
     indicator: str = Query(..., description="Indicator name"),
     region: str = Query("US", description="Region code"),
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     """Get economic indicator."""
     from infinity_matrix.industries.economic import EconomicAnalyzer
 
@@ -238,7 +237,7 @@ async def get_economic_indicator(
 @app.get("/api/v1/economic/snapshot")
 async def get_economic_snapshot(
     region: str = Query("US", description="Region code"),
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     """Get economic snapshot."""
     from infinity_matrix.industries.economic import EconomicAnalyzer
 
@@ -260,7 +259,7 @@ async def get_economic_snapshot(
 async def analyze_sentiment(
     text: str = Query(..., description="Text to analyze"),
     method: str = Query("vader", description="Analysis method"),
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     """Analyze sentiment."""
     from infinity_matrix.analytics.sentiment import SentimentAnalyzer
 
@@ -277,24 +276,24 @@ async def analyze_sentiment(
 
 # Campaign Endpoints
 @app.post("/api/v1/campaigns/create")
-async def create_campaign(request: CampaignRequest) -> Dict[str, Any]:
+async def create_campaign(request: CampaignRequest) -> dict[str, Any]:
     """Create a campaign."""
     from infinity_matrix.campaigns import CampaignEngine
 
     try:
         engine = CampaignEngine()
         await engine.initialize()
-        
+
         # Would fetch actual leads from database
         leads = [{"id": lid, "contact": {}} for lid in request.lead_ids]
-        
+
         campaign_id = await engine.create_campaign(
             name=request.name,
             leads=leads,
             template=request.template,
             channel=request.channel,
         )
-        
+
         await engine.shutdown()
 
         return {
@@ -308,7 +307,7 @@ async def create_campaign(request: CampaignRequest) -> Dict[str, Any]:
 
 
 @app.post("/api/v1/campaigns/{campaign_id}/launch")
-async def launch_campaign(campaign_id: str) -> Dict[str, Any]:
+async def launch_campaign(campaign_id: str) -> dict[str, Any]:
     """Launch a campaign."""
     from infinity_matrix.campaigns import CampaignEngine
 
@@ -327,7 +326,7 @@ async def launch_campaign(campaign_id: str) -> Dict[str, Any]:
 
 
 @app.get("/api/v1/campaigns/{campaign_id}/status")
-async def get_campaign_status(campaign_id: str) -> Dict[str, Any]:
+async def get_campaign_status(campaign_id: str) -> dict[str, Any]:
     """Get campaign status."""
     from infinity_matrix.campaigns import CampaignEngine
 
@@ -349,7 +348,7 @@ async def get_campaign_status(campaign_id: str) -> Dict[str, Any]:
 async def crawl_url(
     url: str = Query(..., description="URL to crawl"),
     use_headless: bool = Query(True, description="Use headless browser"),
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     """Crawl a URL."""
     try:
         if use_headless:
@@ -372,7 +371,7 @@ async def crawl_url(
 
 if __name__ == "__main__":
     import uvicorn
-    
+
     uvicorn.run(
         "infinity_matrix.api.server:app",
         host=settings.api_host,

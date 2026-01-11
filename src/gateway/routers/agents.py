@@ -43,14 +43,14 @@ _agents: dict[str, dict[str, Any]] = {}
 
 @router.get(
     "/",
-    summary="List all agents",
+    summary="list all agents",
     response_model=list[AgentStatus],
 )
 async def list_agents() -> list[AgentStatus]:
-    """List all registered agents.
-    
+    """list all registered agents.
+
     Returns:
-        List of agent status information
+        list of agent status information
     """
     return [
         AgentStatus(
@@ -72,17 +72,17 @@ async def list_agents() -> list[AgentStatus]:
 )
 async def register_agent(agent: AgentRegistration) -> AgentResponse:
     """Register a new agent in the system.
-    
+
     Args:
         agent: Agent registration details
-        
+
     Returns:
         Registered agent information with API key
     """
     # Generate agent ID and API key
     agent_id = f"agent_{uuid4().hex[:12]}"
     api_key = f"key_{uuid4().hex}"
-    
+
     # Determine authority level based on agent type
     authority_levels = {
         "user": 0,
@@ -92,7 +92,7 @@ async def register_agent(agent: AgentRegistration) -> AgentResponse:
         "worker": 3,
     }
     authority_level = authority_levels.get(agent.agent_type.lower(), 3)
-    
+
     # Store agent data
     _agents[agent_id] = {
         "agent_id": agent_id,
@@ -105,7 +105,7 @@ async def register_agent(agent: AgentRegistration) -> AgentResponse:
         "created_at": "2025-12-30T22:47:42.913Z",
         "last_active": "2025-12-30T22:47:42.913Z",
     }
-    
+
     return AgentResponse(
         agent_id=agent_id,
         agent_type=agent.agent_type,
@@ -122,13 +122,13 @@ async def register_agent(agent: AgentRegistration) -> AgentResponse:
 )
 async def get_agent(agent_id: str) -> AgentStatus:
     """Get details of a specific agent.
-    
+
     Args:
         agent_id: Unique agent identifier
-        
+
     Returns:
         Agent status information
-        
+
     Raises:
         HTTPException: If agent not found
     """
@@ -137,7 +137,7 @@ async def get_agent(agent_id: str) -> AgentStatus:
             status_code=status.HTTP_404_NOT_FOUND,
             detail=f"Agent {agent_id} not found",
         )
-    
+
     agent_data = _agents[agent_id]
     return AgentStatus(
         agent_id=agent_id,
@@ -155,10 +155,10 @@ async def get_agent(agent_id: str) -> AgentStatus:
 )
 async def deregister_agent(agent_id: str) -> None:
     """Deregister an agent from the system.
-    
+
     Args:
         agent_id: Unique agent identifier
-        
+
     Raises:
         HTTPException: If agent not found
     """
@@ -167,5 +167,5 @@ async def deregister_agent(agent_id: str) -> None:
             status_code=status.HTTP_404_NOT_FOUND,
             detail=f"Agent {agent_id} not found",
         )
-    
+
     del _agents[agent_id]

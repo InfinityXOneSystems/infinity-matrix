@@ -1,6 +1,6 @@
 """Documentation Agent - Generates and manages documentation."""
 
-from typing import Any, Dict, List
+from typing import Any, dict, list
 
 from infinity_matrix.agents.base_agent import AgentCapability, BaseAgent
 from infinity_matrix.core.logging import get_logger
@@ -40,7 +40,7 @@ class DocAgent(BaseAgent):
             capabilities=capabilities,
         )
 
-    async def _execute(self, task: Dict[str, Any]) -> Dict[str, Any]:
+    async def _execute(self, task: dict[str, Any]) -> dict[str, Any]:
         """Execute documentation task."""
         action = task.get("action", "generate")
 
@@ -62,13 +62,13 @@ class DocAgent(BaseAgent):
         else:
             raise ValueError(f"Unknown action: {action}")
 
-    async def validate(self, task: Dict[str, Any]) -> bool:
+    async def validate(self, task: dict[str, Any]) -> bool:
         """Validate task input."""
         if "action" not in task:
             return False
         return True
 
-    async def _generate_docs(self, code: str, format: str) -> Dict[str, Any]:
+    async def _generate_docs(self, code: str, format: str) -> dict[str, Any]:
         """Generate documentation from code."""
         self.logger.info("generating_documentation", format=format)
 
@@ -83,8 +83,8 @@ class DocAgent(BaseAgent):
         }
 
     async def _update_docs(
-        self, documentation: str, changes: List[Dict[str, Any]]
-    ) -> Dict[str, Any]:
+        self, documentation: str, changes: list[dict[str, Any]]
+    ) -> dict[str, Any]:
         """Update existing documentation."""
         self.logger.info("updating_documentation", changes_count=len(changes))
 
@@ -102,7 +102,7 @@ class DocAgent(BaseAgent):
             "changes_applied": len(changes),
         }
 
-    async def _validate_docs(self, documentation: str, code: str) -> Dict[str, Any]:
+    async def _validate_docs(self, documentation: str, code: str) -> dict[str, Any]:
         """Validate documentation completeness."""
         self.logger.info("validating_documentation")
 
@@ -150,7 +150,7 @@ class DocAgent(BaseAgent):
 
     def _generate_markdown(self, code: str) -> str:
         """Generate markdown documentation."""
-        return f"""# API Documentation
+        return """# API Documentation
 
 ## Overview
 

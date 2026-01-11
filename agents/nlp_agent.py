@@ -3,7 +3,8 @@ NLP Agent - Handles natural language processing tasks.
 """
 
 import logging
-from typing import Dict, Any
+from typing import Any, dict
+
 from agents.base_agent import BaseAgent
 
 logger = logging.getLogger(__name__)
@@ -11,7 +12,7 @@ logger = logging.getLogger(__name__)
 
 class NLPAgent(BaseAgent):
     """Agent for NLP operations."""
-    
+
     def __init__(self, agent_id: str = "nlp-agent"):
         super().__init__(
             agent_id=agent_id,
@@ -25,19 +26,19 @@ class NLPAgent(BaseAgent):
                 "text_summarization"
             ]
         )
-    
+
     async def on_start(self) -> None:
         """Initialize NLP agent."""
         logger.info(f"{self.agent_id}: NLP agent started")
-    
+
     async def on_stop(self) -> None:
         """Cleanup NLP agent."""
         logger.info(f"{self.agent_id}: NLP agent stopped")
-    
-    async def process_request(self, request: Dict[str, Any]) -> Dict[str, Any]:
+
+    async def process_request(self, request: dict[str, Any]) -> dict[str, Any]:
         """Process NLP request."""
         request_type = request.get("type", "unknown")
-        
+
         if request_type == "sentiment_analysis":
             return await self.analyze_sentiment(request.get("data", {}))
         elif request_type == "entity_extraction":
@@ -49,8 +50,8 @@ class NLPAgent(BaseAgent):
                 "status": "error",
                 "message": f"Unknown request type: {request_type}"
             }
-    
-    async def analyze_sentiment(self, data: Dict[str, Any]) -> Dict[str, Any]:
+
+    async def analyze_sentiment(self, data: dict[str, Any]) -> dict[str, Any]:
         """Analyze sentiment of text."""
         logger.info(f"{self.agent_id}: Analyzing sentiment")
         return {
@@ -59,8 +60,8 @@ class NLPAgent(BaseAgent):
             "score": 0.85,
             "data": data
         }
-    
-    async def extract_entities(self, data: Dict[str, Any]) -> Dict[str, Any]:
+
+    async def extract_entities(self, data: dict[str, Any]) -> dict[str, Any]:
         """Extract named entities from text."""
         logger.info(f"{self.agent_id}: Extracting entities")
         return {
@@ -68,8 +69,8 @@ class NLPAgent(BaseAgent):
             "entities": [],
             "data": data
         }
-    
-    async def summarize_text(self, data: Dict[str, Any]) -> Dict[str, Any]:
+
+    async def summarize_text(self, data: dict[str, Any]) -> dict[str, Any]:
         """Summarize text."""
         logger.info(f"{self.agent_id}: Summarizing text")
         return {

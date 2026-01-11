@@ -2,13 +2,14 @@
 Admin Control Plane API
 Task management, approvals, and system monitoring
 """
-from fastapi import APIRouter, HTTPException, BackgroundTasks
-from pydantic import BaseModel
-from typing import Dict, Any, List, Optional
+import logging
 import uuid
 from datetime import datetime
 from enum import Enum
-import logging
+from typing import Any, dict, list
+
+from fastapi import APIRouter, BackgroundTasks, HTTPException
+from pydantic import BaseModel
 
 logger = logging.getLogger(__name__)
 
@@ -42,24 +43,24 @@ class AdminTask(BaseModel):
     name: str
     description: str
     task_type: str
-    parameters: Dict[str, Any]
+    parameters: dict[str, Any]
     priority: TaskPriority
     created_by: str
     created_at: datetime
     updated_at: datetime
     status: str  # pending, approved, rejected, executing, completed, failed
     approval_status: ApprovalStatus = ApprovalStatus.PENDING
-    approval_notes: Optional[str] = None
-    approved_by: Optional[str] = None
-    approved_at: Optional[datetime] = None
-    execution_result: Optional[Dict[str, Any]] = None
-    error_message: Optional[str] = None
+    approval_notes: str | None = None
+    approved_by: str | None = None
+    approved_at: datetime | None = None
+    execution_result: dict[str, Any] | None = None
+    error_message: str | None = None
 
 class ApprovalRequest(BaseModel):
     """Request to approve or reject a task"""
     task_id: str
     approved: bool
-    notes: Optional[str] = None
+    notes: str | None = None
     approved_by: str
 
 class SystemLog(BaseModel):
@@ -69,7 +70,7 @@ class SystemLog(BaseModel):
     level: str  # info, warning, error, critical
     component: str
     message: str
-    details: Dict[str, Any] = {}
+    details: dict[str, Any] = {}
 
 class SystemHealth(BaseModel):
     """System health status"""
@@ -87,16 +88,18 @@ class SystemHealth(BaseModel):
 # In-Memory Storage (replace with database in production)
 # ============================================================================
 
-admin_tasks: Dict[str, AdminTask] = {}
-system_logs: List[SystemLog] = []
-approval_queue: Dict[str, AdminTask] = {}
+admin_tasks: dict[str, AdminTask] = {}
+system_logs: list[SystemLog] = []
+approval_queue: dict[str, AdminTask] = {}
 
 # ============================================================================
 # Helper Functions
 # ============================================================================
 
-def add_log(level: str, component: str, message: str, details: Dict[str, Any] = {}):
+def add_log(level: str, component: str, message: str, details: dict[str, Any] = None):
     """Add an entry to the system log"""
+    if details is None:
+        details = {}
     log = SystemLog(
         log_id=str(uuid.uuid4()),
         timestamp=datetime.now(),
@@ -120,15 +123,15 @@ async def create_admin_task(
     name: str,
     description: str,
     task_type: str,
-    parameters: Dict[str, Any],
+    parameters: dict[str, Any],
     priority: TaskPriority = TaskPriority.NORMAL,
     created_by: str = "system"
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     """
     Create a new admin task for approval
     """
     task_id = str(uuid.uuid4())
-    
+
     task = AdminTask(
         task_id=task_id,
         name=name,
@@ -142,17 +145,17 @@ async def create_admin_task(
         status="pending",
         approval_status=ApprovalStatus.PENDING
     )
-    
+
     admin_tasks[task_id] = task
     approval_queue[task_id] = task
-    
+
     add_log(
         "info",
         "AdminControlPlane",
         f"Task created: {name}",
         {"task_id": task_id, "priority": priority.value}
     )
-    
+
     return {
         "task_id": task_id,
         "status": "created",
@@ -162,20 +165,20 @@ async def create_admin_task(
 
 @router.get("/approvals")
 async def get_approval_queue(
-    status: Optional[str] = None,
-    priority: Optional[str] = None
-) -> Dict[str, Any]:
+    status: str | None = None,
+    priority: str | None = None
+) -> dict[str, Any]:
     """
     Get the approval queue with optional filtering
     """
     queue = []
-    
-    for task_id, task in approval_queue.items():
+
+    for _task_id, task in approval_queue.items():
         if status and task.approval_status.value != status:
             continue
         if priority and task.priority.value != priority:
             continue
-        
+
         queue.append({
             "task_id": task.task_id,
             "name": task.name,
@@ -185,7 +188,7 @@ async def get_approval_queue(
             "created_at": task.created_at.isoformat(),
             "approval_status": task.approval_status.value
         })
-    
+
     return {
         "total_pending": len(queue),
         "filtered_status": status,
@@ -197,40 +200,40 @@ async def get_approval_queue(
 async def approve_task(
     task_id: str,
     approved_by: str,
-    notes: Optional[str] = None,
+    notes: str | None = None,
     background_tasks: BackgroundTasks = None
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     """
     Approve a task for execution
     """
     if task_id not in admin_tasks:
         raise HTTPException(status_code=404, detail=f"Task {task_id} not found")
-    
+
     task = admin_tasks[task_id]
-    
+
     if task.approval_status != ApprovalStatus.PENDING:
         raise HTTPException(
             status_code=400,
             detail=f"Task {task_id} is already {task.approval_status.value}"
         )
-    
+
     task.approval_status = ApprovalStatus.APPROVED
     task.approved_by = approved_by
     task.approved_at = datetime.now()
     task.approval_notes = notes
     task.status = "approved"
     task.updated_at = datetime.now()
-    
+
     if task_id in approval_queue:
         del approval_queue[task_id]
-    
+
     add_log(
         "info",
         "AdminControlPlane",
         f"Task approved: {task.name}",
         {"task_id": task_id, "approved_by": approved_by}
     )
-    
+
     return {
         "task_id": task_id,
         "approval_status": "approved",
@@ -242,39 +245,39 @@ async def approve_task(
 async def reject_task(
     task_id: str,
     approved_by: str,
-    notes: Optional[str] = None
-) -> Dict[str, Any]:
+    notes: str | None = None
+) -> dict[str, Any]:
     """
     Reject a task
     """
     if task_id not in admin_tasks:
         raise HTTPException(status_code=404, detail=f"Task {task_id} not found")
-    
+
     task = admin_tasks[task_id]
-    
+
     if task.approval_status != ApprovalStatus.PENDING:
         raise HTTPException(
             status_code=400,
             detail=f"Task {task_id} is already {task.approval_status.value}"
         )
-    
+
     task.approval_status = ApprovalStatus.REJECTED
     task.approved_by = approved_by
     task.approved_at = datetime.now()
     task.approval_notes = notes
     task.status = "rejected"
     task.updated_at = datetime.now()
-    
+
     if task_id in approval_queue:
         del approval_queue[task_id]
-    
+
     add_log(
         "warning",
         "AdminControlPlane",
         f"Task rejected: {task.name}",
         {"task_id": task_id, "rejected_by": approved_by}
     )
-    
+
     return {
         "task_id": task_id,
         "approval_status": "rejected",
@@ -283,24 +286,24 @@ async def reject_task(
     }
 
 @router.post("/execute/{task_id}")
-async def execute_approved_task(task_id: str) -> Dict[str, Any]:
+async def execute_approved_task(task_id: str) -> dict[str, Any]:
     """
     Execute an approved task
     """
     if task_id not in admin_tasks:
         raise HTTPException(status_code=404, detail=f"Task {task_id} not found")
-    
+
     task = admin_tasks[task_id]
-    
+
     if task.approval_status != ApprovalStatus.APPROVED:
         raise HTTPException(
             status_code=400,
             detail=f"Task {task_id} is not approved (status: {task.approval_status.value})"
         )
-    
+
     task.status = "executing"
     task.updated_at = datetime.now()
-    
+
     try:
         # Simulate task execution
         task.execution_result = {
@@ -312,53 +315,53 @@ async def execute_approved_task(task_id: str) -> Dict[str, Any]:
                 "timestamp": datetime.now().isoformat()
             }
         }
-        
+
         task.status = "completed"
-        
+
         add_log(
             "info",
             "AdminControlPlane",
             f"Task executed: {task.name}",
             {"task_id": task_id, "result": "success"}
         )
-        
+
         return {
             "task_id": task_id,
             "status": "completed",
             "result": task.execution_result,
             "message": f"Task {task.name} executed successfully"
         }
-        
+
     except Exception as e:
         task.status = "failed"
         task.error_message = str(e)
-        
+
         add_log(
             "error",
             "AdminControlPlane",
             f"Task execution failed: {task.name}",
             {"task_id": task_id, "error": str(e)}
         )
-        
+
         raise HTTPException(status_code=500, detail=f"Task execution failed: {str(e)}")
 
 @router.get("/logs")
 async def get_system_logs(
-    level: Optional[str] = None,
-    component: Optional[str] = None,
+    level: str | None = None,
+    component: str | None = None,
     limit: int = 100
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     """
     Get system activity logs with optional filtering
     """
     logs = []
-    
+
     for log in reversed(system_logs[-limit:]):
         if level and log.level != level:
             continue
         if component and log.component != component:
             continue
-        
+
         logs.append({
             "log_id": log.log_id,
             "timestamp": log.timestamp.isoformat(),
@@ -367,7 +370,7 @@ async def get_system_logs(
             "message": log.message,
             "details": log.details
         })
-    
+
     return {
         "total_logs": len(logs),
         "filtered_level": level,
@@ -376,7 +379,7 @@ async def get_system_logs(
     }
 
 @router.get("/health")
-async def get_system_health() -> Dict[str, Any]:
+async def get_system_health() -> dict[str, Any]:
     """
     Get overall system health status
     """
@@ -385,7 +388,7 @@ async def get_system_health() -> Dict[str, Any]:
     completed_tasks = sum(1 for t in admin_tasks.values() if t.status == "completed")
     failed_tasks = sum(1 for t in admin_tasks.values() if t.status == "failed")
     active_tasks = sum(1 for t in admin_tasks.values() if t.status == "executing")
-    
+
     # Determine health status
     if failed_tasks > total_tasks * 0.2:
         health_status = "degraded"
@@ -393,7 +396,7 @@ async def get_system_health() -> Dict[str, Any]:
         health_status = "critical"
     else:
         health_status = "healthy"
-    
+
     health = SystemHealth(
         status=health_status,
         uptime_seconds=3600.0,  # Simulated
@@ -405,19 +408,19 @@ async def get_system_health() -> Dict[str, Any]:
         cpu_usage_percent=32.1,  # Simulated
         last_check=datetime.now()
     )
-    
+
     return health.dict()
 
 @router.get("/tasks/{task_id}")
-async def get_task_details(task_id: str) -> Dict[str, Any]:
+async def get_task_details(task_id: str) -> dict[str, Any]:
     """
     Get detailed information about a specific task
     """
     if task_id not in admin_tasks:
         raise HTTPException(status_code=404, detail=f"Task {task_id} not found")
-    
+
     task = admin_tasks[task_id]
-    
+
     return {
         "task_id": task.task_id,
         "name": task.name,
@@ -438,7 +441,7 @@ async def get_task_details(task_id: str) -> Dict[str, Any]:
     }
 
 @router.get("/dashboard")
-async def get_admin_dashboard() -> Dict[str, Any]:
+async def get_admin_dashboard() -> dict[str, Any]:
     """
     Get comprehensive admin dashboard data
     """
@@ -446,7 +449,7 @@ async def get_admin_dashboard() -> Dict[str, Any]:
     pending_approvals = len(approval_queue)
     completed_tasks = sum(1 for t in admin_tasks.values() if t.status == "completed")
     failed_tasks = sum(1 for t in admin_tasks.values() if t.status == "failed")
-    
+
     # Get recent logs
     recent_logs = [
         {
@@ -456,7 +459,7 @@ async def get_admin_dashboard() -> Dict[str, Any]:
         }
         for log in system_logs[-10:]
     ]
-    
+
     return {
         "summary": {
             "total_tasks": total_tasks,

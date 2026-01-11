@@ -13,10 +13,9 @@ Handles:
 
 import logging
 import asyncio
-from typing import Dict, List, Optional, Any, Callable
+from collections.abc import Callable, dict, list, Optional, Any, 
 from datetime import datetime
 from dataclasses import dataclass, field
-import json
 from enum import Enum
 
 # Configure logging
@@ -36,10 +35,10 @@ class Permission(Enum):
 class Policy:
     """Security policy definition."""
     name: str
-    roles: List[str]
-    permissions: List[Permission]
-    resources: List[str]
-    conditions: Dict[str, Any] = field(default_factory=dict)
+    roles: list[str]
+    permissions: list[Permission]
+    resources: list[str]
+    conditions: dict[str, Any] = field(default_factory=dict)
 
 
 @dataclass
@@ -48,7 +47,7 @@ class Credential:
     name: str
     credential_type: str  # google, hostinger, vscode, api_key, etc.
     value: str
-    metadata: Dict[str, Any] = field(default_factory=dict)
+    metadata: dict[str, Any] = field(default_factory=dict)
     created_at: str = field(default_factory=lambda: datetime.utcnow().isoformat())
 
 
@@ -59,7 +58,7 @@ class Route:
     agent_id: str
     method: str = "POST"
     requires_auth: bool = True
-    policies: List[str] = field(default_factory=list)
+    policies: list[str] = field(default_factory=list)
     rate_limit: Optional[int] = None
 
 
@@ -67,11 +66,11 @@ class SecretManager:
     """Manages secrets and credentials."""
     
     def __init__(self):
-        self.secrets: Dict[str, Credential] = {}
+        self.secrets: dict[str, Credential] = {}
         logger.info("Secret Manager initialized")
     
     def store_secret(self, name: str, credential_type: str, value: str, 
-                     metadata: Optional[Dict[str, Any]] = None) -> None:
+                     metadata: Optional[dict[str, Any]] = None) -> None:
         """Store a secret credential."""
         self.secrets[name] = Credential(
             name=name,
@@ -93,8 +92,8 @@ class SecretManager:
             return True
         return False
     
-    def list_secrets(self) -> List[str]:
-        """List all secret names (not values)."""
+    def list_secrets(self) -> list[str]:
+        """list all secret names (not values)."""
         return list(self.secrets.keys())
 
 
@@ -102,8 +101,8 @@ class PolicyEnforcer:
     """Enforces RBAC policies."""
     
     def __init__(self):
-        self.policies: Dict[str, Policy] = {}
-        self.user_roles: Dict[str, List[str]] = {}
+        self.policies: dict[str, Policy] = {}
+        self.user_roles: dict[str, list[str]] = {}
         logger.info("Policy Enforcer initialized")
     
     def add_policy(self, policy: Policy) -> None:
@@ -141,7 +140,7 @@ class PolicyEnforcer:
         logger.warning(f"Permission denied: {user_id} -> {resource} ({permission.value})")
         return False
     
-    def get_user_permissions(self, user_id: str) -> Dict[str, Any]:
+    def get_user_permissions(self, user_id: str) -> dict[str, Any]:
         """Get all permissions for a user."""
         user_roles = self.user_roles.get(user_id, [])
         permissions = {
@@ -164,12 +163,12 @@ class OmniRouter:
     """Smart routing gateway for the Infinity Matrix system."""
     
     def __init__(self):
-        self.routes: Dict[str, Route] = {}
-        self.api_registry: Dict[str, Dict[str, Any]] = {}
+        self.routes: dict[str, Route] = {}
+        self.api_registry: dict[str, dict[str, Any]] = {}
         self.secret_manager = SecretManager()
         self.policy_enforcer = PolicyEnforcer()
-        self.event_handlers: Dict[str, List[Callable]] = {}
-        self.request_count: Dict[str, int] = {}
+        self.event_handlers: dict[str, list[Callable]] = {}
+        self.request_count: dict[str, int] = {}
         self.is_running = False
         logger.info("Omni Router initialized")
         
@@ -210,7 +209,7 @@ class OmniRouter:
         self.routes[route.path] = route
         logger.info(f"Registered route: {route.method} {route.path} -> {route.agent_id}")
     
-    def register_api(self, api_id: str, api_info: Dict[str, Any]) -> None:
+    def register_api(self, api_id: str, api_info: dict[str, Any]) -> None:
         """Register an API."""
         self.api_registry[api_id] = {
             "info": api_info,
@@ -232,7 +231,7 @@ class OmniRouter:
         self.event_handlers[event_type].append(handler)
         logger.info(f"Subscribed to event: {event_type}")
     
-    def publish_event(self, event_type: str, data: Dict[str, Any]) -> None:
+    def publish_event(self, event_type: str, data: dict[str, Any]) -> None:
         """Publish a routing event."""
         event = {
             "type": event_type,
@@ -248,7 +247,7 @@ class OmniRouter:
                 except Exception as e:
                     logger.error(f"Error in event handler: {e}")
     
-    async def route(self, request: Dict[str, Any]) -> Dict[str, Any]:
+    async def route(self, request: dict[str, Any]) -> dict[str, Any]:
         """Route a request with smart routing and policy enforcement."""
         path = request.get("path", "")
         user_id = request.get("user_id", "anonymous")
@@ -317,7 +316,7 @@ class OmniRouter:
             "routed_at": datetime.utcnow().isoformat()
         }
     
-    def get_status(self) -> Dict[str, Any]:
+    def get_status(self) -> dict[str, Any]:
         """Get gateway status."""
         return {
             "status": "running" if self.is_running else "stopped",

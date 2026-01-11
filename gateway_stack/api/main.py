@@ -2,12 +2,13 @@
 FastAPI main application for Infinity-Matrix Gateway
 """
 
+import sys
+from datetime import datetime
+from pathlib import Path
+
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
-from datetime import datetime
-import sys
-from pathlib import Path
 
 # Add project root to path
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
@@ -42,9 +43,9 @@ async def log_requests(request: Request, call_next):
     start_time = datetime.utcnow()
     response = await call_next(request)
     duration = (datetime.utcnow() - start_time).total_seconds()
-    
+
     print(f"{request.method} {request.url.path} - {response.status_code} - {duration:.3f}s")
-    
+
     return response
 
 
@@ -88,7 +89,7 @@ async def get_system_status():
 
 @app.get("/api/v1/agents")
 async def list_agents():
-    """List all agents."""
+    """list all agents."""
     # TODO: Integrate with Vision Cortex
     agents = [
         {"name": "crawler", "status": "idle", "type": "data"},
@@ -100,7 +101,7 @@ async def list_agents():
         {"name": "validator", "status": "idle", "type": "support"},
         {"name": "documentor", "status": "idle", "type": "support"},
     ]
-    
+
     return {
         "agents": agents,
         "total": len(agents)
@@ -124,7 +125,7 @@ async def get_agent_details(agent_name: str):
 
 @app.get("/api/v1/events")
 async def list_events(limit: int = 100, event_type: str = None):
-    """List recent events."""
+    """list recent events."""
     # TODO: Integrate with State Manager
     return {
         "events": [],

@@ -3,8 +3,7 @@ Approval system with multi-level gates for high-risk operations.
 """
 from datetime import datetime
 from enum import Enum
-from typing import Dict, List, Any, Optional
-import asyncio
+from typing import Any, dict, list
 
 import structlog
 
@@ -30,7 +29,7 @@ class RiskLevel(str, Enum):
 
 class ApprovalRequest:
     """Approval request data model."""
-    
+
     def __init__(
         self,
         request_id: str,
@@ -38,7 +37,7 @@ class ApprovalRequest:
         risk_level: RiskLevel,
         requester: str,
         description: str,
-        metadata: Optional[Dict[str, Any]] = None,
+        metadata: dict[str, Any] | None = None,
     ):
         self.request_id = request_id
         self.operation = operation
@@ -49,10 +48,10 @@ class ApprovalRequest:
         self.status = ApprovalStatus.PENDING
         self.created_at = datetime.now()
         self.updated_at = datetime.now()
-        self.approvers: List[Dict[str, Any]] = []
-        self.comments: List[Dict[str, Any]] = []
-    
-    def to_dict(self) -> Dict[str, Any]:
+        self.approvers: list[dict[str, Any]] = []
+        self.comments: list[dict[str, Any]] = []
+
+    def to_dict(self) -> dict[str, Any]:
         """Convert to dictionary."""
         return {
             "request_id": self.request_id,
@@ -71,27 +70,27 @@ class ApprovalRequest:
 
 class ApprovalSystem:
     """Multi-level approval system with agent handoff and escalation."""
-    
+
     def __init__(self):
-        self.requests: Dict[str, ApprovalRequest] = {}
+        self.requests: dict[str, ApprovalRequest] = {}
         self.approval_rules = {
             RiskLevel.LOW: {"required_approvals": 1, "auto_approve_threshold": 0.9},
             RiskLevel.MEDIUM: {"required_approvals": 2, "auto_approve_threshold": 0.95},
             RiskLevel.HIGH: {"required_approvals": 3, "auto_approve_threshold": None},
             RiskLevel.CRITICAL: {"required_approvals": 5, "auto_approve_threshold": None},
         }
-    
+
     async def submit_approval_request(
         self,
         operation: str,
         risk_level: RiskLevel,
         requester: str,
         description: str,
-        metadata: Optional[Dict[str, Any]] = None,
+        metadata: dict[str, Any] | None = None,
     ) -> ApprovalRequest:
         """Submit new approval request."""
         request_id = f"APR-{datetime.now().strftime('%Y%m%d-%H%M%S')}"
-        
+
         request = ApprovalRequest(
             request_id=request_id,
             operation=operation,
@@ -100,25 +99,25 @@ class ApprovalSystem:
             description=description,
             metadata=metadata,
         )
-        
+
         self.requests[request_id] = request
-        
+
         logger.info(
             "Approval request submitted",
             request_id=request_id,
             operation=operation,
             risk_level=risk_level.value,
         )
-        
+
         # Check if auto-approval is possible
         rules = self.approval_rules[risk_level]
         if rules["auto_approve_threshold"] and \
            metadata and \
            metadata.get("confidence", 0) >= rules["auto_approve_threshold"]:
             await self._auto_approve(request)
-        
+
         return request
-    
+
     async def _auto_approve(self, request: ApprovalRequest) -> None:
         """Auto-approve low-risk requests with high confidence."""
         request.status = ApprovalStatus.APPROVED
@@ -129,31 +128,31 @@ class ApprovalSystem:
             "timestamp": datetime.now().isoformat(),
             "comment": "Auto-approved based on confidence threshold",
         })
-        
+
         logger.info("Request auto-approved", request_id=request.request_id)
-    
+
     async def approve_request(
         self,
         request_id: str,
         approver: str,
-        comment: Optional[str] = None,
+        comment: str | None = None,
     ) -> ApprovalRequest:
         """Approve a request."""
         if request_id not in self.requests:
             raise ValueError(f"Request {request_id} not found")
-        
+
         request = self.requests[request_id]
-        
+
         if request.status != ApprovalStatus.PENDING:
             raise ValueError(f"Request {request_id} is not pending")
-        
+
         request.approvers.append({
             "approver": approver,
             "decision": "approved",
             "timestamp": datetime.now().isoformat(),
             "comment": comment or "",
         })
-        
+
         # Check if enough approvals
         required_approvals = self.approval_rules[request.risk_level]["required_approvals"]
         if len(request.approvers) >= required_approvals:
@@ -166,11 +165,11 @@ class ApprovalSystem:
                 approvals=len(request.approvers),
                 required=required_approvals,
             )
-        
+
         request.updated_at = datetime.now()
-        
+
         return request
-    
+
     async def reject_request(
         self,
         request_id: str,
@@ -180,12 +179,12 @@ class ApprovalSystem:
         """Reject a request."""
         if request_id not in self.requests:
             raise ValueError(f"Request {request_id} not found")
-        
+
         request = self.requests[request_id]
-        
+
         if request.status != ApprovalStatus.PENDING:
             raise ValueError(f"Request {request_id} is not pending")
-        
+
         request.status = ApprovalStatus.REJECTED
         request.updated_at = datetime.now()
         request.approvers.append({
@@ -194,11 +193,11 @@ class ApprovalSystem:
             "timestamp": datetime.now().isoformat(),
             "comment": reason,
         })
-        
+
         logger.info("Request rejected", request_id=request_id, approver=approver)
-        
+
         return request
-    
+
     async def escalate_request(
         self,
         request_id: str,
@@ -208,9 +207,9 @@ class ApprovalSystem:
         """Escalate a request to higher authority."""
         if request_id not in self.requests:
             raise ValueError(f"Request {request_id} not found")
-        
+
         request = self.requests[request_id]
-        
+
         request.status = ApprovalStatus.ESCALATED
         request.updated_at = datetime.now()
         request.comments.append({
@@ -219,50 +218,50 @@ class ApprovalSystem:
             "reason": reason,
             "timestamp": datetime.now().isoformat(),
         })
-        
+
         logger.warning(
             "Request escalated",
             request_id=request_id,
             escalated_to=escalated_to,
         )
-        
+
         return request
-    
-    def get_request(self, request_id: str) -> Optional[ApprovalRequest]:
+
+    def get_request(self, request_id: str) -> ApprovalRequest | None:
         """Get approval request by ID."""
         return self.requests.get(request_id)
-    
+
     def list_requests(
         self,
-        status: Optional[ApprovalStatus] = None,
-        risk_level: Optional[RiskLevel] = None,
-        requester: Optional[str] = None,
-    ) -> List[ApprovalRequest]:
-        """List approval requests with filters."""
+        status: ApprovalStatus | None = None,
+        risk_level: RiskLevel | None = None,
+        requester: str | None = None,
+    ) -> list[ApprovalRequest]:
+        """list approval requests with filters."""
         requests = list(self.requests.values())
-        
+
         if status:
             requests = [r for r in requests if r.status == status]
-        
+
         if risk_level:
             requests = [r for r in requests if r.risk_level == risk_level]
-        
+
         if requester:
             requests = [r for r in requests if r.requester == requester]
-        
+
         return sorted(requests, key=lambda x: x.created_at, reverse=True)
-    
-    def get_statistics(self) -> Dict[str, Any]:
+
+    def get_statistics(self) -> dict[str, Any]:
         """Get approval statistics."""
         total = len(self.requests)
-        
+
         by_status = {}
         by_risk_level = {}
-        
+
         for request in self.requests.values():
             by_status[request.status.value] = by_status.get(request.status.value, 0) + 1
             by_risk_level[request.risk_level.value] = by_risk_level.get(request.risk_level.value, 0) + 1
-        
+
         return {
             "total_requests": total,
             "by_status": by_status,

@@ -1,8 +1,8 @@
 """
 Competitive Analyzer - Analyzes competitive landscape
 """
-from typing import Dict, Any, List
 import logging
+from typing import Any, dict, list
 
 logger = logging.getLogger(__name__)
 
@@ -10,7 +10,7 @@ logger = logging.getLogger(__name__)
 class CompetitiveAnalyzer:
     """
     Analyzes competitive landscape and positioning.
-    
+
     Analyzes:
     - Direct and indirect competitors
     - Competitive advantages and disadvantages
@@ -18,15 +18,15 @@ class CompetitiveAnalyzer:
     - Competitive threats
     - White space opportunities
     """
-    
+
     async def analyze(
         self,
         business_name: str,
-        crawled_data: List[Dict[str, Any]]
-    ) -> Dict[str, Any]:
+        crawled_data: list[dict[str, Any]]
+    ) -> dict[str, Any]:
         """Generate comprehensive competitive analysis"""
         logger.info(f"Analyzing competitive landscape for {business_name}")
-        
+
         analysis = {
             "competitive_landscape": self._analyze_landscape(business_name, crawled_data),
             "competitor_profiles": self._profile_competitors(crawled_data),
@@ -38,14 +38,14 @@ class CompetitiveAnalyzer:
             "competitive_intensity": self._assess_competitive_intensity(crawled_data),
             "market_dynamics": self._analyze_market_dynamics(crawled_data)
         }
-        
+
         return analysis
-    
+
     def _analyze_landscape(
         self,
         business_name: str,
-        crawled_data: List[Dict[str, Any]]
-    ) -> Dict[str, Any]:
+        crawled_data: list[dict[str, Any]]
+    ) -> dict[str, Any]:
         """Analyze overall competitive landscape"""
         return {
             "market_structure": "Fragmented with emerging consolidation",
@@ -57,11 +57,11 @@ class CompetitiveAnalyzer:
             "barriers_to_entry": "Moderate to High",
             "competitive_dynamics": "Rapidly evolving"
         }
-    
+
     def _profile_competitors(
         self,
-        crawled_data: List[Dict[str, Any]]
-    ) -> List[Dict[str, Any]]:
+        crawled_data: list[dict[str, Any]]
+    ) -> list[dict[str, Any]]:
         """Profile key competitors"""
         return [
             {
@@ -92,11 +92,11 @@ class CompetitiveAnalyzer:
                 "threat_level": "Low to Medium"
             }
         ]
-    
+
     def _identify_advantages(
         self,
-        crawled_data: List[Dict[str, Any]]
-    ) -> List[str]:
+        crawled_data: list[dict[str, Any]]
+    ) -> list[str]:
         """Identify competitive advantages"""
         return [
             "Superior AI/ML technology stack",
@@ -108,11 +108,11 @@ class CompetitiveAnalyzer:
             "Better product-market fit for mid-market",
             "More agile and responsive to market changes"
         ]
-    
+
     def _identify_disadvantages(
         self,
-        crawled_data: List[Dict[str, Any]]
-    ) -> List[str]:
+        crawled_data: list[dict[str, Any]]
+    ) -> list[str]:
         """Identify competitive disadvantages"""
         return [
             "Lower brand recognition compared to leaders",
@@ -122,11 +122,11 @@ class CompetitiveAnalyzer:
             "Smaller partner ecosystem",
             "Less comprehensive product suite"
         ]
-    
+
     def _analyze_differentiation(
         self,
-        crawled_data: List[Dict[str, Any]]
-    ) -> Dict[str, Any]:
+        crawled_data: list[dict[str, Any]]
+    ) -> dict[str, Any]:
         """Analyze differentiation strategy"""
         return {
             "primary_differentiators": [
@@ -140,11 +140,11 @@ class CompetitiveAnalyzer:
             "customer_perception": "Differentiated and valuable",
             "uniqueness_score": 8.0
         }
-    
+
     def _identify_threats(
         self,
-        crawled_data: List[Dict[str, Any]]
-    ) -> List[Dict[str, str]]:
+        crawled_data: list[dict[str, Any]]
+    ) -> list[dict[str, str]]:
         """Identify competitive threats"""
         return [
             {
@@ -166,11 +166,11 @@ class CompetitiveAnalyzer:
                 "mitigation": "Focus on value and differentiation"
             }
         ]
-    
+
     def _identify_white_space(
         self,
-        crawled_data: List[Dict[str, Any]]
-    ) -> List[Dict[str, str]]:
+        crawled_data: list[dict[str, Any]]
+    ) -> list[dict[str, str]]:
         """Identify market white space opportunities"""
         return [
             {
@@ -192,11 +192,11 @@ class CompetitiveAnalyzer:
                 "feasibility": "Medium"
             }
         ]
-    
+
     def _assess_competitive_intensity(
         self,
-        crawled_data: List[Dict[str, Any]]
-    ) -> Dict[str, Any]:
+        crawled_data: list[dict[str, Any]]
+    ) -> dict[str, Any]:
         """Assess competitive intensity"""
         return {
             "overall_intensity": "High",
@@ -210,11 +210,11 @@ class CompetitiveAnalyzer:
             },
             "trend": "Increasing"
         }
-    
+
     def _analyze_market_dynamics(
         self,
-        crawled_data: List[Dict[str, Any]]
-    ) -> Dict[str, Any]:
+        crawled_data: list[dict[str, Any]]
+    ) -> dict[str, Any]:
         """Analyze market dynamics"""
         return {
             "market_growth_rate": "25-30% CAGR",

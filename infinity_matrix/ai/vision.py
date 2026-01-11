@@ -1,10 +1,8 @@
 """Vision Cortex - Image and document analysis using Google Vision API."""
 
 import base64
-from pathlib import Path
-from typing import Any, Dict, List, Optional, Union
+from typing import Any, dict, list
 
-from infinity_matrix.core.config import settings
 from infinity_matrix.core.logging import LoggerMixin
 
 
@@ -15,10 +13,10 @@ class VisionCortex(LoggerMixin):
         """Initialize Vision API client."""
         try:
             from google.cloud import vision
-            
+
             self.client = vision.ImageAnnotatorClient()
             self.vision = vision
-            
+
             self.log_info("vision_cortex_initialized")
         except ImportError:
             self.log_error("vision_api_import_failed")
@@ -26,20 +24,20 @@ class VisionCortex(LoggerMixin):
 
     async def analyze_image(
         self,
-        image_path: Optional[str] = None,
-        image_url: Optional[str] = None,
-        image_bytes: Optional[bytes] = None,
-        features: Optional[List[str]] = None,
-    ) -> Dict[str, Any]:
+        image_path: str | None = None,
+        image_url: str | None = None,
+        image_bytes: bytes | None = None,
+        features: list[str] | None = None,
+    ) -> dict[str, Any]:
         """
         Analyze image with various detection features.
-        
+
         Args:
             image_path: Local path to image
             image_url: URL of image
             image_bytes: Raw image bytes
-            features: List of features to detect (labels, faces, text, etc.)
-            
+            features: list of features to detect (labels, faces, text, etc.)
+
         Returns:
             Analysis results
         """
@@ -58,12 +56,12 @@ class VisionCortex(LoggerMixin):
             raise ValueError("Must provide image_path, image_url, or image_bytes")
 
         image = self.vision.Image(content=content)
-        
+
         # Default features if none specified
         if not features:
             features = ["labels", "text", "objects", "faces"]
 
-        results: Dict[str, Any] = {}
+        results: dict[str, Any] = {}
 
         try:
             # Label detection
@@ -175,15 +173,15 @@ class VisionCortex(LoggerMixin):
     async def extract_document_text(
         self,
         document_path: str,
-        language_hints: Optional[List[str]] = None,
-    ) -> Dict[str, Any]:
+        language_hints: list[str] | None = None,
+    ) -> dict[str, Any]:
         """
         Extract text from document (PDF, DOCX, etc.).
-        
+
         Args:
             document_path: Path to document
             language_hints: Language hints for OCR
-            
+
         Returns:
             Extracted text and metadata
         """
@@ -192,7 +190,7 @@ class VisionCortex(LoggerMixin):
                 content = f.read()
 
             image = self.vision.Image(content=content)
-            
+
             # Configure OCR
             image_context = self.vision.ImageContext(
                 language_hints=language_hints or ["en"]
@@ -206,7 +204,7 @@ class VisionCortex(LoggerMixin):
             if response.full_text_annotation:
                 text = response.full_text_annotation.text
                 pages = []
-                
+
                 for page in response.full_text_annotation.pages:
                     page_info = {
                         "width": page.width,
@@ -241,28 +239,28 @@ class VisionCortex(LoggerMixin):
 
     async def analyze_batch_images(
         self,
-        image_paths: List[str],
-        features: Optional[List[str]] = None,
-    ) -> List[Dict[str, Any]]:
+        image_paths: list[str],
+        features: list[str] | None = None,
+    ) -> list[dict[str, Any]]:
         """
         Analyze multiple images in batch.
-        
+
         Args:
-            image_paths: List of image paths
+            image_paths: list of image paths
             features: Features to detect
-            
+
         Returns:
-            List of analysis results
+            list of analysis results
         """
         import asyncio
-        
+
         tasks = [
             self.analyze_image(image_path=path, features=features)
             for path in image_paths
         ]
-        
+
         results = await asyncio.gather(*tasks, return_exceptions=True)
-        
+
         self.log_info("batch_analysis_complete", count=len(results))
         return results
 

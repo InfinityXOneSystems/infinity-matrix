@@ -30,7 +30,7 @@ class CrawlerAgent:
             input_signal: Optional signal to guide crawling
 
         Returns:
-            List of raw data/assets collected
+            list of raw data/assets collected
         """
         print("CrawlerAgent: Crawling sources...")
 

@@ -4,7 +4,7 @@ import json
 from datetime import datetime
 from enum import Enum
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any, dict, list, Optional
 from uuid import uuid4
 
 from pydantic import BaseModel, Field
@@ -39,7 +39,7 @@ class AuditEvent(BaseModel):
     action: str
     resource: Optional[str] = None
     status: str  # success, failure, in_progress
-    metadata: Dict[str, Any] = Field(default_factory=dict)
+    metadata: dict[str, Any] = Field(default_factory=dict)
     correlation_id: Optional[str] = None
 
 
@@ -50,7 +50,7 @@ class AuditLogger(BaseService):
         """Initialize audit logger."""
         super().__init__(name="audit_logger")
         self.settings = get_settings()
-        self._events: List[AuditEvent] = []
+        self._events: list[AuditEvent] = []
         self._storage_path = Path(self.settings.logs_storage_path)
 
     async def _initialize(self) -> None:
@@ -83,7 +83,7 @@ class AuditLogger(BaseService):
         action: str,
         status: str = "success",
         resource: Optional[str] = None,
-        metadata: Optional[Dict[str, Any]] = None,
+        metadata: Optional[dict[str, Any]] = None,
         correlation_id: Optional[str] = None,
     ) -> AuditEvent:
         """Log an audit event."""
@@ -120,7 +120,7 @@ class AuditLogger(BaseService):
         start_time: Optional[datetime] = None,
         end_time: Optional[datetime] = None,
         limit: int = 100,
-    ) -> List[AuditEvent]:
+    ) -> list[AuditEvent]:
         """Query audit events."""
         events = self._events
 
@@ -150,11 +150,11 @@ class AuditLogger(BaseService):
                 return event
         return None
 
-    async def get_events_by_correlation(self, correlation_id: str) -> List[AuditEvent]:
+    async def get_events_by_correlation(self, correlation_id: str) -> list[AuditEvent]:
         """Get all events with the same correlation ID."""
         return [e for e in self._events if e.correlation_id == correlation_id]
 
-    async def verify_event(self, event_id: str) -> Dict[str, Any]:
+    async def verify_event(self, event_id: str) -> dict[str, Any]:
         """Verify event integrity and authenticity."""
         event = await self.get_event(event_id)
 
@@ -177,7 +177,7 @@ class AuditLogger(BaseService):
         self,
         start_time: datetime,
         end_time: datetime,
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """Generate audit report for a time period."""
         events = await self.get_events(
             start_time=start_time,

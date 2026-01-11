@@ -3,7 +3,8 @@ Analytics Agent - Handles data analytics and reporting.
 """
 
 import logging
-from typing import Dict, Any
+from typing import Any, dict
+
 from agents.base_agent import BaseAgent
 
 logger = logging.getLogger(__name__)
@@ -11,7 +12,7 @@ logger = logging.getLogger(__name__)
 
 class AnalyticsAgent(BaseAgent):
     """Agent for analytics operations."""
-    
+
     def __init__(self, agent_id: str = "analytics-agent"):
         super().__init__(
             agent_id=agent_id,
@@ -25,19 +26,19 @@ class AnalyticsAgent(BaseAgent):
                 "predictive_modeling"
             ]
         )
-    
+
     async def on_start(self) -> None:
         """Initialize analytics agent."""
         logger.info(f"{self.agent_id}: Analytics agent started")
-    
+
     async def on_stop(self) -> None:
         """Cleanup analytics agent."""
         logger.info(f"{self.agent_id}: Analytics agent stopped")
-    
-    async def process_request(self, request: Dict[str, Any]) -> Dict[str, Any]:
+
+    async def process_request(self, request: dict[str, Any]) -> dict[str, Any]:
         """Process analytics request."""
         request_type = request.get("type", "unknown")
-        
+
         if request_type == "data_analysis":
             return await self.analyze_data(request.get("data", {}))
         elif request_type == "report_generation":
@@ -49,8 +50,8 @@ class AnalyticsAgent(BaseAgent):
                 "status": "error",
                 "message": f"Unknown request type: {request_type}"
             }
-    
-    async def analyze_data(self, data: Dict[str, Any]) -> Dict[str, Any]:
+
+    async def analyze_data(self, data: dict[str, Any]) -> dict[str, Any]:
         """Analyze data."""
         logger.info(f"{self.agent_id}: Analyzing data")
         return {
@@ -58,8 +59,8 @@ class AnalyticsAgent(BaseAgent):
             "insights": ["Insight 1", "Insight 2"],
             "data": data
         }
-    
-    async def generate_report(self, data: Dict[str, Any]) -> Dict[str, Any]:
+
+    async def generate_report(self, data: dict[str, Any]) -> dict[str, Any]:
         """Generate analytics report."""
         logger.info(f"{self.agent_id}: Generating report")
         return {
@@ -67,8 +68,8 @@ class AnalyticsAgent(BaseAgent):
             "report_id": "RPT-12345",
             "data": data
         }
-    
-    async def detect_trends(self, data: Dict[str, Any]) -> Dict[str, Any]:
+
+    async def detect_trends(self, data: dict[str, Any]) -> dict[str, Any]:
         """Detect trends in data."""
         logger.info(f"{self.agent_id}: Detecting trends")
         return {

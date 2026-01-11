@@ -1,7 +1,7 @@
 """Sentiment analysis engine using multiple approaches."""
 
-from typing import Any, Dict, List, Optional
 from enum import Enum
+from typing import Any, dict, list
 
 from infinity_matrix.core.logging import LoggerMixin
 
@@ -41,14 +41,14 @@ class SentimentAnalyzer(LoggerMixin):
 
     async def analyze_text(
         self, text: str, method: str = "vader"
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """
         Analyze sentiment of text.
-        
+
         Args:
             text: Text to analyze
             method: Analysis method (vader, textblob, llm)
-            
+
         Returns:
             Sentiment analysis results
         """
@@ -61,11 +61,11 @@ class SentimentAnalyzer(LoggerMixin):
         else:
             raise ValueError(f"Unknown method: {method}")
 
-    async def _analyze_vader(self, text: str) -> Dict[str, Any]:
+    async def _analyze_vader(self, text: str) -> dict[str, Any]:
         """Analyze using VADER."""
         vader = self._get_vader()
         scores = vader.polarity_scores(text)
-        
+
         # Determine label
         compound = scores["compound"]
         if compound >= 0.5:
@@ -87,14 +87,14 @@ class SentimentAnalyzer(LoggerMixin):
             "success": True,
         }
 
-    async def _analyze_textblob(self, text: str) -> Dict[str, Any]:
+    async def _analyze_textblob(self, text: str) -> dict[str, Any]:
         """Analyze using TextBlob."""
         TextBlob = self._get_textblob()
         blob = TextBlob(text)
-        
+
         polarity = blob.sentiment.polarity
         subjectivity = blob.sentiment.subjectivity
-        
+
         # Determine label
         if polarity >= 0.5:
             label = SentimentLabel.VERY_POSITIVE
@@ -116,21 +116,21 @@ class SentimentAnalyzer(LoggerMixin):
             "success": True,
         }
 
-    async def _analyze_llm(self, text: str) -> Dict[str, Any]:
+    async def _analyze_llm(self, text: str) -> dict[str, Any]:
         """Analyze using LLM."""
         from infinity_matrix.ai.llm import analyze_with_llm
-        
+
         result = await analyze_with_llm(text, "sentiment")
-        
+
         # Parse LLM response to extract score
         # This is a simplified version - production would need proper parsing
         response = result.get("result", "")
-        
+
         # Try to extract numeric score from response
         import re
         match = re.search(r"[-+]?\d*\.?\d+", response)
         score = float(match.group()) if match else 0.0
-        
+
         # Determine label
         if score >= 0.5:
             label = SentimentLabel.VERY_POSITIVE
@@ -152,24 +152,24 @@ class SentimentAnalyzer(LoggerMixin):
         }
 
     async def analyze_batch(
-        self, texts: List[str], method: str = "vader"
-    ) -> List[Dict[str, Any]]:
+        self, texts: list[str], method: str = "vader"
+    ) -> list[dict[str, Any]]:
         """Analyze multiple texts."""
         import asyncio
-        
+
         tasks = [self.analyze_text(text, method) for text in texts]
         results = await asyncio.gather(*tasks)
-        
+
         self.log_info("batch_sentiment_analysis_complete", count=len(results))
         return results
 
-    async def analyze_consensus(self, text: str) -> Dict[str, Any]:
+    async def analyze_consensus(self, text: str) -> dict[str, Any]:
         """
         Analyze using multiple methods and return consensus.
-        
+
         Args:
             text: Text to analyze
-            
+
         Returns:
             Consensus sentiment analysis
         """
@@ -178,11 +178,11 @@ class SentimentAnalyzer(LoggerMixin):
             methods.append("llm")
 
         results = await self.analyze_batch([text] * len(methods), method=methods[0])
-        
+
         # Calculate average score
         scores = [r["score"] for r in results if r.get("success")]
         avg_score = sum(scores) / len(scores) if scores else 0.0
-        
+
         # Determine consensus label
         if avg_score >= 0.5:
             label = SentimentLabel.VERY_POSITIVE
@@ -203,11 +203,11 @@ class SentimentAnalyzer(LoggerMixin):
             "success": True,
         }
 
-    def _calculate_confidence(self, scores: List[float]) -> float:
+    def _calculate_confidence(self, scores: list[float]) -> float:
         """Calculate confidence based on score variance."""
         if len(scores) < 2:
             return 1.0
-        
+
         import statistics
         variance = statistics.variance(scores)
         # Lower variance = higher confidence
@@ -216,16 +216,16 @@ class SentimentAnalyzer(LoggerMixin):
 
     async def track_sentiment_over_time(
         self,
-        texts_with_timestamps: List[tuple[str, str]],
+        texts_with_timestamps: list[tuple[str, str]],
         method: str = "vader",
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """
         Track sentiment changes over time.
-        
+
         Args:
-            texts_with_timestamps: List of (text, timestamp) tuples
+            texts_with_timestamps: list of (text, timestamp) tuples
             method: Analysis method
-            
+
         Returns:
             Sentiment trend analysis
         """
@@ -240,7 +240,7 @@ class SentimentAnalyzer(LoggerMixin):
         # Calculate trend
         scores = [r["sentiment"]["score"] for r in results]
         trend = "increasing" if scores[-1] > scores[0] else "decreasing"
-        
+
         return {
             "timeline": results,
             "trend": trend,

@@ -1,6 +1,7 @@
 """Tests for agent registry."""
 
 import pytest
+
 from infinity_matrix.agents import AgentRegistry, BaseAgent
 
 

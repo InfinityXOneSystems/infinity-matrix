@@ -7,7 +7,7 @@ and managing the auto-builder system.
 
 from contextlib import asynccontextmanager
 from datetime import datetime, timedelta, timezone
-from typing import Any, AsyncGenerator, Optional
+from collections.abc import AsyncGenerator, Any, , Optional
 
 from fastapi import Depends, FastAPI, HTTPException, status
 from fastapi.middleware.cors import CORSMiddleware
@@ -216,7 +216,7 @@ async def get_build(
 async def list_builds(
     current_user: TokenData = Depends(get_current_user),
 ) -> list[BuildStatus]:
-    """List all builds."""
+    """list all builds."""
     return await auto_builder.list_builds()
 
 
@@ -241,7 +241,7 @@ async def cancel_build(
 async def list_agents(
     current_user: TokenData = Depends(get_current_user),
 ) -> dict[str, Any]:
-    """List all registered agents."""
+    """list all registered agents."""
     vision_cortex = auto_builder.get_vision_cortex()
     return {
         "agents": vision_cortex.list_agents(),

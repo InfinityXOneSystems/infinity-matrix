@@ -2,7 +2,6 @@
 
 import logging
 import sys
-from typing import Any, Dict, Optional
 
 import structlog
 from structlog.types import EventDict, Processor
@@ -58,7 +57,7 @@ def configure_logging() -> None:
     )
 
 
-def get_logger(name: Optional[str] = None) -> structlog.stdlib.BoundLogger:
+def get_logger(name: str | None = None) -> structlog.stdlib.BoundLogger:
     """Get a configured logger instance."""
     return structlog.get_logger(name)
 

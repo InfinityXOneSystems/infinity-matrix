@@ -2,8 +2,8 @@
 
 import pytest
 
-from infinity_matrix.core.blueprint import Blueprint, ProjectType
 from infinity_matrix.core.auto_builder import AutoBuilder
+from infinity_matrix.core.blueprint import Blueprint, ProjectType
 from infinity_matrix.core.vision_cortex import VisionCortex
 
 
@@ -97,7 +97,7 @@ class TestAutoBuilder:
         # Create a build
         await builder.build(prompt="Test build")
 
-        # List builds
+        # list builds
         builds = await builder.list_builds()
 
         assert len(builds) >= 1

@@ -1,19 +1,15 @@
 """
 Discovery API Endpoints
 """
-from fastapi import APIRouter, Depends, HTTPException, BackgroundTasks
-from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select
-from typing import List
+from typing import list
 
 from app.core.database import get_db
 from app.models.models import Discovery, DiscoveryStatus
-from app.models.schemas import (
-    DiscoveryRequest,
-    DiscoveryResponse,
-    ComprehensiveDiscoveryPack
-)
+from app.models.schemas import ComprehensiveDiscoveryPack, DiscoveryRequest, DiscoveryResponse
 from app.services.discovery_service import DiscoveryService
+from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException
+from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
 
 router = APIRouter()
 
@@ -26,7 +22,7 @@ async def start_discovery(
 ):
     """
     Start a new discovery session.
-    
+
     Accepts client name and business name, then automatically:
     - Crawls public information
     - Analyzes business and competitive landscape
@@ -39,18 +35,18 @@ async def start_discovery(
         business_name=request.business_name,
         status=DiscoveryStatus.PENDING
     )
-    
+
     db.add(discovery)
     await db.commit()
     await db.refresh(discovery)
-    
+
     # Start discovery process in background
     discovery_service = DiscoveryService(db)
     background_tasks.add_task(
         discovery_service.run_discovery,
         discovery.id
     )
-    
+
     return discovery
 
 
@@ -64,20 +60,20 @@ async def get_discovery(
         select(Discovery).where(Discovery.id == discovery_id)
     )
     discovery = result.scalar_one_or_none()
-    
+
     if not discovery:
         raise HTTPException(status_code=404, detail="Discovery not found")
-    
+
     return discovery
 
 
-@router.get("/", response_model=List[DiscoveryResponse])
+@router.get("/", response_model=list[DiscoveryResponse])
 async def list_discoveries(
     skip: int = 0,
     limit: int = 100,
     db: AsyncSession = Depends(get_db)
 ):
-    """List all discoveries"""
+    """list all discoveries"""
     result = await db.execute(
         select(Discovery)
         .order_by(Discovery.created_at.desc())
@@ -102,10 +98,10 @@ async def get_complete_discovery_pack(
     """
     discovery_service = DiscoveryService(db)
     pack = await discovery_service.get_comprehensive_pack(discovery_id)
-    
+
     if not pack:
         raise HTTPException(status_code=404, detail="Discovery pack not found or not ready")
-    
+
     return pack
 
 
@@ -119,11 +115,11 @@ async def delete_discovery(
         select(Discovery).where(Discovery.id == discovery_id)
     )
     discovery = result.scalar_one_or_none()
-    
+
     if not discovery:
         raise HTTPException(status_code=404, detail="Discovery not found")
-    
+
     await db.delete(discovery)
     await db.commit()
-    
+
     return None

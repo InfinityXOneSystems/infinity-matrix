@@ -1,9 +1,9 @@
 """Base agent interface and common functionality."""
 
 from abc import ABC, abstractmethod
-from datetime import datetime, timezone
+from datetime import datetime
 from enum import Enum
-from typing import Any, Optional
+from typing import Any
 from uuid import uuid4
 
 from pydantic import BaseModel, Field
@@ -50,22 +50,22 @@ class AgentResult(BaseModel):
     agent_type: AgentType
     status: AgentStatus
     output_data: dict[str, Any] = Field(default_factory=dict)
-    error: Optional[str] = None
+    error: str | None = None
     metadata: dict[str, Any] = Field(default_factory=dict)
     started_at: datetime = Field(default_factory=datetime.utcnow)
-    completed_at: Optional[datetime] = None
-    duration_seconds: Optional[float] = None
+    completed_at: datetime | None = None
+    duration_seconds: float | None = None
 
 
 class BaseAgent(ABC):
     """
     Base class for all agents in the system.
-    
+
     Each agent is a specialized component that performs specific tasks
     in the auto-builder pipeline.
     """
 
-    def __init__(self, agent_type: AgentType, config: Optional[dict[str, Any]] = None):
+    def __init__(self, agent_type: AgentType, config: dict[str, Any] | None = None):
         """Initialize the agent."""
         self.agent_type = agent_type
         self.config = config or {}
@@ -75,22 +75,21 @@ class BaseAgent(ABC):
     async def execute(self, task: AgentTask) -> AgentResult:
         """
         Execute a task.
-        
+
         Args:
             task: The task to execute
-            
+
         Returns:
             AgentResult with the execution results
         """
-        pass
 
     async def validate_task(self, task: AgentTask) -> bool:
         """
         Validate if the task can be executed by this agent.
-        
+
         Args:
             task: The task to validate
-            
+
         Returns:
             True if task is valid for this agent
         """
@@ -99,9 +98,9 @@ class BaseAgent(ABC):
     def get_capabilities(self) -> list[str]:
         """
         Get the list of capabilities this agent provides.
-        
+
         Returns:
-            List of capability names
+            list of capability names
         """
         return []
 

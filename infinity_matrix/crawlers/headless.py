@@ -1,10 +1,9 @@
 """Headless crawler engine using Playwright."""
 
 import asyncio
-from typing import Any, Dict, List, Optional
-from urllib.parse import urlparse
+from typing import Any, dict, list
 
-from playwright.async_api import async_playwright, Browser, BrowserContext, Page
+from playwright.async_api import Browser, BrowserContext, Page, async_playwright
 from tenacity import retry, stop_after_attempt, wait_exponential
 
 from infinity_matrix.core.base import BaseCrawler
@@ -18,14 +17,14 @@ class HeadlessCrawler(BaseCrawler):
         """Initialize crawler."""
         super().__init__(kwargs)
         self.anti_detection = anti_detection
-        self.browser: Optional[Browser] = None
-        self.context: Optional[BrowserContext] = None
+        self.browser: Browser | None = None
+        self.context: BrowserContext | None = None
         self._playwright = None
 
     async def initialize(self) -> None:
         """Initialize browser resources."""
         self._playwright = await async_playwright().start()
-        
+
         # Launch browser with anti-detection
         self.browser = await self._playwright.chromium.launch(
             headless=True,
@@ -51,12 +50,12 @@ class HeadlessCrawler(BaseCrawler):
                 Object.defineProperty(navigator, 'webdriver', {
                     get: () => undefined
                 });
-                
+
                 // Mock plugins
                 Object.defineProperty(navigator, 'plugins', {
                     get: () => [1, 2, 3, 4, 5]
                 });
-                
+
                 // Mock languages
                 Object.defineProperty(navigator, 'languages', {
                     get: () => ['en-US', 'en']
@@ -82,21 +81,21 @@ class HeadlessCrawler(BaseCrawler):
     async def crawl(
         self,
         url: str,
-        selectors: Optional[Dict[str, str]] = None,
-        wait_for_selector: Optional[str] = None,
+        selectors: dict[str, str] | None = None,
+        wait_for_selector: str | None = None,
         screenshot: bool = False,
         javascript: bool = True,
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """
         Crawl a URL and extract data.
-        
+
         Args:
             url: URL to crawl
             selectors: Dictionary of CSS selectors to extract data
             wait_for_selector: Wait for this selector before extracting
             screenshot: Take a screenshot
             javascript: Enable JavaScript
-            
+
         Returns:
             Dictionary with extracted data
         """
@@ -106,7 +105,7 @@ class HeadlessCrawler(BaseCrawler):
         self.log_info("crawling_url", url=url)
 
         page = await self.context.new_page()
-        
+
         try:
             # Navigate to URL
             response = await page.goto(
@@ -120,7 +119,7 @@ class HeadlessCrawler(BaseCrawler):
                 await page.wait_for_selector(wait_for_selector, timeout=10000)
 
             # Extract data using selectors
-            data: Dict[str, Any] = {
+            data: dict[str, Any] = {
                 "url": url,
                 "status": response.status if response else None,
                 "title": await page.title(),
@@ -158,24 +157,24 @@ class HeadlessCrawler(BaseCrawler):
 
     async def crawl_multiple(
         self,
-        urls: List[str],
+        urls: list[str],
         concurrent: int = 5,
         **kwargs: Any,
-    ) -> List[Dict[str, Any]]:
+    ) -> list[dict[str, Any]]:
         """
         Crawl multiple URLs concurrently.
-        
+
         Args:
-            urls: List of URLs to crawl
+            urls: list of URLs to crawl
             concurrent: Number of concurrent requests
             **kwargs: Arguments to pass to crawl()
-            
+
         Returns:
-            List of results
+            list of results
         """
         semaphore = asyncio.Semaphore(concurrent)
 
-        async def crawl_with_semaphore(url: str) -> Dict[str, Any]:
+        async def crawl_with_semaphore(url: str) -> dict[str, Any]:
             async with semaphore:
                 try:
                     return await self.crawl(url, **kwargs)
@@ -187,7 +186,7 @@ class HeadlessCrawler(BaseCrawler):
             *[crawl_with_semaphore(url) for url in urls],
             return_exceptions=False,
         )
-        
+
         return results
 
     async def execute_javascript(self, page: Page, script: str) -> Any:
@@ -199,7 +198,7 @@ class HeadlessCrawler(BaseCrawler):
         await page.wait_for_selector(selector)
         await page.click(selector)
 
-    async def fill_form(self, page: Page, form_data: Dict[str, str]) -> None:
+    async def fill_form(self, page: Page, form_data: dict[str, str]) -> None:
         """Fill a form with data."""
         for selector, value in form_data.items():
             await page.fill(selector, value)
@@ -211,7 +210,7 @@ class SeleniumCrawler(BaseCrawler):
     def __init__(self, **kwargs: Any):
         """Initialize Selenium crawler."""
         super().__init__(kwargs)
-        self.driver: Optional[Any] = None
+        self.driver: Any | None = None
 
     async def initialize(self) -> None:
         """Initialize Selenium driver."""
@@ -233,13 +232,13 @@ class SeleniumCrawler(BaseCrawler):
             self.driver.quit()
         self.log_info("selenium_crawler_shutdown")
 
-    async def crawl(self, url: str, **kwargs: Any) -> Dict[str, Any]:
+    async def crawl(self, url: str, **kwargs: Any) -> dict[str, Any]:
         """Crawl URL using Selenium."""
         if not self.driver:
             await self.initialize()
 
         self.log_info("selenium_crawling_url", url=url)
-        
+
         try:
             self.driver.get(url)
             await asyncio.sleep(2)  # Wait for page load

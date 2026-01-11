@@ -3,7 +3,8 @@ Financial Agent - Handles financial analysis and operations.
 """
 
 import logging
-from typing import Dict, Any
+from typing import Any, dict
+
 from agents.base_agent import BaseAgent
 
 logger = logging.getLogger(__name__)
@@ -11,7 +12,7 @@ logger = logging.getLogger(__name__)
 
 class FinancialAgent(BaseAgent):
     """Agent for financial operations."""
-    
+
     def __init__(self, agent_id: str = "financial-agent"):
         super().__init__(
             agent_id=agent_id,
@@ -25,19 +26,19 @@ class FinancialAgent(BaseAgent):
                 "financial_reporting"
             ]
         )
-    
+
     async def on_start(self) -> None:
         """Initialize financial agent."""
         logger.info(f"{self.agent_id}: Financial agent started")
-    
+
     async def on_stop(self) -> None:
         """Cleanup financial agent."""
         logger.info(f"{self.agent_id}: Financial agent stopped")
-    
-    async def process_request(self, request: Dict[str, Any]) -> Dict[str, Any]:
+
+    async def process_request(self, request: dict[str, Any]) -> dict[str, Any]:
         """Process financial analysis request."""
         request_type = request.get("type", "unknown")
-        
+
         if request_type == "market_analysis":
             return await self.analyze_market(request.get("data", {}))
         elif request_type == "portfolio_management":
@@ -49,8 +50,8 @@ class FinancialAgent(BaseAgent):
                 "status": "error",
                 "message": f"Unknown request type: {request_type}"
             }
-    
-    async def analyze_market(self, data: Dict[str, Any]) -> Dict[str, Any]:
+
+    async def analyze_market(self, data: dict[str, Any]) -> dict[str, Any]:
         """Perform market analysis."""
         logger.info(f"{self.agent_id}: Analyzing market")
         return {
@@ -58,8 +59,8 @@ class FinancialAgent(BaseAgent):
             "analysis": "Market analysis completed",
             "data": data
         }
-    
-    async def manage_portfolio(self, data: Dict[str, Any]) -> Dict[str, Any]:
+
+    async def manage_portfolio(self, data: dict[str, Any]) -> dict[str, Any]:
         """Manage investment portfolio."""
         logger.info(f"{self.agent_id}: Managing portfolio")
         return {
@@ -67,8 +68,8 @@ class FinancialAgent(BaseAgent):
             "result": "Portfolio managed",
             "data": data
         }
-    
-    async def assess_risk(self, data: Dict[str, Any]) -> Dict[str, Any]:
+
+    async def assess_risk(self, data: dict[str, Any]) -> dict[str, Any]:
         """Assess financial risk."""
         logger.info(f"{self.agent_id}: Assessing risk")
         return {

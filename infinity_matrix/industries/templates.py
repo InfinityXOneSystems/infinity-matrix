@@ -1,7 +1,7 @@
 """Industry template system for top 10 industries."""
 
-from typing import Any, Dict, List
 from enum import Enum
+from typing import Any, dict, list
 
 from infinity_matrix.core.logging import LoggerMixin
 
@@ -28,7 +28,7 @@ class IndustryTemplate(LoggerMixin):
         self.industry = industry
         self.config = self._load_config()
 
-    def _load_config(self) -> Dict[str, Any]:
+    def _load_config(self) -> dict[str, Any]:
         """Load industry-specific configuration."""
         configs = {
             Industry.FINANCIAL_SERVICES: {
@@ -95,23 +95,23 @@ class IndustryTemplate(LoggerMixin):
 
         return configs.get(self.industry, {})
 
-    def get_data_sources(self) -> List[str]:
+    def get_data_sources(self) -> list[str]:
         """Get recommended data sources for industry."""
         return self.config.get("data_sources", [])
 
-    def get_key_metrics(self) -> List[str]:
+    def get_key_metrics(self) -> list[str]:
         """Get key metrics to track."""
         return self.config.get("key_metrics", [])
 
-    def get_lead_criteria(self) -> List[str]:
+    def get_lead_criteria(self) -> list[str]:
         """Get lead qualification criteria."""
         return self.config.get("lead_criteria", [])
 
-    def get_compliance_requirements(self) -> List[str]:
+    def get_compliance_requirements(self) -> list[str]:
         """Get compliance requirements."""
         return self.config.get("compliance", [])
 
-    async def create_analysis_pipeline(self) -> Dict[str, Any]:
+    async def create_analysis_pipeline(self) -> dict[str, Any]:
         """Create industry-specific analysis pipeline."""
         pipeline = {
             "industry": self.industry.value,
@@ -134,7 +134,7 @@ class IndustryTemplate(LoggerMixin):
 
         return pipeline
 
-    async def create_lead_generation_strategy(self) -> Dict[str, Any]:
+    async def create_lead_generation_strategy(self) -> dict[str, Any]:
         """Create industry-specific lead generation strategy."""
         strategy = {
             "industry": self.industry.value,
@@ -151,7 +151,7 @@ class IndustryTemplate(LoggerMixin):
 
         return strategy
 
-    def _get_recommended_channels(self) -> List[str]:
+    def _get_recommended_channels(self) -> list[str]:
         """Get recommended marketing channels."""
         channel_map = {
             Industry.FINANCIAL_SERVICES: ["linkedin", "webinars", "content_marketing"],
@@ -168,7 +168,7 @@ class IndustryTemplate(LoggerMixin):
 
         return channel_map.get(self.industry, ["email", "seo"])
 
-    def _get_scoring_model(self) -> Dict[str, float]:
+    def _get_scoring_model(self) -> dict[str, float]:
         """Get lead scoring model weights."""
         return {
             "engagement": 0.25,
@@ -177,7 +177,7 @@ class IndustryTemplate(LoggerMixin):
             "timing": 0.20,
         }
 
-    def _get_nurture_sequence(self) -> List[Dict[str, Any]]:
+    def _get_nurture_sequence(self) -> list[dict[str, Any]]:
         """Get lead nurture sequence."""
         return [
             {"day": 0, "action": "welcome_email", "channel": "email"},
@@ -195,16 +195,16 @@ class IndustryTemplateFactory:
     def create(industry: Industry) -> IndustryTemplate:
         """
         Create an industry template.
-        
+
         Args:
             industry: Industry type
-            
+
         Returns:
             IndustryTemplate instance
         """
         return IndustryTemplate(industry)
 
     @staticmethod
-    def get_available_industries() -> List[Industry]:
+    def get_available_industries() -> list[Industry]:
         """Get list of available industries."""
         return list(Industry)

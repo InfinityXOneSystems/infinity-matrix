@@ -1,8 +1,8 @@
 """Tests for build pipeline."""
 
 import pytest
-from pathlib import Path
-from infinity_matrix.builder.pipeline import BuildPipeline, BuildConfig, BuildStatus
+
+from infinity_matrix.builder.pipeline import BuildPipeline
 
 
 @pytest.mark.asyncio

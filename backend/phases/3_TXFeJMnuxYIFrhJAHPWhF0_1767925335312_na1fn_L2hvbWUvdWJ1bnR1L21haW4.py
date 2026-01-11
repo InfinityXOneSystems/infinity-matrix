@@ -1,13 +1,14 @@
 
-import os
 import datetime
-import uuid
-from flask import Flask, request, jsonify
-from google.cloud import firestore
-import logging
-import jwt
-from functools import wraps
 import json
+import logging
+import os
+import uuid
+from functools import wraps
+
+import jwt
+from flask import Flask, jsonify, request
+from google.cloud import firestore
 
 # Initialize Flask App
 app = Flask(__name__)

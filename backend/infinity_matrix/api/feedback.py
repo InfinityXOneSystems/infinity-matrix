@@ -1,14 +1,15 @@
 """
 Feedback API endpoints.
 """
+from datetime import datetime
+from typing import Any, dict, list
+
 from fastapi import APIRouter
 from pydantic import BaseModel
-from typing import List, Dict, Any, Optional
-from datetime import datetime
 
 router = APIRouter()
 
-feedback_store: List[Dict[str, Any]] = []
+feedback_store: list[dict[str, Any]] = []
 
 
 class FeedbackRequest(BaseModel):
@@ -16,11 +17,11 @@ class FeedbackRequest(BaseModel):
     user_id: str
     type: str  # bug, feature, improvement, other
     message: str
-    metadata: Optional[Dict[str, Any]] = None
+    metadata: dict[str, Any] | None = None
 
 
 @router.post("/submit")
-async def submit_feedback(request: FeedbackRequest) -> Dict[str, Any]:
+async def submit_feedback(request: FeedbackRequest) -> dict[str, Any]:
     """Submit user feedback."""
     feedback_id = f"FB-{datetime.now().strftime('%Y%m%d-%H%M%S')}"
     feedback = {
@@ -38,26 +39,26 @@ async def submit_feedback(request: FeedbackRequest) -> Dict[str, Any]:
 
 @router.get("/list")
 async def list_feedback(
-    type: Optional[str] = None,
+    type: str | None = None,
     limit: int = 100,
-) -> List[Dict[str, Any]]:
-    """List feedback submissions."""
+) -> list[dict[str, Any]]:
+    """list feedback submissions."""
     results = feedback_store
-    
+
     if type:
         results = [f for f in results if f["type"] == type]
-    
+
     return results[-limit:]
 
 
 @router.get("/stats")
-async def get_feedback_stats() -> Dict[str, Any]:
+async def get_feedback_stats() -> dict[str, Any]:
     """Get feedback statistics."""
     by_type = {}
     for fb in feedback_store:
         fb_type = fb["type"]
         by_type[fb_type] = by_type.get(fb_type, 0) + 1
-    
+
     return {
         "total_feedback": len(feedback_store),
         "by_type": by_type,

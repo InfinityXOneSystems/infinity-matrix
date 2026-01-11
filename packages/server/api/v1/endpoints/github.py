@@ -1,9 +1,8 @@
 """
 GitHub integration endpoints
 """
-from fastapi import APIRouter, HTTPException, Depends
+from fastapi import APIRouter
 from pydantic import BaseModel
-from typing import Optional
 
 router = APIRouter()
 

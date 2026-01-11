@@ -1,7 +1,7 @@
 """LLM integration for OpenAI, Anthropic, and local models."""
 
 from abc import ABC, abstractmethod
-from typing import Any, AsyncIterator, Dict, List, Optional
+from collections.abc import AsyncIterator, Any, , dict, Optional
 
 from infinity_matrix.core.config import settings
 from infinity_matrix.core.logging import LoggerMixin
@@ -19,7 +19,6 @@ class BaseLLM(ABC, LoggerMixin):
         **kwargs: Any,
     ) -> str:
         """Generate text from prompt."""
-        pass
 
     @abstractmethod
     async def generate_stream(
@@ -30,7 +29,6 @@ class BaseLLM(ABC, LoggerMixin):
         **kwargs: Any,
     ) -> AsyncIterator[str]:
         """Stream generated text from prompt."""
-        pass
 
 
 class OpenAILLM(BaseLLM):
@@ -228,7 +226,7 @@ async def analyze_with_llm(
     analysis_type: str,
     provider: str = "openai",
     **kwargs: Any,
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     """
     Analyze data using LLM.
     

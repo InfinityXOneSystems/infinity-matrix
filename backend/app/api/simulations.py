@@ -1,19 +1,19 @@
 """
 Simulations API Endpoints
 """
-from fastapi import APIRouter, Depends, HTTPException
-from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select
-from typing import List
+from typing import list
 
 from app.core.database import get_db
-from app.models.models import Simulation, Discovery
+from app.models.models import Discovery, Simulation
 from app.models.schemas import SimulationResponse
+from fastapi import APIRouter, Depends, HTTPException
+from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
 
 router = APIRouter()
 
 
-@router.get("/{discovery_id}/simulations", response_model=List[SimulationResponse])
+@router.get("/{discovery_id}/simulations", response_model=list[SimulationResponse])
 async def get_simulations(
     discovery_id: int,
     db: AsyncSession = Depends(get_db)
@@ -26,7 +26,7 @@ async def get_simulations(
     discovery = result.scalar_one_or_none()
     if not discovery:
         raise HTTPException(status_code=404, detail="Discovery not found")
-    
+
     # Get simulations
     result = await db.execute(
         select(Simulation)
@@ -34,7 +34,7 @@ async def get_simulations(
         .order_by(Simulation.created_at.desc())
     )
     simulations = result.scalars().all()
-    
+
     return simulations
 
 
@@ -48,8 +48,8 @@ async def get_simulation(
         select(Simulation).where(Simulation.id == simulation_id)
     )
     simulation = result.scalar_one_or_none()
-    
+
     if not simulation:
         raise HTTPException(status_code=404, detail="Simulation not found")
-    
+
     return simulation

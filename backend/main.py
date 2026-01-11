@@ -2,28 +2,26 @@
 MANUS AUTO-FIX: Production-Ready FastAPI Backend
 All critical fixes applied: async DB, security, logging, error handling, rate limiting, RBAC
 """
-import os
 import logging
+import os
 from datetime import datetime, timedelta
-from typing import Optional, List
-from functools import wraps
-import asyncio
+from typing import list
 
-from fastapi import FastAPI, Depends, HTTPException, Request, status
+import redis.asyncio as redis
+from fastapi import Depends, FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.trustedhost import TrustedHostMiddleware
 from fastapi.responses import JSONResponse
-from fastapi.security import HTTPBearer, HTTPAuthCredentials
-from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
-from sqlalchemy.orm import declarative_base, sessionmaker
-from sqlalchemy import select, Column, Integer, String, DateTime, Boolean
-from pydantic import BaseModel, EmailStr
+from fastapi.security import HTTPAuthCredentials, HTTPBearer
 from jose import JWTError, jwt
 from passlib.context import CryptContext
-import redis.asyncio as redis
+from pydantic import BaseModel, EmailStr
 from slowapi import Limiter
-from slowapi.util import get_remote_address
 from slowapi.errors import RateLimitExceeded
+from slowapi.util import get_remote_address
+from sqlalchemy import Boolean, Column, DateTime, Integer, String, select
+from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
+from sqlalchemy.orm import declarative_base, sessionmaker
 
 # ============================================================================
 # CONFIGURATION & SECURITY
@@ -34,24 +32,24 @@ class Config:
     SECRET_KEY = os.getenv("SECRET_KEY")
     if not SECRET_KEY:
         raise ValueError("❌ SECRET_KEY environment variable required")
-    
+
     DATABASE_URL = os.getenv("DATABASE_URL")
     if not DATABASE_URL:
         raise ValueError("❌ DATABASE_URL environment variable required")
-    
+
     # Convert to async
     if "postgresql://" in DATABASE_URL:
         ASYNC_DATABASE_URL = DATABASE_URL.replace("postgresql://", "postgresql+asyncpg://")
     else:
         ASYNC_DATABASE_URL = DATABASE_URL
-    
+
     ALGORITHM = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES = 30
     REFRESH_TOKEN_EXPIRE_DAYS = 7
-    
+
     CORS_ORIGINS = os.getenv("CORS_ORIGINS", "http://localhost:3000").split(",")
     REDIS_URL = os.getenv("REDIS_URL", "redis://localhost:6379")
-    
+
     DEBUG = os.getenv("DEBUG", "False").lower() == "true"
     LOG_LEVEL = os.getenv("LOG_LEVEL", "INFO")
 
@@ -103,7 +101,7 @@ async def get_db() -> AsyncSession:
 class User(Base):
     """User model with async support"""
     __tablename__ = "users"
-    
+
     id = Column(Integer, primary_key=True)
     email = Column(String(255), unique=True, nullable=False, index=True)
     hashed_password = Column(String(255), nullable=False)
@@ -129,7 +127,7 @@ class UserResponse(BaseModel):
     role: str
     is_active: bool
     created_at: datetime
-    
+
     class Config:
         from_attributes = True
 
@@ -153,14 +151,14 @@ def verify_password(plain_password: str, hashed_password: str) -> bool:
     """Verify password"""
     return pwd_context.verify(plain_password, hashed_password)
 
-def create_access_token(data: dict, expires_delta: Optional[timedelta] = None) -> str:
+def create_access_token(data: dict, expires_delta: timedelta | None = None) -> str:
     """Create JWT access token"""
     to_encode = data.copy()
     if expires_delta:
         expire = datetime.utcnow() + expires_delta
     else:
         expire = datetime.utcnow() + timedelta(minutes=Config.ACCESS_TOKEN_EXPIRE_MINUTES)
-    
+
     to_encode.update({"exp": expire})
     encoded_jwt = jwt.encode(to_encode, Config.SECRET_KEY, algorithm=Config.ALGORITHM)
     return encoded_jwt
@@ -185,17 +183,17 @@ async def get_current_user(
             raise HTTPException(status_code=401, detail="Invalid token")
     except JWTError:
         raise HTTPException(status_code=401, detail="Invalid token")
-    
+
     # Query user from database
     result = await session.execute(select(User).where(User.email == email))
     user = result.scalar_one_or_none()
-    
+
     if user is None:
         raise HTTPException(status_code=401, detail="User not found")
-    
+
     if not user.is_active:
         raise HTTPException(status_code=403, detail="User is inactive")
-    
+
     return user
 
 async def get_admin_user(current_user: User = Depends(get_current_user)) -> User:
@@ -208,7 +206,7 @@ async def get_admin_user(current_user: User = Depends(get_current_user)) -> User
 # CACHING (REDIS)
 # ============================================================================
 
-redis_client: Optional[redis.Redis] = None
+redis_client: redis.Redis | None = None
 
 async def init_redis():
     """Initialize Redis connection"""
@@ -281,7 +279,7 @@ app.state.limiter = limiter
 async def global_exception_handler(request: Request, exc: Exception):
     """Global exception handler for all unhandled errors"""
     logger.error(f"Unhandled exception: {str(exc)}", exc_info=True)
-    
+
     return JSONResponse(
         status_code=500,
         content={
@@ -307,13 +305,13 @@ async def rate_limit_handler(request: Request, exc: RateLimitExceeded):
 async def add_security_headers(request: Request, call_next):
     """Add security headers to all responses"""
     response = await call_next(request)
-    
+
     response.headers["X-Content-Type-Options"] = "nosniff"
     response.headers["X-Frame-Options"] = "DENY"
     response.headers["X-XSS-Protection"] = "1; mode=block"
     response.headers["Strict-Transport-Security"] = "max-age=31536000; includeSubDomains"
     response.headers["Content-Security-Policy"] = "default-src 'self'"
-    
+
     return response
 
 # ============================================================================
@@ -325,14 +323,14 @@ async def log_requests(request: Request, call_next):
     """Log all requests and responses"""
     import time
     start_time = time.time()
-    
+
     logger.info(f"→ {request.method} {request.url.path}")
-    
+
     response = await call_next(request)
-    
+
     duration = time.time() - start_time
     logger.info(f"← {response.status_code} {request.url.path} ({duration:.2f}s)")
-    
+
     response.headers["X-Process-Time"] = str(duration)
     return response
 
@@ -383,7 +381,7 @@ async def register(
     result = await session.execute(select(User).where(User.email == user_data.email))
     if result.scalar_one_or_none():
         raise HTTPException(status_code=400, detail="Email already registered")
-    
+
     # Create new user
     new_user = User(
         email=user_data.email,
@@ -391,11 +389,11 @@ async def register(
         full_name=user_data.full_name,
         role="user"
     )
-    
+
     session.add(new_user)
     await session.commit()
     await session.refresh(new_user)
-    
+
     logger.info(f"✅ New user registered: {user_data.email}")
     return new_user
 
@@ -410,18 +408,18 @@ async def login(
     """Login user and return tokens"""
     result = await session.execute(select(User).where(User.email == email))
     user = result.scalar_one_or_none()
-    
+
     if not user or not verify_password(password, user.hashed_password):
         raise HTTPException(status_code=401, detail="Invalid credentials")
-    
+
     if not user.is_active:
         raise HTTPException(status_code=403, detail="User is inactive")
-    
+
     access_token = create_access_token({"sub": user.email})
     refresh_token = create_refresh_token({"sub": user.email})
-    
+
     logger.info(f"✅ User logged in: {email}")
-    
+
     return {
         "access_token": access_token,
         "refresh_token": refresh_token,
@@ -435,10 +433,10 @@ async def refresh_token(credentials: HTTPAuthCredentials = Depends(security)):
         payload = jwt.decode(credentials.credentials, Config.SECRET_KEY, algorithms=[Config.ALGORITHM])
         if payload.get("type") != "refresh":
             raise HTTPException(status_code=401, detail="Invalid token type")
-        
+
         email = payload.get("sub")
         new_access_token = create_access_token({"sub": email})
-        
+
         return {
             "access_token": new_access_token,
             "refresh_token": credentials.credentials,
@@ -456,14 +454,14 @@ async def get_current_user_info(current_user: User = Depends(get_current_user)):
     """Get current user info"""
     return current_user
 
-@app.get("/api/v1/users", response_model=List[UserResponse], tags=["Users"])
+@app.get("/api/v1/users", response_model=list[UserResponse], tags=["Users"])
 @limiter.limit("30/minute")
 async def list_users(
     request: Request,
     session: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_admin_user)
 ):
-    """List all users (admin only)"""
+    """list all users (admin only)"""
     result = await session.execute(select(User))
     users = result.scalars().all()
     return users
@@ -476,24 +474,24 @@ async def list_users(
 async def startup():
     """Initialize app on startup"""
     logger.info("🚀 Starting Infinity Matrix API...")
-    
+
     # Initialize database
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
-    
+
     # Initialize Redis
     await init_redis()
-    
+
     logger.info("✅ App started successfully")
 
 @app.on_event("shutdown")
 async def shutdown():
     """Cleanup on shutdown"""
     logger.info("🛑 Shutting down...")
-    
+
     if redis_client:
         await redis_client.close()
-    
+
     await engine.dispose()
     logger.info("✅ Shutdown complete")
 

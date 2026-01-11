@@ -1,13 +1,13 @@
 """Real estate intelligence module with lead generation."""
 
-from typing import Any, Dict, List, Optional
 from datetime import datetime
+from typing import Any, Optional, dict, list
 
 from infinity_matrix.core.base import BaseAnalyzer, BaseLeadGenerator
 from infinity_matrix.core.logging import LoggerMixin
 
 
-class RealEstateAnalyzer(BaseAnalyzer[Dict[str, Any], Dict[str, Any]]):
+class RealEstateAnalyzer(BaseAnalyzer[dict[str, Any], dict[str, Any]]):
     """Real estate market analysis engine."""
 
     def __init__(self, **kwargs: Any):
@@ -22,32 +22,32 @@ class RealEstateAnalyzer(BaseAnalyzer[Dict[str, Any], Dict[str, Any]]):
         """Cleanup resources."""
         self.log_info("real_estate_analyzer_shutdown")
 
-    async def analyze(self, data: Dict[str, Any]) -> Dict[str, Any]:
+    async def analyze(self, data: dict[str, Any]) -> dict[str, Any]:
         """Analyze real estate data."""
         location = data.get("location")
         property_type = data.get("property_type", "residential")
-        
+
         return await self.analyze_market(location, property_type)
 
     async def analyze_market(
         self,
         location: str,
         property_type: str = "residential",
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """
         Analyze real estate market for a location.
-        
+
         Args:
             location: Location string (city, state, zip)
             property_type: Type of property
-            
+
         Returns:
             Market analysis
         """
         try:
             # This would integrate with real estate APIs
             # For now, returning structured analysis template
-            
+
             analysis = {
                 "location": location,
                 "property_type": property_type,
@@ -82,14 +82,14 @@ class RealEstateAnalyzer(BaseAnalyzer[Dict[str, Any], Dict[str, Any]]):
 
     async def analyze_property(
         self,
-        property_data: Dict[str, Any],
-    ) -> Dict[str, Any]:
+        property_data: dict[str, Any],
+    ) -> dict[str, Any]:
         """
         Analyze a specific property.
-        
+
         Args:
             property_data: Property details
-            
+
         Returns:
             Property analysis and valuation
         """
@@ -146,20 +146,20 @@ class RealEstateLeadGenerator(BaseLeadGenerator):
 
     async def discover_leads(
         self,
-        criteria: Dict[str, Any],
-    ) -> List[Dict[str, Any]]:
+        criteria: dict[str, Any],
+    ) -> list[dict[str, Any]]:
         """
         Discover real estate leads based on criteria.
-        
+
         Args:
             criteria: Search criteria
                 - location: Geographic area
                 - property_type: Type of property
                 - price_range: (min, max) tuple
                 - lead_type: buyer, seller, investor, agent
-                
+
         Returns:
-            List of qualified leads
+            list of qualified leads
         """
         location = criteria.get("location")
         lead_type = criteria.get("lead_type", "buyer")
@@ -173,7 +173,7 @@ class RealEstateLeadGenerator(BaseLeadGenerator):
 
         # This would integrate with MLS, public records, social media, etc.
         # For now, returning structured lead template
-        
+
         leads = [
             {
                 "id": f"lead_{i}",
@@ -208,13 +208,13 @@ class RealEstateLeadGenerator(BaseLeadGenerator):
         self.log_info("leads_discovered", count=len(leads))
         return leads
 
-    async def score_lead(self, lead: Dict[str, Any]) -> float:
+    async def score_lead(self, lead: dict[str, Any]) -> float:
         """
         Score a real estate lead.
-        
+
         Args:
             lead: Lead data
-            
+
         Returns:
             Score from 0.0 to 1.0
         """
@@ -225,7 +225,7 @@ class RealEstateLeadGenerator(BaseLeadGenerator):
             score += 0.1
         if lead.get("contact", {}).get("phone"):
             score += 0.1
-        
+
         # Score based on profile details
         profile = lead.get("profile", {})
         if profile.get("price_range"):
@@ -240,20 +240,20 @@ class RealEstateLeadGenerator(BaseLeadGenerator):
 
     async def enrich_lead(
         self,
-        lead: Dict[str, Any],
-    ) -> Dict[str, Any]:
+        lead: dict[str, Any],
+    ) -> dict[str, Any]:
         """
         Enrich lead with additional data.
-        
+
         Args:
             lead: Lead data
-            
+
         Returns:
             Enriched lead data
         """
         # This would integrate with data enrichment services
         # For now, adding sample enrichment
-        
+
         enriched = lead.copy()
         enriched["enrichment"] = {
             "property_history": [],
@@ -290,42 +290,42 @@ class RealEstateEngine(LoggerMixin):
     async def discover_leads(
         self,
         location: str,
-        criteria: Optional[Dict[str, Any]] = None,
-    ) -> List[Dict[str, Any]]:
+        criteria: dict[str, Any] | None = None,
+    ) -> list[dict[str, Any]]:
         """Discover and return scored leads."""
         criteria = criteria or {}
         criteria["location"] = location
-        
+
         return await self.lead_generator.discover_leads(criteria)
 
     async def analyze_market(
         self,
         location: str,
         property_type: str = "residential",
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """Analyze market for location."""
         return await self.analyzer.analyze_market(location, property_type)
 
     async def launch_campaign(
         self,
-        leads: List[Dict[str, Any]],
+        leads: list[dict[str, Any]],
         channel: str = "email",
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """Launch outreach campaign for leads."""
         from infinity_matrix.campaigns import CampaignEngine
-        
+
         engine = CampaignEngine()
         await engine.initialize()
-        
+
         campaign_id = await engine.create_campaign(
             name=f"Real Estate Campaign {datetime.now().isoformat()}",
             leads=leads,
             template="real_estate_outreach",
         )
-        
+
         await engine.launch_campaign(campaign_id)
         await engine.shutdown()
-        
+
         return {
             "campaign_id": campaign_id,
             "leads_count": len(leads),

@@ -1,17 +1,13 @@
 
-import os
-import json
 import hashlib
 import hmac
-import time
-from datetime import datetime, timezone
+import os
+from datetime import UTC, datetime
 
 import firebase_admin
-from firebase_admin import credentials, firestore, auth
-from flask import Flask, request, jsonify, abort
-import yaml
-
 from evidence_pack_generator import EvidencePackGenerator
+from firebase_admin import credentials, firestore
+from flask import Flask, abort, jsonify, request
 
 # Initialize Flask app
 app = Flask(__name__)
@@ -23,7 +19,7 @@ def initialize_firebase():
         cred_path = os.environ.get("FIREBASE_ADMIN_SDK_PATH", "firebase_admin_config.json")
         if not os.path.exists(cred_path):
             raise FileNotFoundError(f"Firebase Admin SDK config file not found at {cred_path}")
-        
+
         cred = credentials.Certificate(cred_path)
         firebase_admin.initialize_app(cred)
         app.logger.info("Firebase Admin SDK initialized successfully.")
@@ -57,7 +53,7 @@ evidence_pack_generator = EvidencePackGenerator(db, CONFIG["GCS_EVIDENCE_PACK_BU
 
 # Helper function for Firestore operations
 def get_firestore_timestamp():
-    return datetime.now(timezone.utc)
+    return datetime.now(UTC)
 
 def add_firestore_metadata(data):
     now = get_firestore_timestamp()
@@ -429,7 +425,7 @@ def create_evidence_pack():
     data = request.get_json()
     if not data or "pack_name" not in data:
         abort(400, description="Missing pack_name.")
-    
+
     actor = request.headers.get("X-User-ID", "anonymous")
     data_query_params = data.get("data_query_params")
     expiration_days = data.get("expiration_days", 7)
@@ -626,7 +622,7 @@ def github_webhook():
 
     payload_body = request.get_data()
     secret = CONFIG["GITHUB_WEBHOOK_SECRET"].encode("utf-8")
-    
+
     # Verify webhook signature
     try:
         mac = hmac.new(secret, payload_body, hashlib.sha256)
@@ -643,7 +639,7 @@ def github_webhook():
     if event == "workflow_run":
         action = payload.get("action")
         workflow_run = payload.get("workflow_run", {})
-        
+
         workflow_name = workflow_run.get("name")
         repository_full_name = payload.get("repository", {}).get("full_name")
         run_id = str(workflow_run.get("id"))
@@ -679,7 +675,7 @@ def github_webhook():
                 ci_data = add_firestore_metadata(ci_data)
                 _, doc_ref = ci_status_ref.add(ci_data)
                 log_audit_event("github_webhook", "create", "ci_status", doc_ref.id, ci_data)
-            
+
             app.logger.info(f"CI Status updated for {workflow_name} in {repository_full_name}: {final_status}")
             return jsonify({"status": "success", "message": "CI status updated."}), 200
 

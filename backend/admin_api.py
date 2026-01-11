@@ -6,28 +6,29 @@ Endpoints:
 - POST /admin/builder/invoke - Start new build task
 - GET /admin/builder/status - Get current builder state
 - POST /admin/builder/kill - Emergency shutdown
-- GET /admin/approvals - List pending PRs
+- GET /admin/approvals - list pending PRs
 - POST /admin/approvals/:id/approve - Approve PR
 - POST /admin/approvals/:id/reject - Reject PR
 - GET /admin/health - System health metrics
 - GET /admin/logs - Query audit logs
 """
 
-from fastapi import FastAPI, HTTPException, Depends
-from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel
-from typing import List, Optional, Dict, Any
-from datetime import datetime
-from enum import Enum
 import os
 import sys
+from datetime import datetime
+from enum import Enum
+from typing import Any, dict, list
+
+from fastapi import FastAPI, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
+from pydantic import BaseModel
 
 # Add parent directory to path for imports
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
 
-from infinity_matrix.builder.orchestrator import TaskOrchestrator
 from infinity_matrix.builder.governance import Governance
 from infinity_matrix.builder.observer import Observer
+from infinity_matrix.builder.orchestrator import TaskOrchestrator
 
 app = FastAPI(title="Infinity Matrix Admin API", version="1.0.0")
 
@@ -61,13 +62,13 @@ class TaskStatus(BaseModel):
     current_phase: str
     created_at: datetime
     updated_at: datetime
-    error: Optional[str] = None
+    error: str | None = None
 
 class BuilderStatus(BaseModel):
     enabled: bool
-    current_task: Optional[TaskStatus]
+    current_task: TaskStatus | None
     queue_length: int
-    last_action: Optional[str]
+    last_action: str | None
     uptime_seconds: int
 
 class ApprovalStatus(Enum):
@@ -89,7 +90,7 @@ class Approval(BaseModel):
     status: ApprovalStatus
 
 class ApprovalAction(BaseModel):
-    comment: Optional[str] = None
+    comment: str | None = None
 
 class HealthMetrics(BaseModel):
     uptime_seconds: int
@@ -108,13 +109,13 @@ class LogEntry(BaseModel):
     level: str  # info, warning, error, critical
     action: str
     user: str
-    details: Dict[str, Any]
+    details: dict[str, Any]
 
 class LogQuery(BaseModel):
-    start_date: Optional[datetime] = None
-    end_date: Optional[datetime] = None
-    level: Optional[str] = None
-    action: Optional[str] = None
+    start_date: datetime | None = None
+    end_date: datetime | None = None
+    level: str | None = None
+    action: str | None = None
     limit: int = 100
 
 # ============================================================================
@@ -125,7 +126,7 @@ class LogQuery(BaseModel):
 async def invoke_builder(request: TaskRequest):
     """
     Start a new autonomous build task
-    
+
     The builder will:
     1. Decompose goal into subtasks
     2. Analyze dependencies and risks
@@ -134,22 +135,22 @@ async def invoke_builder(request: TaskRequest):
     """
     if not governance.is_builder_enabled():
         raise HTTPException(status_code=503, detail="Builder is disabled (kill switch active)")
-    
+
     try:
         task_id = orchestrator.invoke_task(
             goal=request.goal,
             priority=request.priority,
             auto_approve=request.auto_approve
         )
-        
+
         status = orchestrator.get_task_status(task_id)
-        
+
         governance.log_action(
             action="builder_invoked",
             user="admin",  # TODO: Get from auth
             details={"task_id": task_id, "goal": request.goal}
         )
-        
+
         return status
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
@@ -163,19 +164,19 @@ async def get_builder_status():
 async def kill_builder():
     """
     Emergency shutdown - immediately disable builder
-    
+
     This sets a kill switch flag that prevents any new actions.
     Running tasks will complete their current step then pause.
     """
     try:
         governance.activate_kill_switch(reason="Manual admin shutdown")
-        
+
         governance.log_action(
             action="kill_switch_activated",
             user="admin",  # TODO: Get from auth
             details={"reason": "Manual shutdown"}
         )
-        
+
         return {"status": "killed", "message": "Builder disabled successfully"}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
@@ -185,22 +186,22 @@ async def enable_builder():
     """Re-enable builder after kill switch"""
     try:
         governance.deactivate_kill_switch()
-        
+
         governance.log_action(
             action="builder_enabled",
             user="admin",
             details={}
         )
-        
+
         return {"status": "enabled", "message": "Builder re-enabled successfully"}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-@app.get("/admin/approvals", response_model=List[Approval])
-async def list_approvals(status: Optional[ApprovalStatus] = None):
+@app.get("/admin/approvals", response_model=list[Approval])
+async def list_approvals(status: ApprovalStatus | None = None):
     """
-    List PRs requiring approval
-    
+    list PRs requiring approval
+
     Returns pending PRs with:
     - Diff preview
     - Risk assessment
@@ -217,7 +218,7 @@ async def list_approvals(status: Optional[ApprovalStatus] = None):
 async def approve_pr(approval_id: str, action: ApprovalAction):
     """
     Approve a PR for merge
-    
+
     This will:
     1. Merge PR to main
     2. Deploy to staging
@@ -226,13 +227,13 @@ async def approve_pr(approval_id: str, action: ApprovalAction):
     """
     try:
         result = orchestrator.approve_pr(approval_id, comment=action.comment)
-        
+
         governance.log_action(
             action="pr_approved",
             user="admin",
             details={"approval_id": approval_id, "comment": action.comment}
         )
-        
+
         return result
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
@@ -241,19 +242,19 @@ async def approve_pr(approval_id: str, action: ApprovalAction):
 async def reject_pr(approval_id: str, action: ApprovalAction):
     """
     Reject a PR
-    
+
     The PR will be closed and the builder will be notified.
     If auto-fix is enabled, the builder may create a revised PR.
     """
     try:
         result = orchestrator.reject_pr(approval_id, comment=action.comment)
-        
+
         governance.log_action(
             action="pr_rejected",
             user="admin",
             details={"approval_id": approval_id, "comment": action.comment}
         )
-        
+
         return result
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
@@ -262,7 +263,7 @@ async def reject_pr(approval_id: str, action: ApprovalAction):
 async def get_health():
     """
     System health metrics
-    
+
     Includes:
     - Uptime, error rate, response time
     - Active/completed/failed tasks
@@ -275,11 +276,11 @@ async def get_health():
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-@app.post("/admin/logs", response_model=List[LogEntry])
+@app.post("/admin/logs", response_model=list[LogEntry])
 async def query_logs(query: LogQuery):
     """
     Query audit logs
-    
+
     All builder actions are logged immutably.
     Logs cannot be deleted or modified.
     """

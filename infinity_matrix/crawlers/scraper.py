@@ -2,7 +2,7 @@
 
 import asyncio
 import random
-from typing import Any, Dict, List, Optional
+from typing import Any, dict, list
 from urllib.parse import urljoin, urlparse
 
 import aiohttp
@@ -21,7 +21,7 @@ class ScrapingAgent(BaseCrawler):
         """Initialize scraping agent."""
         super().__init__(kwargs)
         self.use_proxy = use_proxy
-        self.session: Optional[aiohttp.ClientSession] = None
+        self.session: aiohttp.ClientSession | None = None
         self.visited_urls: set[str] = set()
 
     async def initialize(self) -> None:
@@ -36,15 +36,15 @@ class ScrapingAgent(BaseCrawler):
         }
 
         connector = aiohttp.TCPConnector(limit=settings.scraper_concurrent_requests)
-        
+
         timeout = aiohttp.ClientTimeout(total=settings.scraper_timeout)
-        
+
         self.session = aiohttp.ClientSession(
             headers=headers,
             connector=connector,
             timeout=timeout,
         )
-        
+
         self.log_info("scraping_agent_initialized")
 
     async def shutdown(self) -> None:
@@ -63,18 +63,18 @@ class ScrapingAgent(BaseCrawler):
         self,
         url: str,
         method: str = "GET",
-        data: Optional[Dict[str, Any]] = None,
+        data: dict[str, Any] | None = None,
         **kwargs: Any,
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """
         Crawl URL with rate limiting and retry logic.
-        
+
         Args:
             url: URL to crawl
             method: HTTP method
             data: Request data for POST
             **kwargs: Additional request arguments
-            
+
         Returns:
             Dictionary with response data
         """
@@ -95,7 +95,7 @@ class ScrapingAgent(BaseCrawler):
                 **kwargs,
             ) as response:
                 content = await response.text()
-                
+
                 self.visited_urls.add(url)
 
                 return {
@@ -113,22 +113,22 @@ class ScrapingAgent(BaseCrawler):
     async def extract_data(
         self,
         html: str,
-        selectors: Dict[str, str],
+        selectors: dict[str, str],
         parser: str = "lxml",
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """
         Extract data from HTML using CSS selectors.
-        
+
         Args:
             html: HTML content
             selectors: Dictionary mapping field names to CSS selectors
             parser: BeautifulSoup parser
-            
+
         Returns:
             Extracted data dictionary
         """
         soup = BeautifulSoup(html, parser)
-        data: Dict[str, Any] = {}
+        data: dict[str, Any] = {}
 
         for field, selector in selectors.items():
             try:
@@ -153,27 +153,27 @@ class ScrapingAgent(BaseCrawler):
         html: str,
         base_url: str,
         filter_external: bool = True,
-    ) -> List[str]:
+    ) -> list[str]:
         """
         Extract all links from HTML.
-        
+
         Args:
             html: HTML content
             base_url: Base URL for resolving relative links
             filter_external: Only return links from same domain
-            
+
         Returns:
-            List of URLs
+            list of URLs
         """
         soup = BeautifulSoup(html, "lxml")
-        links: List[str] = []
+        links: list[str] = []
 
         base_domain = urlparse(base_url).netloc
 
         for anchor in soup.find_all("a", href=True):
             href = anchor["href"]
             absolute_url = urljoin(base_url, href)
-            
+
             if filter_external:
                 if urlparse(absolute_url).netloc == base_domain:
                     links.append(absolute_url)
@@ -187,22 +187,22 @@ class ScrapingAgent(BaseCrawler):
         start_url: str,
         max_depth: int = 2,
         max_pages: int = 100,
-        selectors: Optional[Dict[str, str]] = None,
-    ) -> List[Dict[str, Any]]:
+        selectors: dict[str, str] | None = None,
+    ) -> list[dict[str, Any]]:
         """
         Recursively crawl a website.
-        
+
         Args:
             start_url: Starting URL
             max_depth: Maximum crawl depth
             max_pages: Maximum pages to crawl
             selectors: Data extraction selectors
-            
+
         Returns:
-            List of crawled page data
+            list of crawled page data
         """
-        results: List[Dict[str, Any]] = []
-        to_visit: List[tuple[str, int]] = [(start_url, 0)]
+        results: list[dict[str, Any]] = []
+        to_visit: list[tuple[str, int]] = [(start_url, 0)]
         visited: set[str] = set()
 
         while to_visit and len(results) < max_pages:
@@ -215,7 +215,7 @@ class ScrapingAgent(BaseCrawler):
 
             # Crawl the page
             response = await self.crawl(url)
-            
+
             if not response.get("success"):
                 continue
 
@@ -248,7 +248,7 @@ class ScrapingAgent(BaseCrawler):
 
         return results
 
-    def _get_proxy(self) -> Optional[str]:
+    def _get_proxy(self) -> str | None:
         """Get proxy URL if enabled."""
         if settings.proxy_enabled and settings.proxy_http:
             return settings.proxy_http
@@ -268,5 +268,5 @@ class ScrapingAgent(BaseCrawler):
                     return True
         except Exception as e:
             self.log_error("file_download_failed", url=url, error=str(e))
-        
+
         return False

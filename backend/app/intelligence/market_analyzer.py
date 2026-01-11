@@ -1,8 +1,8 @@
 """
 Market Analyzer - Analyzes market trends and consensus
 """
-from typing import Dict, Any, List
 import logging
+from typing import Any, dict, list
 
 logger = logging.getLogger(__name__)
 
@@ -10,7 +10,7 @@ logger = logging.getLogger(__name__)
 class MarketAnalyzer:
     """
     Analyzes market trends, consensus, and dynamics.
-    
+
     Analyzes:
     - Market size and growth
     - Industry trends
@@ -19,15 +19,15 @@ class MarketAnalyzer:
     - Regulatory environment
     - Market sentiment
     """
-    
+
     async def analyze(
         self,
         business_name: str,
-        crawled_data: List[Dict[str, Any]]
-    ) -> Dict[str, Any]:
+        crawled_data: list[dict[str, Any]]
+    ) -> dict[str, Any]:
         """Generate comprehensive market analysis"""
         logger.info(f"Analyzing market dynamics for {business_name}")
-        
+
         analysis = {
             "market_overview": self._analyze_market_overview(crawled_data),
             "market_trends": self._identify_trends(crawled_data),
@@ -39,13 +39,13 @@ class MarketAnalyzer:
             "market_forecast": self._forecast_market(crawled_data),
             "consensus_view": self._determine_consensus(crawled_data)
         }
-        
+
         return analysis
-    
+
     def _analyze_market_overview(
         self,
-        crawled_data: List[Dict[str, Any]]
-    ) -> Dict[str, Any]:
+        crawled_data: list[dict[str, Any]]
+    ) -> dict[str, Any]:
         """Analyze overall market"""
         return {
             "market_size": "$50B (global AI/ML services)",
@@ -61,11 +61,11 @@ class MarketAnalyzer:
             },
             "market_health": "Strong and growing"
         }
-    
+
     def _identify_trends(
         self,
-        crawled_data: List[Dict[str, Any]]
-    ) -> List[Dict[str, Any]]:
+        crawled_data: list[dict[str, Any]]
+    ) -> list[dict[str, Any]]:
         """Identify key market trends"""
         return [
             {
@@ -104,11 +104,11 @@ class MarketAnalyzer:
                 "implications": "Demand for seamless integration"
             }
         ]
-    
+
     def _analyze_customers(
         self,
-        crawled_data: List[Dict[str, Any]]
-    ) -> Dict[str, Any]:
+        crawled_data: list[dict[str, Any]]
+    ) -> dict[str, Any]:
         """Analyze customer landscape"""
         return {
             "target_segments": [
@@ -143,11 +143,11 @@ class MarketAnalyzer:
                 "decision_makers": "Multiple stakeholders (3-7 people)"
             }
         }
-    
+
     def _analyze_technology_trends(
         self,
-        crawled_data: List[Dict[str, Any]]
-    ) -> List[Dict[str, str]]:
+        crawled_data: list[dict[str, Any]]
+    ) -> list[dict[str, str]]:
         """Analyze technology trends"""
         return [
             {
@@ -175,11 +175,11 @@ class MarketAnalyzer:
                 "impact": "High for regulated industries"
             }
         ]
-    
+
     def _analyze_regulatory(
         self,
-        crawled_data: List[Dict[str, Any]]
-    ) -> Dict[str, Any]:
+        crawled_data: list[dict[str, Any]]
+    ) -> dict[str, Any]:
         """Analyze regulatory landscape"""
         return {
             "regulatory_environment": "Evolving",
@@ -204,11 +204,11 @@ class MarketAnalyzer:
             },
             "compliance_trends": "Increasing requirements"
         }
-    
+
     def _assess_sentiment(
         self,
-        crawled_data: List[Dict[str, Any]]
-    ) -> Dict[str, Any]:
+        crawled_data: list[dict[str, Any]]
+    ) -> dict[str, Any]:
         """Assess market sentiment"""
         return {
             "overall_sentiment": "Positive",
@@ -223,11 +223,11 @@ class MarketAnalyzer:
                 "AI safety and ethics"
             ]
         }
-    
+
     def _identify_demand_drivers(
         self,
-        crawled_data: List[Dict[str, Any]]
-    ) -> List[str]:
+        crawled_data: list[dict[str, Any]]
+    ) -> list[str]:
         """Identify key demand drivers"""
         return [
             "Digital transformation initiatives",
@@ -239,11 +239,11 @@ class MarketAnalyzer:
             "Revenue growth opportunities",
             "Cost reduction imperatives"
         ]
-    
+
     def _forecast_market(
         self,
-        crawled_data: List[Dict[str, Any]]
-    ) -> Dict[str, Any]:
+        crawled_data: list[dict[str, Any]]
+    ) -> dict[str, Any]:
         """Forecast market developments"""
         return {
             "3_year_outlook": {
@@ -265,11 +265,11 @@ class MarketAnalyzer:
                 ]
             }
         }
-    
+
     def _determine_consensus(
         self,
-        crawled_data: List[Dict[str, Any]]
-    ) -> Dict[str, Any]:
+        crawled_data: list[dict[str, Any]]
+    ) -> dict[str, Any]:
         """Determine market consensus view"""
         return {
             "consensus_opinion": "Strong growth opportunity with increasing enterprise adoption",

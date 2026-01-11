@@ -11,7 +11,7 @@ Handles:
 
 import asyncio
 import logging
-from typing import Dict, List, Optional, Any, Callable
+from collections.abc import Callable, dict, list, Optional, Any, 
 from datetime import datetime, timedelta
 from dataclasses import dataclass, field
 from enum import Enum
@@ -46,10 +46,10 @@ class AgentType(Enum):
 class AgentContext:
     """Agent context information."""
     agent_id: str
-    roles: List[str] = field(default_factory=list)
-    permissions: List[str] = field(default_factory=list)
-    metadata: Dict[str, Any] = field(default_factory=dict)
-    capabilities: List[str] = field(default_factory=list)
+    roles: list[str] = field(default_factory=list)
+    permissions: list[str] = field(default_factory=list)
+    metadata: dict[str, Any] = field(default_factory=dict)
+    capabilities: list[str] = field(default_factory=list)
 
 
 @dataclass
@@ -60,7 +60,7 @@ class HealthCheck:
     last_heartbeat: datetime
     response_time_ms: float
     error_count: int = 0
-    metadata: Dict[str, Any] = field(default_factory=dict)
+    metadata: dict[str, Any] = field(default_factory=dict)
 
 
 @dataclass
@@ -81,9 +81,9 @@ class AgentRegistry:
     """Central registry for all agents."""
     
     def __init__(self):
-        self.agents: Dict[str, RegisteredAgent] = {}
+        self.agents: dict[str, RegisteredAgent] = {}
         self.cortex = None
-        self.event_subscribers: Dict[str, List[Callable]] = {}
+        self.event_subscribers: dict[str, list[Callable]] = {}
         self.health_check_interval = 30  # seconds
         self.heartbeat_timeout = 60  # seconds
         self.is_running = False
@@ -99,11 +99,11 @@ class AgentRegistry:
         self,
         agent_id: str,
         agent_type: AgentType,
-        roles: List[str],
-        permissions: List[str],
-        capabilities: List[str] = None,
+        roles: list[str],
+        permissions: list[str],
+        capabilities: list[str] = None,
         endpoint: Optional[str] = None,
-        metadata: Optional[Dict[str, Any]] = None
+        metadata: Optional[dict[str, Any]] = None
     ) -> bool:
         """Register a new agent."""
         if agent_id in self.agents:
@@ -185,7 +185,7 @@ class AgentRegistry:
         
         return True
     
-    def heartbeat(self, agent_id: str, metadata: Optional[Dict[str, Any]] = None) -> bool:
+    def heartbeat(self, agent_id: str, metadata: Optional[dict[str, Any]] = None) -> bool:
         """Record agent heartbeat."""
         if agent_id not in self.agents:
             logger.warning(f"Agent not found: {agent_id}")
@@ -220,8 +220,8 @@ class AgentRegistry:
         self,
         agent_type: Optional[AgentType] = None,
         status: Optional[AgentStatus] = None
-    ) -> List[RegisteredAgent]:
-        """List agents with optional filters."""
+    ) -> list[RegisteredAgent]:
+        """list agents with optional filters."""
         agents = list(self.agents.values())
         
         if agent_type:
@@ -246,7 +246,7 @@ class AgentRegistry:
         self.event_subscribers[event_type].append(callback)
         logger.info(f"Subscribed to event: {event_type}")
     
-    def publish_event(self, event_type: str, data: Dict[str, Any]) -> None:
+    def publish_event(self, event_type: str, data: dict[str, Any]) -> None:
         """Publish a registry event."""
         event = {
             "type": event_type,
@@ -336,7 +336,7 @@ class AgentRegistry:
         # Publish event
         self.publish_event("registry_stopped", {})
     
-    def get_status(self) -> Dict[str, Any]:
+    def get_status(self) -> dict[str, Any]:
         """Get registry status."""
         agents_by_status = {}
         for agent in self.agents.values():

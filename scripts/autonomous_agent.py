@@ -8,18 +8,18 @@ for automated code actions, PR creation, and repository management.
 By default, runs in dry-run mode for safety.
 """
 
-import os
-import sys
 import argparse
 import logging
-from pathlib import Path
-from typing import Dict, Optional
+import os
+import sys
 from datetime import datetime
+from pathlib import Path
+from typing import dict
 
 try:
+    import colorlog
     from dotenv import load_dotenv
     from github import Github, GithubException
-    import colorlog
 except ImportError as e:
     msg = "Error: Missing required dependencies. "
     msg += "Please run: pip install -r requirements.txt"
@@ -139,12 +139,12 @@ class AutonomousAgent:
             self.logger.error(f"Unexpected error connecting to GitHub: {e}")
             return False
 
-    def analyze_repository_structure(self) -> Dict:
+    def analyze_repository_structure(self) -> dict:
         """
         Analyze the repository structure.
 
         Returns:
-            Dict containing analysis results
+            dict containing analysis results
         """
         self.logger.info("Analyzing repository structure...")
 
@@ -177,7 +177,7 @@ class AutonomousAgent:
                 try:
                     if item.suffix in [
                             '.py', '.md', '.txt', '.yml', '.yaml', '.json']:
-                        with open(item, 'r', encoding='utf-8') as f:
+                        with open(item, encoding='utf-8') as f:
                             lines = len(f.readlines())
                             analysis['total_lines'] += lines
                 except Exception:
@@ -195,12 +195,12 @@ class AutonomousAgent:
 
         return analysis
 
-    def check_code_quality(self) -> Dict:
+    def check_code_quality(self) -> dict:
         """
         Check code quality using flake8.
 
         Returns:
-            Dict containing quality check results
+            dict containing quality check results
         """
         if not self.config['enable_code_analysis']:
             self.logger.info("Code analysis disabled in configuration")
@@ -250,12 +250,12 @@ class AutonomousAgent:
 
         return results
 
-    def check_repository_health(self) -> Dict:
+    def check_repository_health(self) -> dict:
         """
         Check repository health metrics.
 
         Returns:
-            Dict containing health check results
+            dict containing health check results
         """
         if not self.config['enable_health_checks']:
             self.logger.info("Health checks disabled in configuration")
@@ -317,9 +317,9 @@ class AutonomousAgent:
 
     def generate_report(
             self,
-            analysis: Dict,
-            quality: Dict,
-            health: Dict) -> str:
+            analysis: dict,
+            quality: dict,
+            health: dict) -> str:
         """
         Generate a comprehensive analysis report.
 
@@ -403,7 +403,7 @@ class AutonomousAgent:
 
         return "\n".join(report)
 
-    def create_analysis_pr(self, report: str) -> Optional[str]:
+    def create_analysis_pr(self, report: str) -> str | None:
         """
         Create a PR with analysis results.
 

@@ -1,8 +1,8 @@
 """
 Business Analyzer - Analyzes business intelligence
 """
-from typing import Dict, Any, List
 import logging
+from typing import Any, dict, list
 
 logger = logging.getLogger(__name__)
 
@@ -10,7 +10,7 @@ logger = logging.getLogger(__name__)
 class BusinessAnalyzer:
     """
     Analyzes business information and generates insights.
-    
+
     Analyzes:
     - Business model and operations
     - Financial health indicators
@@ -19,15 +19,15 @@ class BusinessAnalyzer:
     - Market position
     - Strengths and capabilities
     """
-    
+
     async def analyze(
         self,
         business_name: str,
-        crawled_data: List[Dict[str, Any]]
-    ) -> Dict[str, Any]:
+        crawled_data: list[dict[str, Any]]
+    ) -> dict[str, Any]:
         """Generate comprehensive business analysis"""
         logger.info(f"Analyzing business intelligence for {business_name}")
-        
+
         analysis = {
             "business_overview": self._analyze_business_overview(business_name, crawled_data),
             "financial_data": self._analyze_financial_indicators(crawled_data),
@@ -39,14 +39,14 @@ class BusinessAnalyzer:
             "digital_maturity": self._assess_digital_maturity(crawled_data),
             "innovation_index": self._calculate_innovation_index(crawled_data)
         }
-        
+
         return analysis
-    
+
     def _analyze_business_overview(
         self,
         business_name: str,
-        crawled_data: List[Dict[str, Any]]
-    ) -> Dict[str, Any]:
+        crawled_data: list[dict[str, Any]]
+    ) -> dict[str, Any]:
         """Analyze business overview"""
         return {
             "name": business_name,
@@ -58,11 +58,11 @@ class BusinessAnalyzer:
             "stage": "Growth Stage",
             "description": f"{business_name} provides enterprise-grade AI solutions"
         }
-    
+
     def _analyze_financial_indicators(
         self,
-        crawled_data: List[Dict[str, Any]]
-    ) -> Dict[str, Any]:
+        crawled_data: list[dict[str, Any]]
+    ) -> dict[str, Any]:
         """Analyze financial indicators"""
         return {
             "estimated_revenue": "$10M-$50M",
@@ -78,11 +78,11 @@ class BusinessAnalyzer:
                 "market_sentiment": "Positive"
             }
         }
-    
+
     def _analyze_operations(
         self,
-        crawled_data: List[Dict[str, Any]]
-    ) -> Dict[str, Any]:
+        crawled_data: list[dict[str, Any]]
+    ) -> dict[str, Any]:
         """Analyze operational aspects"""
         return {
             "team_size": "75-150 employees",
@@ -93,11 +93,11 @@ class BusinessAnalyzer:
             "technology_stack": ["Python", "React", "AWS", "Kubernetes"],
             "automation_level": "Moderate"
         }
-    
+
     def _analyze_products(
         self,
-        crawled_data: List[Dict[str, Any]]
-    ) -> Dict[str, Any]:
+        crawled_data: list[dict[str, Any]]
+    ) -> dict[str, Any]:
         """Analyze product portfolio"""
         return {
             "primary_products": [
@@ -118,11 +118,11 @@ class BusinessAnalyzer:
             "innovation_rate": "Moderate to High",
             "roadmap_strength": "Strong"
         }
-    
+
     def _analyze_market_position(
         self,
-        crawled_data: List[Dict[str, Any]]
-    ) -> Dict[str, Any]:
+        crawled_data: list[dict[str, Any]]
+    ) -> dict[str, Any]:
         """Analyze market position"""
         return {
             "market_share": "3-5% in target segment",
@@ -132,11 +132,11 @@ class BusinessAnalyzer:
             "positioning": "Premium, Enterprise-focused",
             "competitive_standing": "Strong challenger"
         }
-    
+
     def _identify_strengths(
         self,
-        crawled_data: List[Dict[str, Any]]
-    ) -> List[str]:
+        crawled_data: list[dict[str, Any]]
+    ) -> list[str]:
         """Identify key business strengths"""
         return [
             "Strong technical capabilities in AI/ML",
@@ -147,11 +147,11 @@ class BusinessAnalyzer:
             "Scalable technology infrastructure",
             "Strong customer relationships"
         ]
-    
+
     def _assess_capabilities(
         self,
-        crawled_data: List[Dict[str, Any]]
-    ) -> Dict[str, Any]:
+        crawled_data: list[dict[str, Any]]
+    ) -> dict[str, Any]:
         """Assess organizational capabilities"""
         return {
             "technical_capability": 8.5,
@@ -163,11 +163,11 @@ class BusinessAnalyzer:
             "innovation_capability": 8.5,
             "financial_management": 7.5
         }
-    
+
     def _assess_digital_maturity(
         self,
-        crawled_data: List[Dict[str, Any]]
-    ) -> Dict[str, Any]:
+        crawled_data: list[dict[str, Any]]
+    ) -> dict[str, Any]:
         """Assess digital maturity"""
         return {
             "overall_score": 7.5,
@@ -178,10 +178,10 @@ class BusinessAnalyzer:
             "digital_culture": "Strong",
             "maturity_stage": "Scaling"
         }
-    
+
     def _calculate_innovation_index(
         self,
-        crawled_data: List[Dict[str, Any]]
+        crawled_data: list[dict[str, Any]]
     ) -> float:
         """Calculate innovation index"""
         return 8.2

@@ -89,7 +89,7 @@ async def test_drift_detection():
                 }
             }
         )
-        
+
         # Check for drift
         response = await client.post(
             "/api/monitoring/drift/check",
@@ -124,7 +124,7 @@ async def test_approval_workflow():
         data = response.json()
         request_id = data["request_id"]
         assert data["status"] == "pending"
-        
+
         # Approve request
         response = await client.post(
             f"/api/governance/approvals/{request_id}/approve",
@@ -210,7 +210,7 @@ async def test_cost_tracking():
                 "cost_per_hour": 2.5
             }
         )
-        
+
         # Track usage
         response = await client.post(
             "/api/monitoring/costs/track",
@@ -273,7 +273,7 @@ async def test_document_search():
                 "tags": ["security", "guidelines"]
             }
         )
-        
+
         # Search for document
         response = await client.get(
             "/api/docs/search",
@@ -288,18 +288,18 @@ async def test_document_search():
 async def test_rate_limiting():
     """Test rate limiting."""
     from infinity_matrix.core.rate_limiter import RateLimiter
-    
+
     rate_limiter = RateLimiter()
-    
+
     # Should allow first requests
-    for i in range(5):
+    for _i in range(5):
         allowed = await rate_limiter.check_rate_limit("test-user", max_requests=10, window_seconds=60)
         assert allowed is True
-    
+
     # Should rate limit after exceeding
-    for i in range(10):
+    for _i in range(10):
         await rate_limiter.check_rate_limit("test-user-2", max_requests=5, window_seconds=60)
-    
+
     allowed = await rate_limiter.check_rate_limit("test-user-2", max_requests=5, window_seconds=60)
     assert allowed is False
 
@@ -308,19 +308,19 @@ async def test_rate_limiting():
 async def test_circuit_breaker():
     """Test circuit breaker."""
     from infinity_matrix.core.rate_limiter import CircuitBreaker
-    
+
     cb = CircuitBreaker(failure_threshold=3, timeout=1)
-    
+
     # Should be closed initially
     assert cb.can_execute() is True
-    
+
     # Record failures
-    for i in range(3):
+    for _i in range(3):
         cb.record_failure()
-    
+
     # Should be open after threshold
     assert cb.can_execute() is False
-    
+
     # Record success should reset
     cb.record_success()
     assert cb.can_execute() is True

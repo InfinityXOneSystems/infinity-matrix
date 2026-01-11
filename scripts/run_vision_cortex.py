@@ -63,7 +63,7 @@ Examples:
     config = {}
     if args.config:
         try:
-            with open(args.config, 'r') as f:
+            with open(args.config) as f:
                 config = json.load(f)
             print(f"Loaded configuration from {args.config}")
         except Exception as e:

@@ -1,7 +1,7 @@
 """Core configuration management for Infinity Matrix."""
 
 from functools import lru_cache
-from typing import List, Optional
+from typing import list
 
 from pydantic import Field, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
@@ -47,7 +47,7 @@ class Settings(BaseSettings):
     # Security Configuration
     secret_key: str = Field(default="change-me-in-production", description="Secret key")
     api_key_header: str = Field(default="X-API-Key", description="API key header")
-    allowed_origins: List[str] = Field(default=["*"], description="CORS allowed origins")
+    allowed_origins: list[str] = Field(default=["*"], description="CORS allowed origins")
     rate_limit_per_minute: int = Field(default=60, description="Rate limit per minute")
 
     # Monitoring Configuration
@@ -92,7 +92,7 @@ class Settings(BaseSettings):
         return self.environment == "development"
 
 
-@lru_cache()
+@lru_cache
 def get_settings() -> Settings:
     """Get cached settings instance."""
     return Settings()

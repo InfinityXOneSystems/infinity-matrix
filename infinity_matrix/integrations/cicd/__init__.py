@@ -2,7 +2,7 @@
 
 from abc import ABC, abstractmethod
 from enum import Enum
-from typing import Any, Dict, List, Optional
+from typing import Any, Optional, dict, list
 
 from pydantic import BaseModel
 
@@ -18,35 +18,33 @@ class CICDPlatform(str, Enum):
 class PipelineStep(BaseModel):
     """CI/CD pipeline step."""
     name: str
-    script: List[str]
-    environment: Dict[str, str] = {}
+    script: list[str]
+    environment: dict[str, str] = {}
 
 
 class PipelineConfig(BaseModel):
     """CI/CD pipeline configuration."""
     name: str
     platform: CICDPlatform
-    steps: List[PipelineStep]
-    triggers: List[str] = ["push"]
+    steps: list[PipelineStep]
+    triggers: list[str] = ["push"]
 
 
 class CICDIntegration(ABC):
     """Abstract base class for CI/CD integrations."""
-    
+
     @abstractmethod
     def generate_config(self, pipeline: PipelineConfig) -> str:
         """Generate CI/CD configuration file."""
-        pass
-    
+
     @abstractmethod
-    def trigger_pipeline(self, pipeline_id: str) -> Dict[str, Any]:
+    def trigger_pipeline(self, pipeline_id: str) -> dict[str, Any]:
         """Trigger a pipeline run."""
-        pass
 
 
 class GitHubActionsIntegration(CICDIntegration):
     """GitHub Actions integration."""
-    
+
     def generate_config(self, pipeline: PipelineConfig) -> str:
         """Generate GitHub Actions workflow file."""
         steps_yaml = []
@@ -58,10 +56,10 @@ class GitHubActionsIntegration(CICDIntegration):
             for script_line in step.script:
                 step_yaml += f"          {script_line}\n"
             steps_yaml.append(step_yaml)
-        
+
         # Format triggers as YAML list
         triggers_yaml = "\n".join([f"  {trigger}:" for trigger in pipeline.triggers])
-        
+
         config = f"""
 name: {pipeline.name}
 
@@ -76,8 +74,8 @@ jobs:
 {''.join(steps_yaml)}
 """
         return config
-    
-    def trigger_pipeline(self, pipeline_id: str) -> Dict[str, Any]:
+
+    def trigger_pipeline(self, pipeline_id: str) -> dict[str, Any]:
         """Trigger GitHub Actions workflow."""
         return {
             "success": True,
@@ -88,16 +86,16 @@ jobs:
 
 class GitLabCIIntegration(CICDIntegration):
     """GitLab CI integration."""
-    
+
     def generate_config(self, pipeline: PipelineConfig) -> str:
         """Generate GitLab CI configuration file."""
         stages = []
         jobs = []
-        
+
         for idx, step in enumerate(pipeline.steps):
             stage_name = f"stage_{idx}"
             stages.append(stage_name)
-            
+
             job = f"""
 {step.name}:
   stage: {stage_name}
@@ -105,9 +103,9 @@ class GitLabCIIntegration(CICDIntegration):
 """
             for script_line in step.script:
                 job += f"    - {script_line}\n"
-            
+
             jobs.append(job)
-        
+
         config = f"""
 stages:
   - {'\n  - '.join(stages)}
@@ -115,8 +113,8 @@ stages:
 {''.join(jobs)}
 """
         return config
-    
-    def trigger_pipeline(self, pipeline_id: str) -> Dict[str, Any]:
+
+    def trigger_pipeline(self, pipeline_id: str) -> dict[str, Any]:
         """Trigger GitLab CI pipeline."""
         return {
             "success": True,

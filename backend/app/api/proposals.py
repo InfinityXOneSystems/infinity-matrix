@@ -1,19 +1,19 @@
 """
 Proposals API Endpoints
 """
-from fastapi import APIRouter, Depends, HTTPException
-from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select
-from typing import List
+from typing import list
 
 from app.core.database import get_db
-from app.models.models import Proposal, Discovery
+from app.models.models import Discovery, Proposal
 from app.models.schemas import ProposalResponse
+from fastapi import APIRouter, Depends, HTTPException
+from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
 
 router = APIRouter()
 
 
-@router.get("/{discovery_id}/proposals", response_model=List[ProposalResponse])
+@router.get("/{discovery_id}/proposals", response_model=list[ProposalResponse])
 async def get_proposals(
     discovery_id: int,
     db: AsyncSession = Depends(get_db)
@@ -26,7 +26,7 @@ async def get_proposals(
     discovery = result.scalar_one_or_none()
     if not discovery:
         raise HTTPException(status_code=404, detail="Discovery not found")
-    
+
     # Get proposals
     result = await db.execute(
         select(Proposal)
@@ -34,7 +34,7 @@ async def get_proposals(
         .order_by(Proposal.created_at.desc())
     )
     proposals = result.scalars().all()
-    
+
     return proposals
 
 
@@ -48,8 +48,8 @@ async def get_proposal(
         select(Proposal).where(Proposal.id == proposal_id)
     )
     proposal = result.scalar_one_or_none()
-    
+
     if not proposal:
         raise HTTPException(status_code=404, detail="Proposal not found")
-    
+
     return proposal

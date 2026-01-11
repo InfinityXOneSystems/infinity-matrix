@@ -1,9 +1,10 @@
 """Tests for vision processor."""
 
-import pytest
 import numpy as np
-from infinity_matrix.vision.processor import VisionProcessor
+import pytest
+
 from infinity_matrix.core.base import Task
+from infinity_matrix.vision.processor import VisionProcessor
 
 
 @pytest.mark.asyncio

@@ -1,8 +1,8 @@
 """Blueprint models for defining build specifications."""
 
-from datetime import datetime, timezone
+from datetime import datetime
 from enum import Enum
-from typing import Any, Optional
+from typing import Any
 
 from pydantic import BaseModel, Field
 
@@ -52,8 +52,8 @@ class Component(BaseModel):
 
     name: str
     type: ComponentType
-    framework: Optional[str] = None
-    language: Optional[str] = None
+    framework: str | None = None
+    language: str | None = None
     features: list[str] = Field(default_factory=list)
     dependencies: list[str] = Field(default_factory=list)
     config: dict[str, Any] = Field(default_factory=dict)
@@ -63,7 +63,7 @@ class Environment(BaseModel):
     """Environment variable specification."""
 
     name: str
-    value: Optional[str] = None
+    value: str | None = None
     secret: bool = False
     required: bool = True
 
@@ -75,7 +75,7 @@ class DeploymentConfig(BaseModel):
     replicas: int = 1
     resources: dict[str, Any] = Field(default_factory=dict)
     environment: list[Environment] = Field(default_factory=list)
-    health_check: Optional[dict[str, Any]] = None
+    health_check: dict[str, Any] | None = None
 
 
 class TestingConfig(BaseModel):
@@ -91,7 +91,7 @@ class TestingConfig(BaseModel):
 class DocumentationConfig(BaseModel):
     """Documentation configuration."""
 
-    api_docs: Optional[str] = "openapi"
+    api_docs: str | None = "openapi"
     readme: bool = True
     architecture_diagram: bool = True
     deployment_guide: bool = True
@@ -101,7 +101,7 @@ class DocumentationConfig(BaseModel):
 class Blueprint(BaseModel):
     """
     Blueprint model defining project specifications.
-    
+
     This is the core data structure for defining what should be built.
     """
 
@@ -116,7 +116,7 @@ class Blueprint(BaseModel):
         default_factory=list,
         description="High-level requirements (e.g., authentication, database)"
     )
-    
+
     # Components
     components: list[Component] = Field(
         default_factory=list,
@@ -124,7 +124,7 @@ class Blueprint(BaseModel):
     )
 
     # Deployment
-    deployment: Optional[DeploymentConfig] = Field(
+    deployment: DeploymentConfig | None = Field(
         None,
         description="Deployment configuration"
     )
@@ -143,7 +143,7 @@ class Blueprint(BaseModel):
 
     # Metadata
     tags: list[str] = Field(default_factory=list)
-    author: Optional[str] = None
+    author: str | None = None
     license: str = "MIT"
     created_at: datetime = Field(default_factory=datetime.utcnow)
     updated_at: datetime = Field(default_factory=datetime.utcnow)
@@ -183,14 +183,14 @@ class Blueprint(BaseModel):
     def from_prompt(cls, prompt: str) -> "Blueprint":
         """
         Create a blueprint from a natural language prompt.
-        
+
         This is a simplified version - in production, this would use
         LLM to parse the prompt into a structured blueprint.
         """
         # Simple heuristic-based parsing
         name = "generated-project"
         project_type = ProjectType.API
-        
+
         # Extract project type hints
         if "microservice" in prompt.lower():
             project_type = ProjectType.MICROSERVICE
@@ -200,7 +200,7 @@ class Blueprint(BaseModel):
             project_type = ProjectType.CLI_TOOL
         elif "library" in prompt.lower():
             project_type = ProjectType.LIBRARY
-        
+
         return cls(
             name=name,
             type=project_type,

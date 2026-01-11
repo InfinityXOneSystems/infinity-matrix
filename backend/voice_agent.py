@@ -1,14 +1,14 @@
 """AI Voice Agent Integration using OpenAI and Twilio"""
 
-import os
 import json
-import asyncio
-from typing import Dict, Any, Optional
+import os
 from datetime import datetime
+from typing import Any, dict
+
 import openai
-from twilio.rest import Client
-from twilio.twiml.voice_response import VoiceResponse, Gather
 from dotenv import load_dotenv
+from twilio.rest import Client
+from twilio.twiml.voice_response import Gather, VoiceResponse
 
 load_dotenv()
 
@@ -21,7 +21,7 @@ class VoiceAgent:
         openai_key = os.getenv("OPENAI_API_KEY")
         twilio_sid = os.getenv("TWILIO_ACCOUNT_SID")
         twilio_token = os.getenv("TWILIO_AUTH_TOKEN")
-        
+
         # Initialize OpenAI client with error handling
         self.openai_client = None
         if openai_key:
@@ -29,7 +29,7 @@ class VoiceAgent:
                 self.openai_client = openai.OpenAI(api_key=openai_key)
             except Exception as e:
                 print(f"Warning: Failed to initialize OpenAI client: {e}")
-        
+
         # Initialize Twilio client with error handling
         self.twilio_client = None
         if twilio_sid and twilio_token:
@@ -37,18 +37,18 @@ class VoiceAgent:
                 self.twilio_client = Client(twilio_sid, twilio_token)
             except Exception as e:
                 print(f"Warning: Failed to initialize Twilio client: {e}")
-        
-        self.twilio_phone = os.getenv("TWILIO_PHONE_NUMBER")
-        self.conversation_history: Dict[str, list] = {}
 
-    async def initiate_call(self, phone_number: str, callback_url: str) -> Dict[str, Any]:
+        self.twilio_phone = os.getenv("TWILIO_PHONE_NUMBER")
+        self.conversation_history: dict[str, list] = {}
+
+    async def initiate_call(self, phone_number: str, callback_url: str) -> dict[str, Any]:
         """Initiate an outbound call to a lead"""
         if not self.twilio_client:
             raise Exception("Twilio client not configured. Please set TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN, and TWILIO_PHONE_NUMBER environment variables.")
-        
+
         if not self.twilio_phone:
             raise Exception("Twilio phone number not configured. Please set TWILIO_PHONE_NUMBER environment variable.")
-        
+
         try:
             call = self.twilio_client.calls.create(
                 to=phone_number,
@@ -58,7 +58,7 @@ class VoiceAgent:
                 status_callback_event=['initiated', 'ringing', 'answered', 'completed'],
                 record=True
             )
-            
+
             return {
                 "call_sid": call.sid,
                 "status": call.status,
@@ -91,9 +91,9 @@ class VoiceAgent:
         call_sid: str,
         speech_result: str,
         conversation_stage: str = "greeting"
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """Process speech input and generate AI response"""
-        
+
         # Initialize conversation history if needed
         if call_sid not in self.conversation_history:
             self.conversation_history[call_sid] = [
@@ -127,7 +127,7 @@ class VoiceAgent:
                 "conversation_complete": True,
                 "error": "OpenAI client not configured"
             }
-        
+
         try:
             completion = self.openai_client.chat.completions.create(
                 model=os.getenv("AI_VOICE_MODEL", "gpt-4-turbo-preview"),
@@ -137,7 +137,7 @@ class VoiceAgent:
             )
 
             ai_response = completion.choices[0].message.content
-            
+
             # Add AI response to history
             self.conversation_history[call_sid].append({
                 "role": "assistant",
@@ -163,7 +163,7 @@ class VoiceAgent:
     def generate_response_twiml(self, ai_response: str, is_complete: bool = False) -> str:
         """Generate TwiML for AI response"""
         response = VoiceResponse()
-        
+
         if not is_complete:
             gather = Gather(
                 input='speech',
@@ -181,15 +181,15 @@ class VoiceAgent:
                 voice='Polly.Joanna'
             )
             response.hangup()
-        
+
         return str(response)
 
-    async def _extract_information(self, call_sid: str) -> Dict[str, Any]:
+    async def _extract_information(self, call_sid: str) -> dict[str, Any]:
         """Extract structured information from conversation using AI"""
-        
+
         if not self.openai_client:
             return {}
-        
+
         conversation_text = "\n".join([
             f"{msg['role']}: {msg['content']}"
             for msg in self.conversation_history[call_sid]
@@ -205,10 +205,10 @@ class VoiceAgent:
         - interest_level: low/medium/high based on engagement
         - preferred_callback_time: any mentioned preferred time
         - email: email address if provided
-        
+
         Conversation:
         {conversation_text}
-        
+
         Return only valid JSON, use null for missing fields.
         """
 
@@ -218,20 +218,20 @@ class VoiceAgent:
                 messages=[{"role": "user", "content": extraction_prompt}],
                 response_format={"type": "json_object"}
             )
-            
+
             extracted = json.loads(completion.choices[0].message.content)
             return extracted
-        except Exception as e:
+        except Exception:
             return {}
 
-    def _is_conversation_complete(self, extracted_info: Dict[str, Any]) -> bool:
+    def _is_conversation_complete(self, extracted_info: dict[str, Any]) -> bool:
         """Determine if enough information has been collected"""
         required_fields = ['name', 'company']
         return all(extracted_info.get(field) for field in required_fields)
 
-    async def generate_conversation_summary(self, call_sid: str) -> Dict[str, Any]:
+    async def generate_conversation_summary(self, call_sid: str) -> dict[str, Any]:
         """Generate a summary and sentiment analysis of the conversation"""
-        
+
         if call_sid not in self.conversation_history:
             return {
                 "summary": "No conversation data available",
@@ -258,10 +258,10 @@ class VoiceAgent:
         2. Sentiment (positive/neutral/negative)
         3. Lead quality score (0-100)
         4. Key takeaways
-        
+
         Conversation:
         {conversation_text}
-        
+
         Return as JSON with fields: summary, sentiment, score, takeaways (array)
         """
 
@@ -271,7 +271,7 @@ class VoiceAgent:
                 messages=[{"role": "user", "content": summary_prompt}],
                 response_format={"type": "json_object"}
             )
-            
+
             result = json.loads(completion.choices[0].message.content)
             return result
         except Exception as e:
@@ -282,7 +282,7 @@ class VoiceAgent:
                 "error": str(e)
             }
 
-    def get_call_recording_url(self, call_sid: str) -> Optional[str]:
+    def get_call_recording_url(self, call_sid: str) -> str | None:
         """Get the URL of the call recording"""
         if not self.twilio_client:
             return None

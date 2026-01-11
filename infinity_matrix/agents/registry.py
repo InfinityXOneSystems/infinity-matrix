@@ -1,7 +1,7 @@
 """Agent Registry - Dynamic agent registration and discovery system."""
 
 import asyncio
-from typing import Dict, List, Optional
+from typing import dict, list
 
 from infinity_matrix.agents.base_agent import BaseAgent
 from infinity_matrix.core.base import BaseService
@@ -18,8 +18,8 @@ class AgentRegistry(BaseService):
         """Initialize agent registry."""
         super().__init__(name="agent_registry")
         self.settings = get_settings()
-        self._agents: Dict[str, BaseAgent] = {}
-        self._agents_by_type: Dict[str, List[BaseAgent]] = {}
+        self._agents: dict[str, BaseAgent] = {}
+        self._agents_by_type: dict[str, list[BaseAgent]] = {}
         self._lock = asyncio.Lock()
 
     async def _initialize(self) -> None:
@@ -94,23 +94,23 @@ class AgentRegistry(BaseService):
                 total_agents=len(self._agents),
             )
 
-    def get_agent(self, agent_name: str) -> Optional[BaseAgent]:
+    def get_agent(self, agent_name: str) -> BaseAgent | None:
         """Get agent by name."""
         return self._agents.get(agent_name)
 
-    def get_agents_by_type(self, agent_type: str) -> List[BaseAgent]:
+    def get_agents_by_type(self, agent_type: str) -> list[BaseAgent]:
         """Get all agents of a specific type."""
         return self._agents_by_type.get(agent_type, [])
 
-    def list_agents(self) -> List[BaseAgent]:
-        """List all registered agents."""
+    def list_agents(self) -> list[BaseAgent]:
+        """list all registered agents."""
         return list(self._agents.values())
 
-    def list_agent_types(self) -> List[str]:
-        """List all registered agent types."""
+    def list_agent_types(self) -> list[str]:
+        """list all registered agent types."""
         return list(self._agents_by_type.keys())
 
-    async def get_available_agent(self, agent_type: str) -> Optional[BaseAgent]:
+    async def get_available_agent(self, agent_type: str) -> BaseAgent | None:
         """Get an available (not busy) agent of specified type."""
         agents = self.get_agents_by_type(agent_type)
         for agent in agents:
@@ -118,7 +118,7 @@ class AgentRegistry(BaseService):
                 return agent
         return None
 
-    async def execute_on_agent(self, agent_name: str, task: Dict) -> Dict:
+    async def execute_on_agent(self, agent_name: str, task: dict) -> dict:
         """Execute task on specific agent."""
         agent = self.get_agent(agent_name)
         if not agent:
@@ -126,7 +126,7 @@ class AgentRegistry(BaseService):
 
         return await agent.execute(task)
 
-    async def execute_on_available_agent(self, agent_type: str, task: Dict) -> Dict:
+    async def execute_on_available_agent(self, agent_type: str, task: dict) -> dict:
         """Execute task on any available agent of specified type."""
         agent = await self.get_available_agent(agent_type)
         if not agent:
@@ -134,7 +134,7 @@ class AgentRegistry(BaseService):
 
         return await agent.execute(task)
 
-    async def get_registry_status(self) -> Dict:
+    async def get_registry_status(self) -> dict:
         """Get registry status."""
         agent_statuses = []
         for agent in self._agents.values():
@@ -149,7 +149,7 @@ class AgentRegistry(BaseService):
 
 
 # Global registry instance
-_registry: Optional[AgentRegistry] = None
+_registry: AgentRegistry | None = None
 
 
 def get_registry() -> AgentRegistry:

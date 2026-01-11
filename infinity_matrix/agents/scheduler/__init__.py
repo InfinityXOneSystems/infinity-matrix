@@ -2,7 +2,7 @@
 
 from datetime import datetime, timedelta
 from enum import Enum
-from typing import Any, Callable, Dict, List, Optional
+from collections.abc import Callable, Any, , dict, list, Optional
 from uuid import uuid4
 
 from pydantic import BaseModel, Field
@@ -38,15 +38,15 @@ class ScheduledTask(BaseModel):
     next_run: Optional[datetime] = None
     last_run: Optional[datetime] = None
     run_count: int = 0
-    metadata: Dict[str, Any] = Field(default_factory=dict)
+    metadata: dict[str, Any] = Field(default_factory=dict)
 
 
 class AgentScheduler:
     """Scheduler for automated tasks."""
     
     def __init__(self):
-        self._tasks: Dict[str, ScheduledTask] = {}
-        self._handlers: Dict[str, Callable] = {}
+        self._tasks: dict[str, ScheduledTask] = {}
+        self._handlers: dict[str, Callable] = {}
     
     def schedule(
         self,
@@ -87,8 +87,8 @@ class AgentScheduler:
         self,
         status: Optional[TaskStatus] = None,
         priority: Optional[TaskPriority] = None
-    ) -> List[ScheduledTask]:
-        """List tasks with optional filtering."""
+    ) -> list[ScheduledTask]:
+        """list tasks with optional filtering."""
         tasks = list(self._tasks.values())
         
         if status:
@@ -99,12 +99,12 @@ class AgentScheduler:
         
         return tasks
     
-    def run_pending(self) -> List[str]:
+    def run_pending(self) -> list[str]:
         """
         Run all pending tasks that are due.
         
         Returns:
-            List of task IDs that were executed
+            list of task IDs that were executed
         """
         executed = []
         now = datetime.utcnow()

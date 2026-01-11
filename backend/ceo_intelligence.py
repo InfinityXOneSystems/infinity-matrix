@@ -4,26 +4,26 @@ CEO-Level Strategic Intelligence API
 High-level decision making and strategic planning
 """
 
-from fastapi import APIRouter, HTTPException
+from typing import Any, dict, list
+
+from fastapi import APIRouter
 from pydantic import BaseModel
-from typing import List, Dict, Any
-from datetime import datetime
 
 router = APIRouter(prefix="/ceo", tags=["CEO Intelligence"])
 
 class StrategicDecision(BaseModel):
     decision_type: str  # expand, pivot, optimize, shutdown
     rationale: str
-    expected_impact: Dict[str, Any]
-    risks: List[str]
+    expected_impact: dict[str, Any]
+    risks: list[str]
     timeline: str
 
 class MarketAnalysis(BaseModel):
     market_size: float
     growth_rate: float
     competition_level: str
-    opportunities: List[str]
-    threats: List[str]
+    opportunities: list[str]
+    threats: list[str]
 
 class ResourceAllocation(BaseModel):
     department: str
@@ -32,7 +32,7 @@ class ResourceAllocation(BaseModel):
     justification: str
 
 @router.post("/strategic-decision", response_model=StrategicDecision)
-async def make_strategic_decision(context: Dict[str, Any]):
+async def make_strategic_decision(context: dict[str, Any]):
     """
     Make high-level strategic decision based on current context
     """
@@ -58,7 +58,7 @@ async def analyze_market():
         threats=["Regulatory changes", "Market saturation", "Tech disruption"]
     )
 
-@router.post("/resource-allocation", response_model=List[ResourceAllocation])
+@router.post("/resource-allocation", response_model=list[ResourceAllocation])
 async def optimize_resources():
     """
     Optimize resource allocation across departments

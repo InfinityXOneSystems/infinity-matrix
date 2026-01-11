@@ -1,7 +1,8 @@
 """Tests for financial analysis module."""
 
 import pytest
-from infinity_matrix.industries.finance import FinancialAnalyzer, CryptoAnalyzer
+
+from infinity_matrix.industries.finance import CryptoAnalyzer, FinancialAnalyzer
 
 
 @pytest.mark.asyncio
@@ -18,11 +19,11 @@ async def test_analyze_stock():
     """Test stock analysis."""
     analyzer = FinancialAnalyzer()
     await analyzer.initialize()
-    
+
     result = await analyzer.analyze_stock("AAPL", "1d", "1mo")
-    
+
     await analyzer.shutdown()
-    
+
     assert result is not None
     assert "symbol" in result
     assert result["symbol"] == "AAPL"
@@ -42,10 +43,10 @@ async def test_analyze_crypto():
     """Test crypto analysis."""
     analyzer = CryptoAnalyzer()
     await analyzer.initialize()
-    
+
     result = await analyzer.analyze_crypto("BTC")
-    
+
     await analyzer.shutdown()
-    
+
     assert result is not None
     assert "symbol" in result

@@ -1,11 +1,10 @@
 """Loan lead generation module for business and personal loans."""
 
-from typing import Any, Dict, List, Optional
 from datetime import datetime
 from enum import Enum
+from typing import Any, dict, list
 
 from infinity_matrix.core.base import BaseLeadGenerator
-from infinity_matrix.core.logging import LoggerMixin
 
 
 class LoanType(str, Enum):
@@ -35,11 +34,11 @@ class LoanLeadGenerator(BaseLeadGenerator):
 
     async def discover_leads(
         self,
-        criteria: Dict[str, Any],
-    ) -> List[Dict[str, Any]]:
+        criteria: dict[str, Any],
+    ) -> list[dict[str, Any]]:
         """
         Discover loan leads based on criteria.
-        
+
         Args:
             criteria: Search criteria
                 - loan_type: Type of loan
@@ -48,9 +47,9 @@ class LoanLeadGenerator(BaseLeadGenerator):
                 - credit_score_range: (min, max) tuple
                 - industry: For business loans
                 - location: Geographic area
-                
+
         Returns:
-            List of qualified leads
+            list of qualified leads
         """
         loan_type = criteria.get("loan_type", LoanType.BUSINESS)
         min_amount = criteria.get("min_amount", 0)
@@ -65,9 +64,9 @@ class LoanLeadGenerator(BaseLeadGenerator):
 
         # This would integrate with business databases, credit bureaus, etc.
         # For now, returning structured lead template
-        
+
         leads = []
-        
+
         if loan_type == LoanType.BUSINESS:
             leads = await self._discover_business_loan_leads(criteria)
         elif loan_type == LoanType.PERSONAL:
@@ -86,8 +85,8 @@ class LoanLeadGenerator(BaseLeadGenerator):
 
     async def _discover_business_loan_leads(
         self,
-        criteria: Dict[str, Any],
-    ) -> List[Dict[str, Any]]:
+        criteria: dict[str, Any],
+    ) -> list[dict[str, Any]]:
         """Discover business loan leads."""
         # Sample business loan leads
         leads = [
@@ -124,13 +123,13 @@ class LoanLeadGenerator(BaseLeadGenerator):
             }
             for i in range(15)
         ]
-        
+
         return leads
 
     async def _discover_personal_loan_leads(
         self,
-        criteria: Dict[str, Any],
-    ) -> List[Dict[str, Any]]:
+        criteria: dict[str, Any],
+    ) -> list[dict[str, Any]]:
         """Discover personal loan leads."""
         # Sample personal loan leads
         leads = [
@@ -165,14 +164,14 @@ class LoanLeadGenerator(BaseLeadGenerator):
             }
             for i in range(15)
         ]
-        
+
         return leads
 
     async def _discover_generic_loan_leads(
         self,
-        criteria: Dict[str, Any],
+        criteria: dict[str, Any],
         loan_type: LoanType,
-    ) -> List[Dict[str, Any]]:
+    ) -> list[dict[str, Any]]:
         """Discover generic loan leads."""
         leads = [
             {
@@ -198,23 +197,23 @@ class LoanLeadGenerator(BaseLeadGenerator):
             }
             for i in range(10)
         ]
-        
+
         return leads
 
-    async def score_lead(self, lead: Dict[str, Any]) -> float:
+    async def score_lead(self, lead: dict[str, Any]) -> float:
         """
         Score a loan lead based on qualification criteria.
-        
+
         Args:
             lead: Lead data
-            
+
         Returns:
             Score from 0.0 to 1.0
         """
         score = 0.5  # Base score
 
         financial = lead.get("financial_profile", {})
-        
+
         # Credit score impact (0.3 weight)
         credit_score = financial.get("credit_score", 0)
         if credit_score >= 750:
@@ -248,20 +247,20 @@ class LoanLeadGenerator(BaseLeadGenerator):
 
     async def qualify_lead(
         self,
-        lead: Dict[str, Any],
-    ) -> Dict[str, Any]:
+        lead: dict[str, Any],
+    ) -> dict[str, Any]:
         """
         Perform detailed qualification of a lead.
-        
+
         Args:
             lead: Lead data
-            
+
         Returns:
             Qualification results
         """
         financial = lead.get("financial_profile", {})
         loan_details = lead.get("loan_details", {})
-        
+
         # Qualification criteria
         qualifications = {
             "credit_check": financial.get("credit_score", 0) >= 600,
@@ -289,10 +288,10 @@ class LoanLeadGenerator(BaseLeadGenerator):
         self.log_info("lead_qualified", lead_id=lead.get("id"), qualified=result["qualified"])
         return result
 
-    def _estimate_rate(self, financial_profile: Dict[str, Any]) -> float:
+    def _estimate_rate(self, financial_profile: dict[str, Any]) -> float:
         """Estimate interest rate based on financial profile."""
         credit_score = financial_profile.get("credit_score", 650)
-        
+
         # Simple rate estimation
         if credit_score >= 750:
             return 5.5
@@ -305,19 +304,19 @@ class LoanLeadGenerator(BaseLeadGenerator):
 
     async def enrich_lead(
         self,
-        lead: Dict[str, Any],
-    ) -> Dict[str, Any]:
+        lead: dict[str, Any],
+    ) -> dict[str, Any]:
         """
         Enrich lead with additional business/financial data.
-        
+
         Args:
             lead: Lead data
-            
+
         Returns:
             Enriched lead
         """
         enriched = lead.copy()
-        
+
         # This would integrate with credit bureaus, business databases, etc.
         enriched["enrichment"] = {
             "credit_report": {},

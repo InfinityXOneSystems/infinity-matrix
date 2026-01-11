@@ -1,17 +1,18 @@
 """Pydantic schemas for API request/response models"""
 
 from datetime import datetime
-from typing import Optional, List, Dict, Any
-from pydantic import BaseModel, Field, EmailStr, field_validator
+from typing import Any, dict
+
 import phonenumbers
+from pydantic import BaseModel, EmailStr, Field, field_validator
 
 
 class LeadBase(BaseModel):
     """Base lead schema"""
     phone_number: str
-    name: Optional[str] = None
-    email: Optional[EmailStr] = None
-    company: Optional[str] = None
+    name: str | None = None
+    email: EmailStr | None = None
+    company: str | None = None
 
     @field_validator('phone_number')
     def validate_phone(cls, v):
@@ -26,36 +27,35 @@ class LeadBase(BaseModel):
 
 class LeadCreate(LeadBase):
     """Schema for creating a new lead"""
-    pass
 
 
 class LeadUpdate(BaseModel):
     """Schema for updating a lead"""
-    name: Optional[str] = None
-    email: Optional[EmailStr] = None
-    company: Optional[str] = None
-    status: Optional[str] = None
-    callback_scheduled: Optional[datetime] = None
-    assigned_to: Optional[str] = None
-    priority: Optional[str] = None
+    name: str | None = None
+    email: EmailStr | None = None
+    company: str | None = None
+    status: str | None = None
+    callback_scheduled: datetime | None = None
+    assigned_to: str | None = None
+    priority: str | None = None
 
 
 class LeadResponse(LeadBase):
     """Schema for lead response"""
     id: int
     status: str
-    call_sid: Optional[str] = None
-    call_duration: Optional[int] = None
-    conversation_summary: Optional[str] = None
-    ai_sentiment: Optional[str] = None
-    ai_score: Optional[float] = None
-    enrichment_data: Optional[Dict[str, Any]] = None
-    social_profiles: Optional[Dict[str, Any]] = None
-    callback_scheduled: Optional[datetime] = None
-    assigned_to: Optional[str] = None
+    call_sid: str | None = None
+    call_duration: int | None = None
+    conversation_summary: str | None = None
+    ai_sentiment: str | None = None
+    ai_score: float | None = None
+    enrichment_data: dict[str, Any] | None = None
+    social_profiles: dict[str, Any] | None = None
+    callback_scheduled: datetime | None = None
+    assigned_to: str | None = None
     priority: str
     created_at: datetime
-    updated_at: Optional[datetime] = None
+    updated_at: datetime | None = None
 
     class Config:
         from_attributes = True
@@ -81,7 +81,7 @@ class CallStatusResponse(BaseModel):
     call_sid: str
     status: str
     phone_number: str
-    duration: Optional[int] = None
+    duration: int | None = None
     started_at: datetime
 
 
@@ -90,9 +90,9 @@ class InteractionCreate(BaseModel):
     lead_id: int
     interaction_type: str
     content: str
-    duration: Optional[int] = None
-    outcome: Optional[str] = None
-    created_by: Optional[str] = None
+    duration: int | None = None
+    outcome: str | None = None
+    created_by: str | None = None
 
 
 class InteractionResponse(BaseModel):
@@ -101,10 +101,10 @@ class InteractionResponse(BaseModel):
     lead_id: int
     interaction_type: str
     content: str
-    duration: Optional[int] = None
-    outcome: Optional[str] = None
+    duration: int | None = None
+    outcome: str | None = None
     created_at: datetime
-    created_by: Optional[str] = None
+    created_by: str | None = None
 
     class Config:
         from_attributes = True
@@ -114,7 +114,7 @@ class NoteCreate(BaseModel):
     """Schema for creating a note"""
     lead_id: int
     content: str
-    created_by: Optional[str] = None
+    created_by: str | None = None
 
 
 class NoteResponse(BaseModel):
@@ -123,7 +123,7 @@ class NoteResponse(BaseModel):
     lead_id: int
     content: str
     created_at: datetime
-    created_by: Optional[str] = None
+    created_by: str | None = None
 
     class Config:
         from_attributes = True
@@ -134,7 +134,7 @@ class CalendarEventCreate(BaseModel):
     lead_id: int
     sales_rep_id: int
     title: str
-    description: Optional[str] = None
+    description: str | None = None
     start_time: datetime
     end_time: datetime
     event_type: str = "callback"
@@ -142,13 +142,13 @@ class CalendarEventCreate(BaseModel):
 
 class CalendarEventUpdate(BaseModel):
     """Schema for updating a calendar event"""
-    title: Optional[str] = None
-    description: Optional[str] = None
-    start_time: Optional[datetime] = None
-    end_time: Optional[datetime] = None
-    status: Optional[str] = None
-    position_x: Optional[float] = None
-    position_y: Optional[float] = None
+    title: str | None = None
+    description: str | None = None
+    start_time: datetime | None = None
+    end_time: datetime | None = None
+    status: str | None = None
+    position_x: float | None = None
+    position_y: float | None = None
 
 
 class CalendarEventResponse(BaseModel):
@@ -157,15 +157,15 @@ class CalendarEventResponse(BaseModel):
     lead_id: int
     sales_rep_id: int
     title: str
-    description: Optional[str] = None
+    description: str | None = None
     start_time: datetime
     end_time: datetime
     event_type: str
     status: str
-    position_x: Optional[float] = None
-    position_y: Optional[float] = None
+    position_x: float | None = None
+    position_y: float | None = None
     created_at: datetime
-    updated_at: Optional[datetime] = None
+    updated_at: datetime | None = None
 
     class Config:
         from_attributes = True
@@ -174,15 +174,15 @@ class CalendarEventResponse(BaseModel):
 class WebSocketMessage(BaseModel):
     """WebSocket message schema"""
     type: str  # lead_created, call_started, call_updated, data_enriched, calendar_updated
-    data: Dict[str, Any]
+    data: dict[str, Any]
     timestamp: datetime = Field(default_factory=datetime.utcnow)
 
 
 class EnrichmentResult(BaseModel):
     """Data enrichment result"""
     lead_id: int
-    enrichment_data: Dict[str, Any]
-    social_profiles: Dict[str, Any]
-    company_info: Dict[str, Any]
+    enrichment_data: dict[str, Any]
+    social_profiles: dict[str, Any]
+    company_info: dict[str, Any]
     success: bool
-    error: Optional[str] = None
+    error: str | None = None

@@ -76,7 +76,7 @@ class WorkspaceAdapter:
         """Send an email via Gmail.
 
         Args:
-            to: List of recipient email addresses
+            to: list of recipient email addresses
             subject: Email subject
             body: Email body (HTML supported)
             attachments: Optional list of file paths to attach

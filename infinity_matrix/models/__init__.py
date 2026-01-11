@@ -2,7 +2,8 @@
 
 from datetime import datetime
 from enum import Enum
-from typing import Any, Dict, List, Optional
+from typing import Any, Optional, dict, list
+
 from pydantic import BaseModel, Field, HttpUrl
 
 
@@ -55,10 +56,10 @@ class Industry(BaseModel):
     name: str
     type: IndustryType
     description: str
-    keywords: List[str] = Field(default_factory=list)
+    keywords: list[str] = Field(default_factory=list)
     priority: int = Field(default=5, ge=1, le=10)
     enabled: bool = True
-    metadata: Dict[str, Any] = Field(default_factory=dict)
+    metadata: dict[str, Any] = Field(default_factory=dict)
 
 
 class DataSource(BaseModel):
@@ -69,10 +70,10 @@ class DataSource(BaseModel):
     base_url: HttpUrl
     industry_id: str
     enabled: bool = True
-    rate_limit: Optional[int] = None  # requests per minute
+    rate_limit: int | None = None  # requests per minute
     authentication_required: bool = False
-    credentials_key: Optional[str] = None
-    metadata: Dict[str, Any] = Field(default_factory=dict)
+    credentials_key: str | None = None
+    metadata: dict[str, Any] = Field(default_factory=dict)
 
 
 class SeedUrl(BaseModel):
@@ -82,7 +83,7 @@ class SeedUrl(BaseModel):
     industry_id: str
     priority: int = Field(default=5, ge=1, le=10)
     depth: int = Field(default=2, ge=0, le=10)
-    metadata: Dict[str, Any] = Field(default_factory=dict)
+    metadata: dict[str, Any] = Field(default_factory=dict)
 
 
 class CrawlTask(BaseModel):
@@ -95,11 +96,11 @@ class CrawlTask(BaseModel):
     attempts: int = 0
     max_attempts: int = 3
     created_at: datetime = Field(default_factory=datetime.utcnow)
-    started_at: Optional[datetime] = None
-    completed_at: Optional[datetime] = None
-    last_error: Optional[str] = None
+    started_at: datetime | None = None
+    completed_at: datetime | None = None
+    last_error: str | None = None
     result_count: int = 0
-    metadata: Dict[str, Any] = Field(default_factory=dict)
+    metadata: dict[str, Any] = Field(default_factory=dict)
 
 
 class RawData(BaseModel):
@@ -111,9 +112,9 @@ class RawData(BaseModel):
     url: HttpUrl
     content_type: str
     raw_content: str
-    headers: Dict[str, str] = Field(default_factory=dict)
+    headers: dict[str, str] = Field(default_factory=dict)
     collected_at: datetime = Field(default_factory=datetime.utcnow)
-    metadata: Dict[str, Any] = Field(default_factory=dict)
+    metadata: dict[str, Any] = Field(default_factory=dict)
 
 
 class NormalizedData(BaseModel):
@@ -122,15 +123,15 @@ class NormalizedData(BaseModel):
     raw_data_id: str
     source_id: str
     industry_id: str
-    title: Optional[str] = None
-    description: Optional[str] = None
+    title: str | None = None
+    description: str | None = None
     content: str
-    entities: List[str] = Field(default_factory=list)
-    keywords: List[str] = Field(default_factory=list)
-    structured_data: Dict[str, Any] = Field(default_factory=dict)
+    entities: list[str] = Field(default_factory=list)
+    keywords: list[str] = Field(default_factory=list)
+    structured_data: dict[str, Any] = Field(default_factory=dict)
     quality_score: float = Field(default=0.0, ge=0.0, le=1.0)
     normalized_at: datetime = Field(default_factory=datetime.utcnow)
-    metadata: Dict[str, Any] = Field(default_factory=dict)
+    metadata: dict[str, Any] = Field(default_factory=dict)
 
 
 class AnalysisResult(BaseModel):
@@ -141,13 +142,13 @@ class AnalysisResult(BaseModel):
     model: str
     prompt_template: str
     analysis: str
-    insights: List[str] = Field(default_factory=list)
-    sentiment: Optional[str] = None
-    categories: List[str] = Field(default_factory=list)
+    insights: list[str] = Field(default_factory=list)
+    sentiment: str | None = None
+    categories: list[str] = Field(default_factory=list)
     confidence_score: float = Field(default=0.0, ge=0.0, le=1.0)
     tokens_used: int = 0
     analyzed_at: datetime = Field(default_factory=datetime.utcnow)
-    metadata: Dict[str, Any] = Field(default_factory=dict)
+    metadata: dict[str, Any] = Field(default_factory=dict)
 
 
 class IngestionStats(BaseModel):

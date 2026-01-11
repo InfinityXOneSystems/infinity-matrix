@@ -5,8 +5,8 @@ Vision Cortex coordinates all agents and manages the build lifecycle.
 """
 
 import asyncio
-from datetime import datetime, timezone
-from typing import Any, Optional
+from datetime import datetime
+from typing import Any
 from uuid import uuid4
 
 from pydantic import BaseModel, Field
@@ -47,7 +47,7 @@ class BuildPlan(BaseModel):
 class VisionCortex:
     """
     Vision Cortex is the high-level orchestrator that coordinates all agents.
-    
+
     It acts as the brain of the auto-builder system, managing:
     - Agent registration and lifecycle
     - Task scheduling and execution
@@ -55,7 +55,7 @@ class VisionCortex:
     - Inter-agent communication
     """
 
-    def __init__(self, config: Optional[dict[str, Any]] = None):
+    def __init__(self, config: dict[str, Any] | None = None):
         """Initialize Vision Cortex."""
         self.config = config or {}
         self.agents: dict[AgentType, BaseAgent] = {}
@@ -78,12 +78,12 @@ class VisionCortex:
     async def orchestrate_build(self, blueprint: Blueprint) -> BuildPlan:
         """
         Orchestrate a complete build process.
-        
+
         This is the main entry point that coordinates all agents to complete a build.
-        
+
         Args:
             blueprint: The blueprint defining what to build
-            
+
         Returns:
             BuildPlan with execution results
         """
@@ -100,11 +100,11 @@ class VisionCortex:
     async def _create_build_plan(self, build_id: str, blueprint: Blueprint) -> BuildPlan:
         """
         Create a build plan with phases and tasks.
-        
+
         Args:
             build_id: Unique build identifier
             blueprint: The blueprint to build from
-            
+
         Returns:
             BuildPlan with phases and tasks
         """
@@ -218,7 +218,7 @@ class VisionCortex:
     async def _execute_phase(self, phase: BuildPhase) -> None:
         """
         Execute a build phase.
-        
+
         Args:
             phase: The phase to execute
         """
@@ -246,16 +246,16 @@ class VisionCortex:
         self,
         agent_type: AgentType,
         action: str,
-        input_data: Optional[dict[str, Any]] = None,
+        input_data: dict[str, Any] | None = None,
     ) -> Any:
         """
         Execute a single task with a specific agent.
-        
+
         Args:
             agent_type: The type of agent to use
             action: The action to perform
             input_data: Input data for the task
-            
+
         Returns:
             AgentResult from task execution
         """
@@ -271,12 +271,12 @@ class VisionCortex:
 
         return await agent.execute(task)
 
-    def get_agent(self, agent_type: AgentType) -> Optional[BaseAgent]:
+    def get_agent(self, agent_type: AgentType) -> BaseAgent | None:
         """Get an agent by type."""
         return self.agents.get(agent_type)
 
     def list_agents(self) -> list[dict[str, Any]]:
-        """List all registered agents."""
+        """list all registered agents."""
         return [
             {
                 "type": agent_type.value,
@@ -286,7 +286,7 @@ class VisionCortex:
             for agent_type, agent in self.agents.items()
         ]
 
-    def get_build_status(self, build_id: str) -> Optional[dict[str, Any]]:
+    def get_build_status(self, build_id: str) -> dict[str, Any] | None:
         """Get the status of a build."""
         build_plan = self.active_builds.get(build_id)
         if not build_plan:
@@ -307,7 +307,7 @@ class VisionCortex:
         }
 
     def list_active_builds(self) -> list[dict[str, Any]]:
-        """List all active builds."""
+        """list all active builds."""
         return [
             self.get_build_status(build_id)
             for build_id in self.active_builds.keys()

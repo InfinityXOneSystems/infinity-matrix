@@ -3,11 +3,11 @@ Auto-Builder main class - High-level interface for the auto-builder system.
 """
 
 import asyncio
-import yaml
 from pathlib import Path
-from typing import Any, Optional
+from typing import Any
 from uuid import uuid4
 
+import yaml
 from pydantic import BaseModel, Field
 
 from infinity_matrix.core.blueprint import Blueprint
@@ -25,20 +25,20 @@ class BuildStatus(BaseModel):
     phases_completed: int = 0
     phases_total: int = 0
     created_at: str
-    completed_at: Optional[str] = None
-    error: Optional[str] = None
+    completed_at: str | None = None
+    error: str | None = None
     artifacts: dict[str, Any] = Field(default_factory=dict)
 
 
 class AutoBuilder:
     """
     Auto-Builder main class.
-    
+
     This is the primary interface for building projects, systems, and workflows
     using the Vision Cortex orchestration system.
     """
 
-    def __init__(self, config: Optional[dict[str, Any]] = None):
+    def __init__(self, config: dict[str, Any] | None = None):
         """Initialize AutoBuilder."""
         self.config = config or {}
         self.vision_cortex = VisionCortex(self.config)
@@ -46,21 +46,21 @@ class AutoBuilder:
 
     async def build(
         self,
-        blueprint: Optional[Blueprint] = None,
-        prompt: Optional[str] = None,
-        blueprint_path: Optional[Path] = None,
+        blueprint: Blueprint | None = None,
+        prompt: str | None = None,
+        blueprint_path: Path | None = None,
     ) -> BuildStatus:
         """
         Trigger a new build.
-        
+
         Args:
             blueprint: A Blueprint object defining the build
             prompt: A natural language prompt to create a blueprint from
             blueprint_path: Path to a blueprint YAML file
-            
+
         Returns:
             BuildStatus object with build information
-            
+
         Raises:
             ValueError: If no valid input is provided
         """
@@ -91,7 +91,7 @@ class AutoBuilder:
     async def _execute_build(self, build_id: str, blueprint: Blueprint) -> None:
         """
         Execute the build process.
-        
+
         Args:
             build_id: The build ID
             blueprint: The blueprint to build
@@ -123,14 +123,14 @@ class AutoBuilder:
     async def _load_blueprint(self, path: Path) -> Blueprint:
         """
         Load a blueprint from a YAML file.
-        
+
         Args:
             path: Path to the blueprint file
-            
+
         Returns:
             Blueprint object
         """
-        with open(path, "r") as f:
+        with open(path) as f:
             data = yaml.safe_load(f)
 
         return Blueprint(**data)
@@ -142,11 +142,11 @@ class AutoBuilder:
     ) -> dict[str, Any]:
         """
         Generate build artifacts.
-        
+
         Args:
             build_id: The build ID
             build_plan: The completed build plan
-            
+
         Returns:
             Dictionary of artifacts
         """
@@ -270,13 +270,13 @@ dev = [
 """
         (project_dir / "pyproject.toml").write_text(pyproject_content)
 
-    async def get_build_status(self, build_id: str) -> Optional[BuildStatus]:
+    async def get_build_status(self, build_id: str) -> BuildStatus | None:
         """
         Get the status of a build.
-        
+
         Args:
             build_id: The build ID
-            
+
         Returns:
             BuildStatus or None if not found
         """
@@ -284,20 +284,20 @@ dev = [
 
     async def list_builds(self) -> list[BuildStatus]:
         """
-        List all builds.
-        
+        list all builds.
+
         Returns:
-            List of BuildStatus objects
+            list of BuildStatus objects
         """
         return list(self.builds.values())
 
     async def cancel_build(self, build_id: str) -> bool:
         """
         Cancel a running build.
-        
+
         Args:
             build_id: The build ID
-            
+
         Returns:
             True if cancelled, False otherwise
         """

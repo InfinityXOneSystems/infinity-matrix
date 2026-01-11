@@ -2,9 +2,10 @@
 Critical Fix: Async Database Operations
 Migrates from synchronous to asynchronous database operations
 """
-from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
-from sqlalchemy.orm import declarative_base, sessionmaker
 import os
+
+from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
+from sqlalchemy.orm import declarative_base, sessionmaker
 
 # Load database URL from environment
 DATABASE_URL = os.getenv("DATABASE_URL", "postgresql://user:pass@localhost/db")
@@ -55,7 +56,7 @@ async def close_db():
     await engine.dispose()
 
 # Example usage in FastAPI
-from fastapi import FastAPI, Depends
+from fastapi import Depends, FastAPI
 from sqlalchemy import select
 
 app = FastAPI()

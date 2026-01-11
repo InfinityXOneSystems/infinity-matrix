@@ -1,6 +1,6 @@
 """Test Agent - Generates and runs tests."""
 
-from typing import Any, Dict, List
+from typing import Any, dict
 
 from infinity_matrix.agents.base_agent import AgentCapability, BaseAgent
 from infinity_matrix.core.logging import get_logger
@@ -40,7 +40,7 @@ class TestAgent(BaseAgent):
             capabilities=capabilities,
         )
 
-    async def _execute(self, task: Dict[str, Any]) -> Dict[str, Any]:
+    async def _execute(self, task: dict[str, Any]) -> dict[str, Any]:
         """Execute testing task."""
         action = task.get("action", "generate")
 
@@ -59,13 +59,13 @@ class TestAgent(BaseAgent):
         else:
             raise ValueError(f"Unknown action: {action}")
 
-    async def validate(self, task: Dict[str, Any]) -> bool:
+    async def validate(self, task: dict[str, Any]) -> bool:
         """Validate task input."""
         if "action" not in task:
             return False
         return True
 
-    async def _generate_tests(self, code: str, framework: str) -> Dict[str, Any]:
+    async def _generate_tests(self, code: str, framework: str) -> dict[str, Any]:
         """Generate tests for code."""
         self.logger.info("generating_tests", framework=framework)
 
@@ -79,7 +79,7 @@ class TestAgent(BaseAgent):
             "test_count": 5,
         }
 
-    async def _run_tests(self, tests: str) -> Dict[str, Any]:
+    async def _run_tests(self, tests: str) -> dict[str, Any]:
         """Run tests and return results."""
         self.logger.info("running_tests")
 
@@ -107,7 +107,7 @@ class TestAgent(BaseAgent):
             "success_rate": results["passed"] / results["total"],
         }
 
-    async def _analyze_coverage(self, code: str, tests: str) -> Dict[str, Any]:
+    async def _analyze_coverage(self, code: str, tests: str) -> dict[str, Any]:
         """Analyze test coverage."""
         self.logger.info("analyzing_coverage")
 
@@ -147,26 +147,26 @@ from module import Component
 
 class TestComponent:
     '''Test suite for Component class.'''
-    
+
     def setup_method(self):
         '''Set up test fixtures.'''
         self.component = Component()
-    
+
     def test_initialization(self):
         '''Test component initialization.'''
         assert self.component is not None
         assert hasattr(self.component, 'process')
-    
+
     def test_process_valid_input(self):
         '''Test processing with valid input.'''
         result = self.component.process({'data': 'test'})
         assert result['status'] == 'success'
-    
+
     def test_process_invalid_input(self):
         '''Test processing with invalid input.'''
         with pytest.raises(ValueError):
             self.component.process(None)
-    
+
     def test_validation(self):
         '''Test input validation.'''
         assert self.component.validate({'data': 'test'}) == True
@@ -181,16 +181,16 @@ from module import Component
 
 class TestComponent(unittest.TestCase):
     '''Test suite for Component class.'''
-    
+
     def setUp(self):
         '''Set up test fixtures.'''
         self.component = Component()
-    
+
     def test_initialization(self):
         '''Test component initialization.'''
         self.assertIsNotNone(self.component)
         self.assertTrue(hasattr(self.component, 'process'))
-    
+
     def test_process_valid_input(self):
         '''Test processing with valid input.'''
         result = self.component.process({'data': 'test'})
