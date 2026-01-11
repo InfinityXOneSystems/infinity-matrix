@@ -3,7 +3,7 @@ import React from 'react';
 import { 
   LayoutDashboard, Globe, Settings, Shield, 
   Database, Server, Code2, Search, LogOut,
-  Zap
+  Zap, Brain
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import TriangleLogo from '@/components/ui/TriangleLogo';
@@ -11,6 +11,8 @@ import TriangleLogo from '@/components/ui/TriangleLogo';
 const AdminSidebar = ({ activeTab, setActiveTab, sidebarOpen, setSidebarOpen, handleLogout }) => {
   const menuItems = [
     { id: 'dashboard', label: 'Control Plane', icon: LayoutDashboard },
+    { section: 'Intelligence' },
+    { id: 'aiprophet', label: 'AI Prophet', icon: Brain },
     { section: 'Platform' },
     { id: 'integrations', label: 'Connectors', icon: Zap },
     { id: 'contracts', label: 'API Contracts', icon: Database },

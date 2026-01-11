@@ -27,6 +27,7 @@ import AdminContractViewer from '@/components/admin/contract/AdminContractViewer
 import AdminSEODashboard from '@/components/admin/seo/AdminSEODashboard';
 import AdminLiveData from '@/components/admin/AdminLiveData';
 import AdminIDE from '@/components/admin/AdminIDE';
+import AdminAIProphet from '@/components/admin/AdminAIProphet';
 
 const AdminPage = () => {
   const navigate = useNavigate();
@@ -44,6 +45,7 @@ const AdminPage = () => {
   const renderContent = () => {
     switch (activeTab) {
       case 'dashboard': return <AdminLiveData />; // Live operations as dashboard
+      case 'aiprophet': return <AdminAIProphet />;
       case 'integrations': return <AdminIntegrationHub />;
       case 'contracts': return <AdminContractViewer />;
       case 'seo': return <AdminSEODashboard />;
