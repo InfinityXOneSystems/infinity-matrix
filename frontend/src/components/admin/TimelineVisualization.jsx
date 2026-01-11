@@ -65,7 +65,7 @@ const TimelineVisualization = ({ timeline, onClose }) => {
 
   const colorMap = {
     green: { text: "text-[#39FF14]", border: "border-[#39FF14]", bg: "bg-[#39FF14]", hex: "#39FF14" },
-    blue: { text: "text-[#0066FF]", border: "border-[#0066FF]", bg: "bg-[#0066FF]", hex: "#0066FF" },
+    blue: { text: "text-[#3399FF]", border: "border-[#3399FF]", bg: "bg-[#3399FF]", hex: "#3399FF" },
     red: { text: "text-[#FF0040]", border: "border-[#FF0040]", bg: "bg-[#FF0040]", hex: "#FF0040" },
     yellow: { text: "text-[#FFD700]", border: "border-[#FFD700]", bg: "bg-[#FFD700]", hex: "#FFD700" }
   };
@@ -81,7 +81,7 @@ const TimelineVisualization = ({ timeline, onClose }) => {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
-        className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4"
+        className="fixed inset-0 z-50 flex items-center justify-center bg-[#020410]/95 backdrop-blur-xl p-4"
         onClick={onClose}
       >
         <motion.div
@@ -89,10 +89,10 @@ const TimelineVisualization = ({ timeline, onClose }) => {
           animate={{ scale: 1, y: 0 }}
           exit={{ scale: 0.9, y: 20 }}
           onClick={(e) => e.stopPropagation()}
-          className="w-full max-w-6xl max-h-[90vh] overflow-y-auto bg-[#0A0A0A] border border-white/20 rounded-2xl shadow-2xl"
+          className="w-full max-w-6xl max-h-[90vh] overflow-y-auto glass-panel rounded-2xl shadow-[0_0_50px_rgba(51,153,255,0.3)]"
         >
           {/* Header */}
-          <div className="sticky top-0 z-10 bg-[#0A0A0A] border-b border-white/10 p-6">
+          <div className="sticky top-0 z-10 glass-panel border-b border-white/10 p-6 rounded-t-2xl">
             <div className="flex items-start justify-between">
               <div>
                 <div className="flex items-center gap-3 mb-2">
@@ -126,7 +126,7 @@ const TimelineVisualization = ({ timeline, onClose }) => {
           {/* Stats Cards */}
           {stats && (
             <div className="p-6 grid grid-cols-2 md:grid-cols-4 gap-4">
-              <div className="p-4 rounded-lg bg-[#111] border border-white/10">
+              <div className="p-4 rounded-lg glass-panel">
                 <div className="text-[10px] text-white/40 uppercase tracking-wider font-mono mb-1">Price Change</div>
                 <div className={cn("text-2xl font-bold flex items-center gap-2", priceTheme.text)}>
                   {stats.priceChange >= 0 ? <TrendingUp size={20} /> : <TrendingDown size={20} />}
@@ -137,10 +137,10 @@ const TimelineVisualization = ({ timeline, onClose }) => {
                 </div>
               </div>
 
-              <div className="p-4 rounded-lg bg-[#111] border border-white/10">
+              <div className="p-4 rounded-lg glass-panel">
                 <div className="text-[10px] text-white/40 uppercase tracking-wider font-mono mb-1">Price Range</div>
                 <div className="text-2xl font-bold text-white flex items-center gap-2">
-                  <Activity size={20} className="text-[#0066FF]" />
+                  <Activity size={20} className="text-[#3399FF]" />
                   {stats.volatility.toFixed(2)}%
                 </div>
                 <div className="text-[10px] text-white/30 font-mono mt-1">
@@ -148,7 +148,7 @@ const TimelineVisualization = ({ timeline, onClose }) => {
                 </div>
               </div>
 
-              <div className="p-4 rounded-lg bg-[#111] border border-white/10">
+              <div className="p-4 rounded-lg glass-panel">
                 <div className="text-[10px] text-white/40 uppercase tracking-wider font-mono mb-1">Avg Volume</div>
                 <div className="text-2xl font-bold text-white flex items-center gap-2">
                   <BarChart3 size={20} className="text-[#39FF14]" />
@@ -159,7 +159,7 @@ const TimelineVisualization = ({ timeline, onClose }) => {
                 </div>
               </div>
 
-              <div className="p-4 rounded-lg bg-[#111] border border-white/10">
+              <div className="p-4 rounded-lg glass-panel">
                 <div className="text-[10px] text-white/40 uppercase tracking-wider font-mono mb-1">Sentiment</div>
                 <div className={cn("text-2xl font-bold flex items-center gap-2", stats.avgSentiment >= 0 ? "text-[#39FF14]" : "text-[#FF0040]")}>
                   <Zap size={20} />
@@ -174,7 +174,7 @@ const TimelineVisualization = ({ timeline, onClose }) => {
 
           {/* View Mode Selector */}
           <div className="px-6 pb-4">
-            <div className="flex items-center gap-2 p-1 bg-[#111] rounded-lg border border-white/10 w-fit">
+            <div className="flex items-center gap-2 p-1 glass-panel rounded-lg w-fit">
               {[
                 { id: 'price', label: 'Price', icon: DollarSign },
                 { id: 'volume', label: 'Volume', icon: BarChart3 },
@@ -200,8 +200,8 @@ const TimelineVisualization = ({ timeline, onClose }) => {
 
           {/* Chart */}
           <div className="px-6 pb-6">
-            <div className="p-6 rounded-xl bg-[#111] border border-white/10 relative overflow-hidden">
-              <div className="absolute inset-0 bg-gradient-to-br from-[#0066FF]/5 to-[#39FF14]/5" />
+            <div className="p-6 rounded-xl glass-panel relative overflow-hidden">
+              <div className="absolute inset-0 bg-gradient-to-br from-[#3399FF]/5 to-[#39FF14]/5" />
               <div className="relative z-10">
                 <TimelineChart 
                   data={chartData} 
@@ -214,14 +214,14 @@ const TimelineVisualization = ({ timeline, onClose }) => {
 
           {/* States Table */}
           <div className="px-6 pb-6">
-            <div className="p-6 rounded-xl bg-[#111] border border-white/10">
+            <div className="p-6 rounded-xl glass-panel">
               <h3 className="text-sm font-bold text-white mb-4 flex items-center gap-2">
-                <Eye size={16} className="text-[#0066FF]" />
+                <Eye size={16} className="text-[#3399FF]" />
                 Timeline States ({timeline.states?.length || 0} days)
               </h3>
               <div className="max-h-64 overflow-y-auto custom-scrollbar">
                 <table className="w-full text-xs">
-                  <thead className="sticky top-0 bg-[#111] border-b border-white/10">
+                  <thead className="sticky top-0 glass-panel border-b border-white/10">
                     <tr className="text-white/40 font-mono uppercase tracking-wider">
                       <th className="text-left py-2 px-3">Day</th>
                       <th className="text-right py-2 px-3">Price</th>

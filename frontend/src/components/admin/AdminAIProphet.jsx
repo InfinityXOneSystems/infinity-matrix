@@ -69,13 +69,13 @@ const MetricCard = ({
 }) => {
   const colorMap = {
     green: { text: "text-[#39FF14]", border: "border-[#39FF14]", bg: "bg-[#39FF14]", glow: "shadow-[0_0_20px_rgba(57,255,20,0.3)]" },
-    blue: { text: "text-[#0066FF]", border: "border-[#0066FF]", bg: "bg-[#0066FF]", glow: "shadow-[0_0_20px_rgba(0,102,255,0.3)]" },
+    blue: { text: "text-[#3399FF]", border: "border-[#3399FF]", bg: "bg-[#3399FF]", glow: "shadow-[0_0_20px_rgba(51,153,255,0.3)]" },
     red: { text: "text-[#FF0040]", border: "border-[#FF0040]", bg: "bg-[#FF0040]", glow: "shadow-[0_0_20px_rgba(255,0,64,0.3)]" },
     yellow: { text: "text-[#FFD700]", border: "border-[#FFD700]", bg: "bg-[#FFD700]", glow: "shadow-[0_0_20px_rgba(255,215,0,0.3)]" }
   };
   
   const theme = colorMap[color];
-  const chartColor = color === 'green' ? '#39FF14' : (color === 'blue' ? '#0066FF' : (color === 'red' ? '#FF0040' : '#FFD700'));
+  const chartColor = color === 'green' ? '#39FF14' : (color === 'blue' ? '#3399FF' : (color === 'red' ? '#FF0040' : '#FFD700'));
 
   return (
     <motion.div 
@@ -83,7 +83,7 @@ const MetricCard = ({
       transition={{ duration: 0.2 }}
       onClick={onClick}
       className={cn(
-        "p-5 rounded-xl bg-[#0A0A0A] border border-white/10 relative overflow-hidden group cursor-pointer",
+        "p-6 rounded-2xl glass-panel relative overflow-hidden group cursor-pointer",
         "hover:border-white/20 transition-all duration-300",
         theme.glow
       )}
@@ -131,16 +131,16 @@ const TimelineCard = ({ timeline, onClick }) => {
   const probabilityColor = timeline.probability > 0.4 ? 'green' : (timeline.probability > 0.2 ? 'yellow' : 'blue');
   const colorMap = {
     green: { text: "text-[#39FF14]", border: "border-[#39FF14]", bg: "bg-[#39FF14]" },
-    blue: { text: "text-[#0066FF]", border: "border-[#0066FF]", bg: "bg-[#0066FF]" },
+    blue: { text: "text-[#3399FF]", border: "border-[#3399FF]", bg: "bg-[#3399FF]" },
     yellow: { text: "text-[#FFD700]", border: "border-[#FFD700]", bg: "bg-[#FFD700]" }
   };
   const theme = colorMap[probabilityColor];
 
   return (
     <motion.div
-      whileHover={{ scale: 1.02 }}
+      whileHover={{ scale: 1.02, y: -2 }}
       onClick={onClick}
-      className="p-4 rounded-lg bg-[#0A0A0A] border border-white/10 hover:border-white/20 cursor-pointer transition-all group"
+      className="p-4 rounded-xl glass-panel hover:border-white/20 cursor-pointer transition-all group"
     >
       <div className="flex items-start justify-between mb-2">
         <div>
@@ -240,7 +240,7 @@ const AdminAIProphet = () => {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-white mb-2 flex items-center gap-3">
+          <h1 className="text-3xl md:text-4xl font-bold text-white mb-2 flex items-center gap-3">
             <Brain className="text-[#39FF14]" size={32} />
             AI Prophet
             <span className="text-sm font-normal text-white/40 ml-2">Quantum Wizard v1.0.0</span>
@@ -254,7 +254,7 @@ const AdminAIProphet = () => {
             onClick={loadProphetData}
             variant="outline"
             size="sm"
-            className="border-white/20 hover:border-[#0066FF] hover:bg-[#0066FF]/10 text-white"
+            className="border-white/20 hover:border-[#3399FF] hover:bg-[#3399FF]/10 text-white"
           >
             <RefreshCw size={14} className="mr-2" />
             Refresh
@@ -262,7 +262,7 @@ const AdminAIProphet = () => {
           <Button
             onClick={runPipeline}
             disabled={isLive}
-            className="bg-gradient-to-r from-[#39FF14] to-[#0066FF] hover:from-[#0066FF] hover:to-[#39FF14] text-black font-bold"
+            className="bg-gradient-to-r from-[#39FF14] to-[#3399FF] hover:from-[#3399FF] hover:to-[#39FF14] text-black font-bold shadow-[0_0_20px_rgba(57,255,20,0.4)]"
           >
             {isLive ? (
               <>
@@ -280,9 +280,9 @@ const AdminAIProphet = () => {
       </div>
 
       {/* Status Banner */}
-      <div className="p-4 rounded-xl bg-gradient-to-r from-[#0066FF]/10 to-[#39FF14]/10 border border-[#39FF14]/20 flex items-center justify-between">
+      <div className="p-4 rounded-xl glass-panel bg-gradient-to-r from-[#3399FF]/10 to-[#39FF14]/10 border-[#39FF14]/20 flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <div className="w-3 h-3 rounded-full bg-[#39FF14] animate-pulse shadow-[0_0_10px_rgba(57,255,20,0.8)]" />
+          <div className="w-3 h-3 rounded-full bg-[#66FF33] animate-pulse shadow-[0_0_10px_rgba(102,255,51,0.8)]" />
           <div>
             <div className="text-sm font-bold text-white">System Status: OPERATIONAL</div>
             <div className="text-[10px] text-white/40 font-mono">Last pipeline: {new Date(pipelineData?.date).toLocaleString()}</div>
@@ -294,7 +294,7 @@ const AdminAIProphet = () => {
             <span className="text-white/60">Accuracy: {((pipelineData?.stages?.learning?.accuracy || 0) * 100).toFixed(1)}%</span>
           </div>
           <div className="flex items-center gap-2">
-            <Activity size={14} className="text-[#0066FF]" />
+            <Activity size={14} className="text-[#3399FF]" />
             <span className="text-white/60">{timelines.length} Timelines</span>
           </div>
         </div>
@@ -345,14 +345,14 @@ const AdminAIProphet = () => {
       </div>
 
       {/* Pipeline Stages */}
-      <div className="p-6 rounded-xl bg-[#0A0A0A] border border-white/10">
+      <div className="p-6 rounded-2xl glass-panel">
         <h2 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
-          <BarChart3 size={20} className="text-[#0066FF]" />
+          <BarChart3 size={20} className="text-[#3399FF]" />
           Pipeline Stages
         </h2>
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
           {Object.entries(pipelineData?.stages || {}).map(([stage, data]) => (
-            <div key={stage} className="p-3 rounded-lg bg-[#111] border border-white/5 hover:border-[#39FF14]/30 transition-all group">
+            <div key={stage} className="p-3 rounded-lg glass-panel hover:border-[#39FF14]/30 transition-all group">
               <div className="flex items-center justify-between mb-2">
                 <div className="text-[10px] text-white/40 uppercase tracking-wider font-mono">{stage}</div>
                 {data.status === 'complete' ? (
@@ -376,7 +376,7 @@ const AdminAIProphet = () => {
       </div>
 
       {/* Timeline Simulations */}
-      <div className="p-6 rounded-xl bg-[#0A0A0A] border border-white/10">
+      <div className="p-6 rounded-2xl glass-panel">
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-lg font-bold text-white flex items-center gap-2">
             <Sparkles size={20} className="text-[#39FF14]" />
@@ -398,7 +398,7 @@ const AdminAIProphet = () => {
       </div>
 
       {/* Footer Info */}
-      <div className="p-4 rounded-xl bg-[#0A0A0A] border border-white/10 flex items-center justify-between text-[10px] text-white/40 font-mono">
+      <div className="p-4 rounded-xl glass-panel flex items-center justify-between text-[10px] text-white/40 font-mono">
         <div>110% Protocol | FAANG Enterprise-Grade | Zero Human Hands</div>
         <div className="flex items-center gap-4">
           <span>Accuracy is everything.</span>
