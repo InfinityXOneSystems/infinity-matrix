@@ -2,7 +2,7 @@
 Database connection and session management
 """
 from contextlib import asynccontextmanager
-from typing import AsyncGenerator
+from collections.abc import AsyncGenerator, 
 
 import structlog
 from sqlalchemy.ext.asyncio import (

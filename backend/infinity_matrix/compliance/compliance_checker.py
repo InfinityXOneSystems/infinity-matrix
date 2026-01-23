@@ -2,8 +2,8 @@
 Compliance framework checker (HIPAA, SOC2, GDPR).
 """
 from datetime import datetime
-from typing import Dict, List, Any, Optional
 from enum import Enum
+from typing import Any, dict, list
 
 import structlog
 
@@ -27,7 +27,7 @@ class ComplianceStatus(str, Enum):
 
 class ComplianceChecker:
     """Automated compliance checking for multiple frameworks."""
-    
+
     def __init__(self):
         self.checks = {
             ComplianceFramework.HIPAA: [
@@ -55,19 +55,19 @@ class ComplianceChecker:
                 "privacy_by_design",
             ],
         }
-        self.check_history: List[Dict[str, Any]] = []
-    
+        self.check_history: list[dict[str, Any]] = []
+
     async def run_compliance_check(
         self,
         framework: ComplianceFramework,
-        system_config: Dict[str, Any],
-    ) -> Dict[str, Any]:
+        system_config: dict[str, Any],
+    ) -> dict[str, Any]:
         """Run compliance check for a framework."""
         logger.info("Running compliance check", framework=framework.value)
-        
+
         required_checks = self.checks[framework]
         results = []
-        
+
         for check_name in required_checks:
             result = await self._run_individual_check(
                 framework,
@@ -75,19 +75,19 @@ class ComplianceChecker:
                 system_config,
             )
             results.append(result)
-        
+
         # Calculate overall compliance
         passed = sum(1 for r in results if r["status"] == "passed")
         total = len(results)
         compliance_score = (passed / total) * 100 if total > 0 else 0
-        
+
         if compliance_score == 100:
             overall_status = ComplianceStatus.COMPLIANT
         elif compliance_score >= 80:
             overall_status = ComplianceStatus.PARTIAL
         else:
             overall_status = ComplianceStatus.NON_COMPLIANT
-        
+
         report = {
             "check_id": f"COMP-{datetime.now().strftime('%Y%m%d-%H%M%S')}",
             "timestamp": datetime.now().isoformat(),
@@ -99,42 +99,42 @@ class ComplianceChecker:
             "checks_failed": total - passed,
             "results": results,
         }
-        
+
         self.check_history.append(report)
-        
+
         logger.info(
             "Compliance check completed",
             framework=framework.value,
             score=compliance_score,
             status=overall_status.value,
         )
-        
+
         return report
-    
+
     async def _run_individual_check(
         self,
         framework: ComplianceFramework,
         check_name: str,
-        system_config: Dict[str, Any],
-    ) -> Dict[str, Any]:
+        system_config: dict[str, Any],
+    ) -> dict[str, Any]:
         """Run individual compliance check."""
         # Simulate check (in production, implement real checks)
         passed = system_config.get(check_name, False)
-        
+
         result = {
             "check_name": check_name,
             "status": "passed" if passed else "failed",
             "timestamp": datetime.now().isoformat(),
         }
-        
+
         if not passed:
             result["remediation"] = self._get_remediation_guidance(
                 framework,
                 check_name,
             )
-        
+
         return result
-    
+
     def _get_remediation_guidance(
         self,
         framework: ComplianceFramework,
@@ -158,17 +158,17 @@ class ComplianceChecker:
             "breach_notification": "Implement breach detection and notification procedures",
             "privacy_by_design": "Incorporate privacy considerations in system design",
         }
-        
+
         return guidance.get(check_name, "Please consult compliance documentation")
-    
+
     def generate_compliance_report(
         self,
-        frameworks: Optional[List[ComplianceFramework]] = None,
-    ) -> Dict[str, Any]:
+        frameworks: list[ComplianceFramework] | None = None,
+    ) -> dict[str, Any]:
         """Generate comprehensive compliance report."""
         if frameworks is None:
             frameworks = list(ComplianceFramework)
-        
+
         report = {
             "report_id": f"REP-{datetime.now().strftime('%Y%m%d-%H%M%S')}",
             "timestamp": datetime.now().isoformat(),
@@ -176,14 +176,14 @@ class ComplianceChecker:
             "summary": {},
             "details": {},
         }
-        
+
         for framework in frameworks:
             # Get latest check for this framework
             framework_checks = [
                 c for c in self.check_history
                 if c["framework"] == framework.value
             ]
-            
+
             if framework_checks:
                 latest_check = framework_checks[-1]
                 report["summary"][framework.value] = {
@@ -192,13 +192,13 @@ class ComplianceChecker:
                     "last_check": latest_check["timestamp"],
                 }
                 report["details"][framework.value] = latest_check
-        
+
         return report
-    
+
     def get_compliance_templates(
         self,
         framework: ComplianceFramework,
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """Get compliance templates and checklists."""
         templates = {
             ComplianceFramework.HIPAA: {
@@ -249,5 +249,5 @@ class ComplianceChecker:
                 ],
             },
         }
-        
+
         return templates.get(framework, {})

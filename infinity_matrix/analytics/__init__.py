@@ -1,12 +1,12 @@
 """Analytics module initialization."""
 
-from infinity_matrix.analytics.sentiment import SentimentAnalyzer, SentimentLabel
 from infinity_matrix.analytics.predictions import (
-    TimeSeriesPredictor,
     ClassificationPredictor,
-    RegressionPredictor,
     EnsemblePredictor,
+    RegressionPredictor,
+    TimeSeriesPredictor,
 )
+from infinity_matrix.analytics.sentiment import SentimentAnalyzer, SentimentLabel
 
 __all__ = [
     "SentimentAnalyzer",

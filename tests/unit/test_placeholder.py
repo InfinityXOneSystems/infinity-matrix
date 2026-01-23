@@ -1,6 +1,5 @@
 """Unit tests for the Infinity Matrix."""
 
-import pytest
 
 
 def test_placeholder():

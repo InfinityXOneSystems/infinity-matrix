@@ -40,7 +40,7 @@ class VertexAIAdapter:
 
         Args:
             model_name: Name of the deployed model
-            instances: List of input instances for prediction
+            instances: list of input instances for prediction
 
         Returns:
             Prediction results

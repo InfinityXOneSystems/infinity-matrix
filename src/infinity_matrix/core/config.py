@@ -1,8 +1,6 @@
 """Core configuration management for Infinity Matrix."""
 
-import os
 from pathlib import Path
-from typing import Any, Dict, Optional
 
 import yaml
 from pydantic import BaseModel, ConfigDict, Field
@@ -11,7 +9,7 @@ from pydantic_settings import BaseSettings
 
 class AgentConfig(BaseModel):
     """Agent system configuration."""
-    
+
     max_concurrent: int = Field(default=10, ge=1, le=1000)
     registry_backend: str = Field(default="memory")
     heartbeat_interval: int = Field(default=30, ge=1)
@@ -20,7 +18,7 @@ class AgentConfig(BaseModel):
 
 class VisionConfig(BaseModel):
     """Vision Cortex configuration."""
-    
+
     enabled: bool = Field(default=True)
     models: list[str] = Field(default_factory=lambda: ["gpt-4-vision"])
     max_image_size: int = Field(default=20_000_000)  # 20MB
@@ -29,7 +27,7 @@ class VisionConfig(BaseModel):
 
 class BuilderConfig(BaseModel):
     """Auto-Builder configuration."""
-    
+
     enabled: bool = Field(default=True)
     platforms: list[str] = Field(default_factory=lambda: ["python", "node", "go"])
     parallel_builds: int = Field(default=4, ge=1)
@@ -38,7 +36,7 @@ class BuilderConfig(BaseModel):
 
 class DocsConfig(BaseModel):
     """Evolution Doc System configuration."""
-    
+
     enabled: bool = Field(default=True)
     auto_generate: bool = Field(default=True)
     formats: list[str] = Field(default_factory=lambda: ["markdown", "html", "pdf"])
@@ -47,7 +45,7 @@ class DocsConfig(BaseModel):
 
 class IndexConfig(BaseModel):
     """Index System configuration."""
-    
+
     enabled: bool = Field(default=True)
     backend: str = Field(default="elasticsearch")
     semantic_search: bool = Field(default=True)
@@ -56,7 +54,7 @@ class IndexConfig(BaseModel):
 
 class TaxonomyConfig(BaseModel):
     """Taxonomy System configuration."""
-    
+
     enabled: bool = Field(default=True)
     auto_classify: bool = Field(default=True)
     categories: list[str] = Field(default_factory=list)
@@ -64,7 +62,7 @@ class TaxonomyConfig(BaseModel):
 
 class PREngineConfig(BaseModel):
     """PR/Merge Engine configuration."""
-    
+
     enabled: bool = Field(default=True)
     auto_review: bool = Field(default=True)
     auto_merge: bool = Field(default=False)
@@ -74,7 +72,7 @@ class PREngineConfig(BaseModel):
 
 class ETLConfig(BaseModel):
     """ETL System configuration."""
-    
+
     enabled: bool = Field(default=True)
     max_workers: int = Field(default=10, ge=1)
     rate_limit: int = Field(default=100)  # requests per minute
@@ -83,32 +81,32 @@ class ETLConfig(BaseModel):
 
 class GitHubIntegration(BaseModel):
     """GitHub integration settings."""
-    
+
     enabled: bool = Field(default=True)
-    token: Optional[str] = Field(default=None)
+    token: str | None = Field(default=None)
     api_url: str = Field(default="https://api.github.com")
-    webhook_secret: Optional[str] = Field(default=None)
+    webhook_secret: str | None = Field(default=None)
 
 
 class GCPIntegration(BaseModel):
     """Google Cloud Platform integration settings."""
-    
+
     enabled: bool = Field(default=False)
-    project_id: Optional[str] = Field(default=None)
-    credentials_file: Optional[str] = Field(default=None)
+    project_id: str | None = Field(default=None)
+    credentials_file: str | None = Field(default=None)
 
 
 class HostingerIntegration(BaseModel):
     """Hostinger integration settings."""
-    
+
     enabled: bool = Field(default=False)
-    api_key: Optional[str] = Field(default=None)
+    api_key: str | None = Field(default=None)
     api_url: str = Field(default="https://api.hostinger.com")
 
 
 class VSCodeIntegration(BaseModel):
     """VS Code integration settings."""
-    
+
     enabled: bool = Field(default=True)
     extension_id: str = Field(default="infinityxone.infinity-matrix")
     lsp_enabled: bool = Field(default=True)
@@ -116,7 +114,7 @@ class VSCodeIntegration(BaseModel):
 
 class IntegrationsConfig(BaseModel):
     """External integrations configuration."""
-    
+
     github: GitHubIntegration = Field(default_factory=GitHubIntegration)
     gcp: GCPIntegration = Field(default_factory=GCPIntegration)
     hostinger: HostingerIntegration = Field(default_factory=HostingerIntegration)
@@ -125,18 +123,18 @@ class IntegrationsConfig(BaseModel):
 
 class Config(BaseSettings):
     """Main configuration for Infinity Matrix system."""
-    
+
     model_config = ConfigDict(
         env_prefix="INFINITY_MATRIX_",
         env_nested_delimiter="__",
         case_sensitive=False
     )
-    
+
     # Core settings
     debug: bool = Field(default=False)
     log_level: str = Field(default="INFO")
     data_dir: Path = Field(default=Path.home() / ".infinity-matrix")
-    
+
     # Component configurations
     agents: AgentConfig = Field(default_factory=AgentConfig)
     vision: VisionConfig = Field(default_factory=VisionConfig)
@@ -147,35 +145,35 @@ class Config(BaseSettings):
     pr_engine: PREngineConfig = Field(default_factory=PREngineConfig)
     etl: ETLConfig = Field(default_factory=ETLConfig)
     integrations: IntegrationsConfig = Field(default_factory=IntegrationsConfig)
-    
+
     @classmethod
     def from_file(cls, path: Path) -> "Config":
         """Load configuration from YAML file."""
-        with open(path, "r") as f:
+        with open(path) as f:
             data = yaml.safe_load(f) or {}
-        
+
         # Handle nested infinity_matrix key
         if "infinity_matrix" in data:
             data = data["infinity_matrix"]
-        
+
         return cls(**data)
-    
+
     @classmethod
     def from_env(cls) -> "Config":
         """Load configuration from environment variables."""
         return cls()
-    
+
     def save(self, path: Path) -> None:
         """Save configuration to YAML file."""
         path.parent.mkdir(parents=True, exist_ok=True)
-        
+
         # Convert to dict and serialize Path objects
         data = self.model_dump(exclude_none=True, mode='json')
         wrapped_data = {"infinity_matrix": data}
-        
+
         with open(path, "w") as f:
             yaml.safe_dump(wrapped_data, f, default_flow_style=False, indent=2)
-    
+
     def ensure_directories(self) -> None:
         """Ensure all required directories exist."""
         directories = [
@@ -185,26 +183,26 @@ class Config(BaseSettings):
             self.data_dir / "agents",
             self.data_dir / "artifacts",
         ]
-        
+
         for directory in directories:
             directory.mkdir(parents=True, exist_ok=True)
 
 
-def load_config(config_path: Optional[Path] = None) -> Config:
+def load_config(config_path: Path | None = None) -> Config:
     """Load configuration from file or environment."""
     if config_path and config_path.exists():
         return Config.from_file(config_path)
-    
+
     # Try default locations
     default_paths = [
         Path.cwd() / "config.yaml",
         Path.cwd() / "infinity-matrix.yaml",
         Path.home() / ".infinity-matrix" / "config.yaml",
     ]
-    
+
     for path in default_paths:
         if path.exists():
             return Config.from_file(path)
-    
+
     # Fall back to environment
     return Config.from_env()

@@ -1,13 +1,12 @@
 """Data enrichment service for scraping and augmenting lead information"""
 
-import os
 import asyncio
+import os
+from typing import Any, dict
+
 import aiohttp
-from typing import Dict, Any, Optional
 from bs4 import BeautifulSoup
 from dotenv import load_dotenv
-import json
-import re
 
 load_dotenv()
 
@@ -23,12 +22,12 @@ class DataEnrichmentService:
     async def enrich_lead_data(
         self,
         phone_number: str,
-        name: Optional[str] = None,
-        company: Optional[str] = None,
-        email: Optional[str] = None
-    ) -> Dict[str, Any]:
+        name: str | None = None,
+        company: str | None = None,
+        email: str | None = None
+    ) -> dict[str, Any]:
         """Main enrichment function that aggregates data from multiple sources"""
-        
+
         if not self.enabled:
             return {
                 "enrichment_data": {},
@@ -48,13 +47,13 @@ class DataEnrichmentService:
         try:
             # Run enrichment tasks concurrently
             tasks = []
-            
+
             if company:
                 tasks.append(self._enrich_company_info(company))
-            
+
             if name:
                 tasks.append(self._search_social_profiles(name, company))
-            
+
             if email:
                 tasks.append(self._enrich_from_email(email))
 
@@ -78,7 +77,7 @@ class DataEnrichmentService:
             results["error"] = str(e)
             return results
 
-    async def _enrich_company_info(self, company_name: str) -> Dict[str, Any]:
+    async def _enrich_company_info(self, company_name: str) -> dict[str, Any]:
         """Enrich company information from public sources"""
         company_info = {
             "name": company_name,
@@ -94,16 +93,16 @@ class DataEnrichmentService:
                 # Search for company information
                 search_query = f"{company_name} company information"
                 search_url = f"https://www.google.com/search?q={search_query}"
-                
+
                 headers = {
                     "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
                 }
-                
+
                 async with session.get(search_url, headers=headers, timeout=self.timeout) as response:
                     if response.status == 200:
                         html = await response.text()
-                        soup = BeautifulSoup(html, 'html.parser')
-                        
+                        BeautifulSoup(html, 'html.parser')
+
                         # Extract basic information from search results
                         # Note: In production, use proper APIs like Clearbit, FullContact, etc.
                         company_info["enriched"] = True
@@ -117,10 +116,10 @@ class DataEnrichmentService:
     async def _search_social_profiles(
         self,
         name: str,
-        company: Optional[str] = None
-    ) -> Dict[str, Any]:
+        company: str | None = None
+    ) -> dict[str, Any]:
         """Search for social media profiles"""
-        
+
         social_profiles = {
             "linkedin": None,
             "twitter": None,
@@ -139,7 +138,7 @@ class DataEnrichmentService:
             # - Twitter API
             # - FullContact API
             # - Clearbit Enrichment API
-            
+
             # For demo purposes, simulate finding profiles
             social_profiles["search_query"] = search_query
             social_profiles["found"] = True
@@ -150,9 +149,9 @@ class DataEnrichmentService:
 
         return {"social_profiles": social_profiles}
 
-    async def _enrich_from_email(self, email: str) -> Dict[str, Any]:
+    async def _enrich_from_email(self, email: str) -> dict[str, Any]:
         """Enrich data from email address"""
-        
+
         enrichment = {
             "email_verified": False,
             "domain": None,
@@ -168,7 +167,7 @@ class DataEnrichmentService:
             # - Hunter.io for email verification
             # - Clearbit for email enrichment
             # - EmailRep for reputation scoring
-            
+
             enrichment["email_verified"] = True
 
         except Exception as e:
@@ -179,11 +178,11 @@ class DataEnrichmentService:
     async def enrich_with_mock_data(
         self,
         phone_number: str,
-        name: Optional[str] = None,
-        company: Optional[str] = None
-    ) -> Dict[str, Any]:
+        name: str | None = None,
+        company: str | None = None
+    ) -> dict[str, Any]:
         """Generate mock enrichment data for demo purposes"""
-        
+
         # Simulate API delay
         await asyncio.sleep(1.5)
 

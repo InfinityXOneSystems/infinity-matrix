@@ -1,13 +1,13 @@
 """Economic analysis module for macro indicators and predictions."""
 
-from datetime import datetime, timedelta
-from typing import Any, Dict, List, Optional
+from datetime import datetime
+from typing import Any, dict, list
 
 from infinity_matrix.core.base import BaseAnalyzer
 from infinity_matrix.core.config import settings
 
 
-class EconomicAnalyzer(BaseAnalyzer[Dict[str, Any], Dict[str, Any]]):
+class EconomicAnalyzer(BaseAnalyzer[dict[str, Any], dict[str, Any]]):
     """Economic analysis engine for macro indicators."""
 
     def __init__(self, **kwargs: Any):
@@ -24,32 +24,32 @@ class EconomicAnalyzer(BaseAnalyzer[Dict[str, Any], Dict[str, Any]]):
                 self.log_info("fred_client_initialized")
             except ImportError:
                 self.log_warning("fredapi_not_installed")
-        
+
         self.log_info("economic_analyzer_initialized")
 
     async def shutdown(self) -> None:
         """Cleanup resources."""
         self.log_info("economic_analyzer_shutdown")
 
-    async def analyze(self, data: Dict[str, Any]) -> Dict[str, Any]:
+    async def analyze(self, data: dict[str, Any]) -> dict[str, Any]:
         """Analyze economic data."""
         indicator = data.get("indicator", "gdp")
         region = data.get("region", "US")
-        
+
         return await self.get_indicator(indicator, region)
 
     async def get_indicator(
         self,
         indicator: str,
         region: str = "US",
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """
         Get economic indicator data.
-        
+
         Args:
             indicator: Indicator name (gdp, unemployment, inflation, etc.)
             region: Region code
-            
+
         Returns:
             Indicator data and analysis
         """
@@ -66,7 +66,7 @@ class EconomicAnalyzer(BaseAnalyzer[Dict[str, Any], Dict[str, Any]]):
         }
 
         series_id = series_map.get(indicator.lower())
-        
+
         if not series_id:
             return {
                 "error": f"Unknown indicator: {indicator}",
@@ -77,10 +77,10 @@ class EconomicAnalyzer(BaseAnalyzer[Dict[str, Any], Dict[str, Any]]):
             if self._fred_client:
                 # Get data from FRED
                 data = self._fred_client.get_series(series_id)
-                
+
                 # Get recent data points
                 recent_data = data.tail(12)  # Last 12 observations
-                
+
                 analysis = {
                     "indicator": indicator,
                     "region": region,
@@ -121,10 +121,10 @@ class EconomicAnalyzer(BaseAnalyzer[Dict[str, Any], Dict[str, Any]]):
             self.log_error("indicator_retrieval_failed", indicator=indicator, error=str(e))
             return {"error": str(e), "success": False}
 
-    def _get_mock_indicator(self, indicator: str, region: str) -> Dict[str, Any]:
+    def _get_mock_indicator(self, indicator: str, region: str) -> dict[str, Any]:
         """Get mock indicator data for testing."""
         import random
-        
+
         base_values = {
             "gdp": 25000,
             "unemployment": 4.0,
@@ -153,13 +153,13 @@ class EconomicAnalyzer(BaseAnalyzer[Dict[str, Any], Dict[str, Any]]):
     async def get_economic_snapshot(
         self,
         region: str = "US",
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """
         Get comprehensive economic snapshot.
-        
+
         Args:
             region: Region code
-            
+
         Returns:
             Economic snapshot with multiple indicators
         """
@@ -172,7 +172,7 @@ class EconomicAnalyzer(BaseAnalyzer[Dict[str, Any], Dict[str, Any]]):
         ]
 
         import asyncio
-        
+
         results = await asyncio.gather(
             *[self.get_indicator(ind, region) for ind in indicators],
             return_exceptions=True,
@@ -185,7 +185,7 @@ class EconomicAnalyzer(BaseAnalyzer[Dict[str, Any], Dict[str, Any]]):
             "success": True,
         }
 
-        for indicator, result in zip(indicators, results):
+        for indicator, result in zip(indicators, results, strict=False):
             if isinstance(result, dict) and result.get("success"):
                 snapshot["indicators"][indicator] = result
 
@@ -196,7 +196,7 @@ class EconomicAnalyzer(BaseAnalyzer[Dict[str, Any], Dict[str, Any]]):
         self.log_info("economic_snapshot_generated", region=region)
         return snapshot
 
-    def _calculate_health_score(self, indicators: Dict[str, Any]) -> float:
+    def _calculate_health_score(self, indicators: dict[str, Any]) -> float:
         """Calculate overall economic health score (0-100)."""
         score = 50.0  # Base score
 
@@ -226,10 +226,10 @@ class EconomicAnalyzer(BaseAnalyzer[Dict[str, Any], Dict[str, Any]]):
 
         return max(0, min(100, score))
 
-    def _determine_outlook(self, indicators: Dict[str, Any]) -> str:
+    def _determine_outlook(self, indicators: dict[str, Any]) -> str:
         """Determine economic outlook."""
         health = self._calculate_health_score(indicators)
-        
+
         if health >= 75:
             return "strong"
         elif health >= 60:
@@ -245,27 +245,27 @@ class EconomicAnalyzer(BaseAnalyzer[Dict[str, Any], Dict[str, Any]]):
         self,
         indicator: str,
         horizon_months: int = 3,
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """
         Predict future values of an economic indicator.
-        
+
         Args:
             indicator: Indicator name
             horizon_months: Prediction horizon in months
-            
+
         Returns:
             Prediction results
         """
         # Get historical data
         current = await self.get_indicator(indicator)
-        
+
         if not current.get("success"):
             return current
 
         # Simple trend-based prediction
         current_value = current["current_value"]
         trend = current.get("trend", "stable")
-        
+
         predictions = []
         for month in range(1, horizon_months + 1):
             if trend == "increasing":
@@ -294,20 +294,20 @@ class EconomicAnalyzer(BaseAnalyzer[Dict[str, Any], Dict[str, Any]]):
     async def compare_regions(
         self,
         indicator: str,
-        regions: List[str],
-    ) -> Dict[str, Any]:
+        regions: list[str],
+    ) -> dict[str, Any]:
         """
         Compare an indicator across regions.
-        
+
         Args:
             indicator: Indicator name
-            regions: List of region codes
-            
+            regions: list of region codes
+
         Returns:
             Comparison results
         """
         import asyncio
-        
+
         results = await asyncio.gather(
             *[self.get_indicator(indicator, region) for region in regions],
             return_exceptions=True,
@@ -322,7 +322,7 @@ class EconomicAnalyzer(BaseAnalyzer[Dict[str, Any], Dict[str, Any]]):
         }
 
         valid_results = []
-        for region, result in zip(regions, results):
+        for region, result in zip(regions, results, strict=False):
             if isinstance(result, dict) and result.get("success"):
                 comparison["regions"][region] = result
                 valid_results.append((region, result["current_value"]))

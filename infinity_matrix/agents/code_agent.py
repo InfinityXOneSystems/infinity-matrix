@@ -1,6 +1,6 @@
 """Code Analysis Agent - Analyzes code for quality, bugs, and improvements."""
 
-from typing import Any, Dict, List
+from typing import Any, dict
 
 from infinity_matrix.agents.base_agent import AgentCapability, BaseAgent
 from infinity_matrix.core.logging import get_logger
@@ -40,7 +40,7 @@ class CodeAgent(BaseAgent):
             capabilities=capabilities,
         )
 
-    async def _execute(self, task: Dict[str, Any]) -> Dict[str, Any]:
+    async def _execute(self, task: dict[str, Any]) -> dict[str, Any]:
         """Execute code analysis task."""
         action = task.get("action", "analyze")
         code = task.get("code", "")
@@ -55,7 +55,7 @@ class CodeAgent(BaseAgent):
         else:
             raise ValueError(f"Unknown action: {action}")
 
-    async def validate(self, task: Dict[str, Any]) -> bool:
+    async def validate(self, task: dict[str, Any]) -> bool:
         """Validate task input."""
         if "action" not in task:
             return False
@@ -63,7 +63,7 @@ class CodeAgent(BaseAgent):
             return False
         return True
 
-    async def _analyze_code(self, code: str, language: str) -> Dict[str, Any]:
+    async def _analyze_code(self, code: str, language: str) -> dict[str, Any]:
         """Analyze code for issues and metrics."""
         self.logger.info("analyzing_code", language=language, code_length=len(code))
 
@@ -106,7 +106,7 @@ class CodeAgent(BaseAgent):
             "language": language,
         }
 
-    async def _review_code(self, code: str, context: Dict[str, Any]) -> Dict[str, Any]:
+    async def _review_code(self, code: str, context: dict[str, Any]) -> dict[str, Any]:
         """Review code and provide feedback."""
         self.logger.info("reviewing_code", code_length=len(code))
 
@@ -134,7 +134,7 @@ class CodeAgent(BaseAgent):
             "summary": "Code is well-structured with minor improvements suggested",
         }
 
-    async def _suggest_improvements(self, code: str) -> Dict[str, Any]:
+    async def _suggest_improvements(self, code: str) -> dict[str, Any]:
         """Suggest code improvements."""
         self.logger.info("suggesting_improvements", code_length=len(code))
 

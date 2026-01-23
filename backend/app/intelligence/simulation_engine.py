@@ -1,12 +1,11 @@
 """
 Simulation Engine - Business outcome simulations
 """
-from typing import Dict, Any, List
-from sqlalchemy.ext.asyncio import AsyncSession
 import logging
-import random
+from typing import list
 
-from app.models.models import Simulation, IntelligenceReport, Proposal
+from app.models.models import IntelligenceReport, Proposal, Simulation
+from sqlalchemy.ext.asyncio import AsyncSession
 
 logger = logging.getLogger(__name__)
 
@@ -14,7 +13,7 @@ logger = logging.getLogger(__name__)
 class SimulationEngine:
     """
     Creates business simulations and projections.
-    
+
     Simulates:
     - Investment impact
     - Lead generation
@@ -23,19 +22,19 @@ class SimulationEngine:
     - Multiple timeline scenarios
     - With/without hire comparisons
     """
-    
+
     async def run_simulations(
         self,
         discovery_id: int,
         intelligence_report: IntelligenceReport,
-        proposals: List[Proposal],
+        proposals: list[Proposal],
         db: AsyncSession
-    ) -> List[Simulation]:
+    ) -> list[Simulation]:
         """Run comprehensive business simulations"""
         logger.info(f"Running simulations for discovery {discovery_id}")
-        
+
         simulations = []
-        
+
         # Investment simulation
         investment_sim = await self._simulate_investment(
             discovery_id,
@@ -44,7 +43,7 @@ class SimulationEngine:
             db
         )
         simulations.append(investment_sim)
-        
+
         # Lead generation simulation
         lead_sim = await self._simulate_lead_generation(
             discovery_id,
@@ -52,7 +51,7 @@ class SimulationEngine:
             db
         )
         simulations.append(lead_sim)
-        
+
         # AI capability simulation
         ai_sim = await self._simulate_ai_capability(
             discovery_id,
@@ -61,7 +60,7 @@ class SimulationEngine:
             db
         )
         simulations.append(ai_sim)
-        
+
         # Business growth simulation
         business_sim = await self._simulate_business_growth(
             discovery_id,
@@ -70,21 +69,21 @@ class SimulationEngine:
             db
         )
         simulations.append(business_sim)
-        
+
         await db.commit()
-        
+
         logger.info(f"Generated {len(simulations)} simulations")
         return simulations
-    
+
     async def _simulate_investment(
         self,
         discovery_id: int,
         intelligence_report: IntelligenceReport,
-        proposals: List[Proposal],
+        proposals: list[Proposal],
         db: AsyncSession
     ) -> Simulation:
         """Simulate investment impact scenarios"""
-        
+
         # Baseline (no investment)
         baseline = {
             "scenario_name": "Current Trajectory (No Investment)",
@@ -113,7 +112,7 @@ class SimulationEngine:
                 "risk_level": "Very high"
             }
         }
-        
+
         # Optimistic scenario (with investment + strong execution)
         optimistic = {
             "scenario_name": "Optimistic (Investment + Strong Execution)",
@@ -142,7 +141,7 @@ class SimulationEngine:
                 "risk_level": "Minimal"
             }
         }
-        
+
         # Realistic scenario (with investment + normal execution)
         realistic = {
             "scenario_name": "Realistic (Investment + Normal Execution)",
@@ -171,7 +170,7 @@ class SimulationEngine:
                 "risk_level": "Low"
             }
         }
-        
+
         # Conservative scenario (with investment + challenges)
         conservative = {
             "scenario_name": "Conservative (Investment + Some Challenges)",
@@ -200,7 +199,7 @@ class SimulationEngine:
                 "risk_level": "Moderate"
             }
         }
-        
+
         # Current state
         current_state = {
             "revenue": 12_000_000,
@@ -210,7 +209,7 @@ class SimulationEngine:
             "customer_count": 120,
             "capabilities_score": 6.5
         }
-        
+
         # Projected state (realistic scenario at 24 months)
         projected_state = {
             "revenue": 23_400_000,
@@ -220,7 +219,7 @@ class SimulationEngine:
             "customer_count": 280,
             "capabilities_score": 8.5
         }
-        
+
         # Transformation metrics
         transformation = {
             "revenue_increase": "95%",
@@ -232,7 +231,7 @@ class SimulationEngine:
             "roi": "380%",
             "payback_period": "8 months"
         }
-        
+
         simulation = Simulation(
             discovery_id=discovery_id,
             simulation_type="investment",
@@ -245,10 +244,10 @@ class SimulationEngine:
             transformation_metrics=transformation,
             confidence_score=82.5
         )
-        
+
         db.add(simulation)
         return simulation
-    
+
     async def _simulate_lead_generation(
         self,
         discovery_id: int,
@@ -256,7 +255,7 @@ class SimulationEngine:
         db: AsyncSession
     ) -> Simulation:
         """Simulate lead generation impact"""
-        
+
         baseline = {
             "scenario_name": "Current Lead Generation",
             "monthly_leads": 45,
@@ -265,7 +264,7 @@ class SimulationEngine:
             "customer_acquisition_cost": 8500,
             "lead_quality_score": 6.2
         }
-        
+
         optimistic = {
             "scenario_name": "Enhanced Lead Generation - Optimistic",
             "monthly_leads": 180,
@@ -275,7 +274,7 @@ class SimulationEngine:
             "lead_quality_score": 8.5,
             "improvement": "4x increase in qualified leads"
         }
-        
+
         realistic = {
             "scenario_name": "Enhanced Lead Generation - Realistic",
             "monthly_leads": 135,
@@ -285,7 +284,7 @@ class SimulationEngine:
             "lead_quality_score": 8.0,
             "improvement": "4.5x increase in qualified leads"
         }
-        
+
         conservative = {
             "scenario_name": "Enhanced Lead Generation - Conservative",
             "monthly_leads": 90,
@@ -295,7 +294,7 @@ class SimulationEngine:
             "lead_quality_score": 7.2,
             "improvement": "2.7x increase in qualified leads"
         }
-        
+
         transformation = {
             "lead_volume_increase": "200%",
             "qualified_lead_increase": "350%",
@@ -303,7 +302,7 @@ class SimulationEngine:
             "cac_reduction": "40%",
             "pipeline_value_increase": "420%"
         }
-        
+
         simulation = Simulation(
             discovery_id=discovery_id,
             simulation_type="lead_generation",
@@ -314,19 +313,19 @@ class SimulationEngine:
             transformation_metrics=transformation,
             confidence_score=78.0
         )
-        
+
         db.add(simulation)
         return simulation
-    
+
     async def _simulate_ai_capability(
         self,
         discovery_id: int,
         intelligence_report: IntelligenceReport,
-        proposals: List[Proposal],
+        proposals: list[Proposal],
         db: AsyncSession
     ) -> Simulation:
         """Simulate AI capability improvements"""
-        
+
         baseline = {
             "scenario_name": "Current AI Capabilities",
             "automation_level": 25,
@@ -336,7 +335,7 @@ class SimulationEngine:
             "scalability": "Limited",
             "competitive_standing": "Below average"
         }
-        
+
         optimistic = {
             "scenario_name": "Enhanced AI - Optimistic",
             "automation_level": 85,
@@ -346,7 +345,7 @@ class SimulationEngine:
             "scalability": "Unlimited",
             "competitive_standing": "Category leader"
         }
-        
+
         realistic = {
             "scenario_name": "Enhanced AI - Realistic",
             "automation_level": 70,
@@ -356,7 +355,7 @@ class SimulationEngine:
             "scalability": "High",
             "competitive_standing": "Above average"
         }
-        
+
         conservative = {
             "scenario_name": "Enhanced AI - Conservative",
             "automation_level": 55,
@@ -366,7 +365,7 @@ class SimulationEngine:
             "scalability": "Moderate",
             "competitive_standing": "Average"
         }
-        
+
         transformation = {
             "automation_increase": "180%",
             "accuracy_improvement": "22%",
@@ -374,7 +373,7 @@ class SimulationEngine:
             "productivity_gain": "250%",
             "competitive_leap": "From below average to above average"
         }
-        
+
         simulation = Simulation(
             discovery_id=discovery_id,
             simulation_type="ai_capability",
@@ -385,19 +384,19 @@ class SimulationEngine:
             transformation_metrics=transformation,
             confidence_score=85.0
         )
-        
+
         db.add(simulation)
         return simulation
-    
+
     async def _simulate_business_growth(
         self,
         discovery_id: int,
         intelligence_report: IntelligenceReport,
-        proposals: List[Proposal],
+        proposals: list[Proposal],
         db: AsyncSession
     ) -> Simulation:
         """Simulate overall business growth"""
-        
+
         baseline = {
             "scenario_name": "Baseline Growth",
             "revenue_growth": 15,
@@ -406,7 +405,7 @@ class SimulationEngine:
             "team_productivity": "Baseline",
             "market_position": "Static"
         }
-        
+
         optimistic = {
             "scenario_name": "Accelerated Growth - Optimistic",
             "revenue_growth": 85,
@@ -415,7 +414,7 @@ class SimulationEngine:
             "team_productivity": "250% of baseline",
             "market_position": "Market leader trajectory"
         }
-        
+
         realistic = {
             "scenario_name": "Strong Growth - Realistic",
             "revenue_growth": 50,
@@ -424,7 +423,7 @@ class SimulationEngine:
             "team_productivity": "180% of baseline",
             "market_position": "Strong competitive position"
         }
-        
+
         conservative = {
             "scenario_name": "Moderate Growth - Conservative",
             "revenue_growth": 30,
@@ -433,7 +432,7 @@ class SimulationEngine:
             "team_productivity": "140% of baseline",
             "market_position": "Improved position"
         }
-        
+
         transformation = {
             "revenue_acceleration": "233%",
             "profitability_improvement": "83%",
@@ -441,7 +440,7 @@ class SimulationEngine:
             "productivity_gain": "80%",
             "valuation_multiple": "2.5x increase"
         }
-        
+
         simulation = Simulation(
             discovery_id=discovery_id,
             simulation_type="business_growth",
@@ -452,6 +451,6 @@ class SimulationEngine:
             transformation_metrics=transformation,
             confidence_score=80.0
         )
-        
+
         db.add(simulation)
         return simulation

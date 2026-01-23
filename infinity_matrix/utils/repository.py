@@ -1,7 +1,7 @@
 """Repository management utilities for Git operations."""
 
 from pathlib import Path
-from typing import List, Optional
+from typing import list
 
 from git import Repo
 from git.exc import GitCommandError
@@ -10,7 +10,7 @@ from git.exc import GitCommandError
 class RepositoryManager:
     """
     Manages Git repository operations.
-    
+
     Handles creating branches, committing changes, creating pull requests,
     and other Git-related operations for the auto-builder.
     """
@@ -18,17 +18,17 @@ class RepositoryManager:
     def __init__(self, repo_path: Path):
         """
         Initialize repository manager.
-        
+
         Args:
             repo_path: Path to the repository
         """
         self.repo_path = repo_path
-        self.repo: Optional[Repo] = None
+        self.repo: Repo | None = None
 
     def init_repo(self, initial_commit: bool = True) -> None:
         """
         Initialize a new Git repository.
-        
+
         Args:
             initial_commit: Whether to create an initial commit
         """
@@ -46,7 +46,7 @@ class RepositoryManager:
     def clone_repo(self, url: str) -> None:
         """
         Clone a repository from URL.
-        
+
         Args:
             url: Git repository URL
         """
@@ -55,7 +55,7 @@ class RepositoryManager:
     def create_branch(self, branch_name: str) -> None:
         """
         Create and checkout a new branch.
-        
+
         Args:
             branch_name: Name of the branch to create
         """
@@ -66,13 +66,13 @@ class RepositoryManager:
         new_branch = self.repo.create_head(branch_name)
         new_branch.checkout()
 
-    def commit_changes(self, message: str, files: Optional[List[str]] = None) -> None:
+    def commit_changes(self, message: str, files: list[str] | None = None) -> None:
         """
         Commit changes to the repository.
-        
+
         Args:
             message: Commit message
-            files: List of files to commit (None = all changes)
+            files: list of files to commit (None = all changes)
         """
         if not self.repo:
             raise ValueError("Repository not initialized")
@@ -84,10 +84,10 @@ class RepositoryManager:
 
         self.repo.index.commit(message)
 
-    def push_changes(self, remote: str = "origin", branch: Optional[str] = None) -> None:
+    def push_changes(self, remote: str = "origin", branch: str | None = None) -> None:
         """
         Push changes to remote repository.
-        
+
         Args:
             remote: Remote name
             branch: Branch name (None = current branch)
@@ -107,7 +107,7 @@ class RepositoryManager:
     def get_current_branch(self) -> str:
         """
         Get the current branch name.
-        
+
         Returns:
             Current branch name
         """
@@ -116,10 +116,10 @@ class RepositoryManager:
 
         return self.repo.active_branch.name
 
-    def get_status(self) -> dict[str, List[str]]:
+    def get_status(self) -> dict[str, list[str]]:
         """
         Get repository status.
-        
+
         Returns:
             Dictionary with status information
         """
@@ -132,10 +132,10 @@ class RepositoryManager:
             "staged": [item.a_path for item in self.repo.index.diff("HEAD")],
         }
 
-    def create_tag(self, tag_name: str, message: Optional[str] = None) -> None:
+    def create_tag(self, tag_name: str, message: str | None = None) -> None:
         """
         Create a Git tag.
-        
+
         Args:
             tag_name: Tag name
             message: Tag message

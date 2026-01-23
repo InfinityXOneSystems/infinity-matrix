@@ -22,7 +22,7 @@ class BaseAgent(ABC):
         Args:
             agent_type: Type of agent (user, vscode, github, etc.)
             authority_level: Authority level (0-5, lower is higher authority)
-            capabilities: List of capabilities this agent provides
+            capabilities: list of capabilities this agent provides
         """
         self.agent_id = f"{agent_type}_{uuid4().hex[:8]}"
         self.agent_type = agent_type

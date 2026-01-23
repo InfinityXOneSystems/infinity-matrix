@@ -5,14 +5,14 @@ Central orchestrator that coordinates all agents in the Vision Cortex system.
 Inspired by FAANG-grade distributed systems and Manus.im architecture.
 """
 
-from .crawler_agent import CrawlerAgent
-from .ingestion_agent import IngestionAgent
-from .predictor_agent import PredictorAgent
 from .ceo_agent import CEOAgent
-from .strategist_agent import StrategistAgent
-from .organizer_agent import OrganizerAgent
-from .validator_agent import ValidatorAgent
+from .crawler_agent import CrawlerAgent
 from .documentor_agent import DocumentorAgent
+from .ingestion_agent import IngestionAgent
+from .organizer_agent import OrganizerAgent
+from .predictor_agent import PredictorAgent
+from .strategist_agent import StrategistAgent
+from .validator_agent import ValidatorAgent
 
 
 class VisionCortex:

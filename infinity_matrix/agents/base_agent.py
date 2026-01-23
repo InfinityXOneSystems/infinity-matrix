@@ -2,12 +2,11 @@
 
 from abc import abstractmethod
 from datetime import datetime
-from typing import Any, Dict, List, Optional
-from uuid import uuid4
+from typing import Any, dict, list
 
 from pydantic import BaseModel, Field
 
-from infinity_matrix.core.base import Component, Task, TaskResult
+from infinity_matrix.core.base import Component
 from infinity_matrix.core.logging import get_logger
 from infinity_matrix.core.metrics import get_metrics_collector, track_execution_time
 
@@ -19,15 +18,15 @@ class AgentCapability(BaseModel):
 
     name: str
     description: str
-    input_schema: Dict[str, Any] = Field(default_factory=dict)
-    output_schema: Dict[str, Any] = Field(default_factory=dict)
+    input_schema: dict[str, Any] = Field(default_factory=dict)
+    output_schema: dict[str, Any] = Field(default_factory=dict)
 
 
 class AgentMetadata(BaseModel):
     """Agent metadata."""
 
     created_at: datetime = Field(default_factory=datetime.utcnow)
-    last_execution: Optional[datetime] = None
+    last_execution: datetime | None = None
     execution_count: int = 0
     success_count: int = 0
     failure_count: int = 0
@@ -42,7 +41,7 @@ class BaseAgent(Component):
         name: str,
         agent_type: str,
         description: str = "",
-        capabilities: Optional[List[AgentCapability]] = None,
+        capabilities: list[AgentCapability] | None = None,
     ):
         """Initialize agent."""
         super().__init__(name=name, component_type="agent")
@@ -65,7 +64,7 @@ class BaseAgent(Component):
         await self._shutdown()
         self.logger.info("agent_shutdown_complete", agent_type=self.agent_type)
 
-    async def health_check(self) -> Dict[str, Any]:
+    async def health_check(self) -> dict[str, Any]:
         """Perform health check."""
         return {
             "name": self.name,
@@ -75,7 +74,7 @@ class BaseAgent(Component):
         }
 
     @track_execution_time("agent_execution")
-    async def execute(self, task: Dict[str, Any]) -> Dict[str, Any]:
+    async def execute(self, task: dict[str, Any]) -> dict[str, Any]:
         """Execute agent task."""
         if self._is_busy:
             raise RuntimeError(f"Agent {self.name} is busy")
@@ -127,24 +126,20 @@ class BaseAgent(Component):
             self._is_busy = False
 
     @abstractmethod
-    async def _execute(self, task: Dict[str, Any]) -> Dict[str, Any]:
+    async def _execute(self, task: dict[str, Any]) -> dict[str, Any]:
         """Internal execution logic to be implemented by subclasses."""
-        pass
 
     @abstractmethod
-    async def validate(self, task: Dict[str, Any]) -> bool:
+    async def validate(self, task: dict[str, Any]) -> bool:
         """Validate task input."""
-        pass
 
     async def _initialize(self) -> None:
         """Internal initialization logic."""
-        pass
 
     async def _shutdown(self) -> None:
         """Internal shutdown logic."""
-        pass
 
-    def get_capabilities(self) -> List[AgentCapability]:
+    def get_capabilities(self) -> list[AgentCapability]:
         """Get agent capabilities."""
         return self.capabilities
 

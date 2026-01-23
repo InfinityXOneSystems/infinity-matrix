@@ -2,32 +2,33 @@
 
 import uuid
 from datetime import datetime
-from typing import Dict, Any
+from typing import Any, dict
+
 import httpx
 
 from infinity_matrix.llm.base import BaseLLMProvider
-from infinity_matrix.models import NormalizedData, AnalysisResult
+from infinity_matrix.models import AnalysisResult, NormalizedData
 
 
 class OllamaProvider(BaseLLMProvider):
     """Ollama provider for local LLM models."""
-    
-    def __init__(self, config: Dict[str, Any]):
+
+    def __init__(self, config: dict[str, Any]):
         """Initialize Ollama provider."""
         super().__init__(config)
-        
+
         self.base_url = config.get("base_url", "http://localhost:11434")
         self.model = config.get("model", "llama2")
         self.temperature = config.get("temperature", 0.7)
-    
+
     def get_provider_name(self) -> str:
         """Get provider name."""
         return "ollama"
-    
+
     def validate_config(self) -> bool:
         """Validate configuration."""
         return True  # Ollama doesn't require API keys
-    
+
     async def analyze(
         self,
         data: NormalizedData,
@@ -37,7 +38,7 @@ class OllamaProvider(BaseLLMProvider):
         """Analyze data using Ollama."""
         # Format prompt
         prompt = self._format_prompt(prompt_template, data)
-        
+
         try:
             # Call Ollama API
             async with httpx.AsyncClient(timeout=60.0) as client:
@@ -53,13 +54,13 @@ class OllamaProvider(BaseLLMProvider):
                     }
                 )
                 response.raise_for_status()
-                
+
                 result_data = response.json()
                 analysis_text = result_data.get("response", "")
-                
+
                 # Parse insights
                 insights = self._extract_insights(analysis_text)
-                
+
                 # Create analysis result
                 result = AnalysisResult(
                     id=str(uuid.uuid4()),
@@ -73,13 +74,13 @@ class OllamaProvider(BaseLLMProvider):
                     tokens_used=0,  # Ollama doesn't report token usage
                     analyzed_at=datetime.utcnow(),
                 )
-                
+
                 return result
-                
+
         except Exception as e:
             self.logger.error(f"Error calling Ollama API: {e}", exc_info=True)
             raise
-    
+
     def _extract_insights(self, text: str) -> list:
         """Extract key insights from analysis text."""
         insights = []
@@ -89,5 +90,5 @@ class OllamaProvider(BaseLLMProvider):
                 insight = line.lstrip('- * • 0123456789. ')
                 if insight:
                     insights.append(insight)
-        
+
         return insights[:10]

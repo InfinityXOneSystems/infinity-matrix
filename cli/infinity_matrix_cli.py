@@ -1,12 +1,10 @@
 """
 Infinity-Matrix CLI tool.
 """
-import asyncio
+import json
+
 import click
 import httpx
-import json
-from typing import Optional
-
 
 BASE_URL = "http://localhost:8000"
 
@@ -14,7 +12,6 @@ BASE_URL = "http://localhost:8000"
 @click.group()
 def cli():
     """Infinity-Matrix CLI - Enterprise AI Platform Management"""
-    pass
 
 
 @cli.command()
@@ -32,7 +29,6 @@ def status():
 @cli.group()
 def security():
     """Security operations."""
-    pass
 
 
 @security.command()
@@ -44,7 +40,7 @@ def scan(full):
         f"{BASE_URL}/api/security/scan",
         json={"include_containers": full}
     )
-    
+
     if response.status_code == 200:
         data = response.json()
         click.echo(f"Scan ID: {data['scan_id']}")
@@ -57,7 +53,6 @@ def scan(full):
 @cli.group()
 def cost():
     """Cost analysis operations."""
-    pass
 
 
 @cost.command()
@@ -66,7 +61,7 @@ def analyze(period):
     """Analyze costs."""
     click.echo(f"Analyzing costs for period: {period}")
     response = httpx.get(f"{BASE_URL}/api/monitoring/costs/realtime")
-    
+
     if response.status_code == 200:
         data = response.json()
         click.echo(f"Current hourly: ${data['costs']['current_hourly']:.2f}")
@@ -80,7 +75,6 @@ def analyze(period):
 @cli.group()
 def dr():
     """Disaster recovery operations."""
-    pass
 
 
 @dr.command()
@@ -92,7 +86,7 @@ def backup(type):
         f"{BASE_URL}/api/dr/backup",
         json={"backup_type": type, "description": f"{type} backup via CLI"}
     )
-    
+
     if response.status_code == 200:
         data = response.json()
         click.echo(f"Backup ID: {data['id']}")
@@ -111,7 +105,7 @@ def restore(backup_id):
         f"{BASE_URL}/api/dr/restore",
         json={"backup_id": backup_id}
     )
-    
+
     if response.status_code == 200:
         data = response.json()
         click.echo(f"Status: {data['status']}")
@@ -123,7 +117,6 @@ def restore(backup_id):
 @cli.group()
 def docs():
     """Documentation operations."""
-    pass
 
 
 @docs.command()
@@ -135,7 +128,7 @@ def search(query):
         f"{BASE_URL}/api/docs/search",
         params={"query": query}
     )
-    
+
     if response.status_code == 200:
         results = response.json()
         click.echo(f"Found {len(results)} results:")
@@ -148,7 +141,6 @@ def search(query):
 @cli.group()
 def feedback():
     """Feedback operations."""
-    pass
 
 
 @feedback.command()
@@ -165,7 +157,7 @@ def submit(type, message):
             "message": message
         }
     )
-    
+
     if response.status_code == 200:
         data = response.json()
         click.echo(f"Feedback ID: {data['id']}")
@@ -177,15 +169,14 @@ def submit(type, message):
 @cli.group()
 def incidents():
     """Incident management."""
-    pass
 
 
 @incidents.command()
 @click.option('--severity', default='medium', help='Incident severity')
 def list(severity):
-    """List incidents."""
+    """list incidents."""
     response = httpx.get(f"{BASE_URL}/api/security/incidents")
-    
+
     if response.status_code == 200:
         incidents = response.json()
         click.echo(f"Total incidents: {len(incidents)}")
@@ -200,7 +191,7 @@ def list(severity):
 def get(incident_id):
     """Get incident details."""
     response = httpx.get(f"{BASE_URL}/api/security/incidents/{incident_id}")
-    
+
     if response.status_code == 200:
         inc = response.json()
         click.echo(json.dumps(inc, indent=2))

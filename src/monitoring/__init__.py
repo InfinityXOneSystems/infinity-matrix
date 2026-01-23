@@ -7,8 +7,8 @@ Provides:
 - SLO tracking
 """
 
-from typing import Any
 import time
+from typing import Any
 
 
 class MetricsCollector:
@@ -48,7 +48,7 @@ class MetricsCollector:
             metric_name: Name of the metric
 
         Returns:
-            List of metric values with timestamps
+            list of metric values with timestamps
         """
         return self.metrics.get(metric_name, [])
 

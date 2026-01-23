@@ -5,7 +5,7 @@ import os
 from datetime import datetime
 from enum import Enum
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import dict, list
 from uuid import uuid4
 
 from pydantic import BaseModel, Field
@@ -33,9 +33,9 @@ class BuildConfig(BaseModel):
 
     project_path: str
     build_command: str = "python -m build"
-    test_command: Optional[str] = "pytest"
-    lint_command: Optional[str] = "ruff check ."
-    environment: Dict[str, str] = Field(default_factory=dict)
+    test_command: str | None = "pytest"
+    lint_command: str | None = "ruff check ."
+    environment: dict[str, str] = Field(default_factory=dict)
     timeout: int = 600  # seconds
 
 
@@ -45,11 +45,11 @@ class BuildResult(BaseModel):
     build_id: str
     status: BuildStatus
     start_time: datetime
-    end_time: Optional[datetime] = None
-    duration: Optional[float] = None
-    logs: List[str] = Field(default_factory=list)
-    artifacts: List[str] = Field(default_factory=list)
-    error: Optional[str] = None
+    end_time: datetime | None = None
+    duration: float | None = None
+    logs: list[str] = Field(default_factory=list)
+    artifacts: list[str] = Field(default_factory=list)
+    error: str | None = None
 
 
 class BuildPipeline(BaseService):
@@ -60,8 +60,8 @@ class BuildPipeline(BaseService):
         super().__init__(name="build_pipeline")
         self.settings = get_settings()
         self.metrics = get_metrics_collector()
-        self._builds: Dict[str, BuildResult] = {}
-        self._running_builds: Dict[str, asyncio.Task] = {}
+        self._builds: dict[str, BuildResult] = {}
+        self._running_builds: dict[str, asyncio.Task] = {}
         self._workspace = Path(self.settings.builder_workspace)
 
     async def _initialize(self) -> None:
@@ -200,7 +200,7 @@ class BuildPipeline(BaseService):
         self,
         command: str,
         cwd: str,
-        env: Dict[str, str],
+        env: dict[str, str],
     ) -> str:
         """Execute a shell command."""
         full_env = {**os.environ, **env}
@@ -221,12 +221,12 @@ class BuildPipeline(BaseService):
 
         return stdout.decode()
 
-    def get_build_status(self, build_id: str) -> Optional[BuildResult]:
+    def get_build_status(self, build_id: str) -> BuildResult | None:
         """Get build status."""
         return self._builds.get(build_id)
 
-    def list_builds(self) -> List[BuildResult]:
-        """List all builds."""
+    def list_builds(self) -> list[BuildResult]:
+        """list all builds."""
         return list(self._builds.values())
 
     async def cancel_build(self, build_id: str) -> bool:

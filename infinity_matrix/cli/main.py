@@ -24,16 +24,16 @@ def init(ctx: click.Context) -> None:
     """Initialize Infinity Matrix configuration."""
     config: Config = ctx.obj["config"]
     console: Console = ctx.obj["console"]
-    
+
     console.print("[bold green]Initializing Infinity Matrix...[/bold green]")
-    
+
     # Create config directory
     config_dir = config.templates.get_template_dir()
     config_dir.mkdir(parents=True, exist_ok=True)
-    
+
     # Save configuration
     config.save()
-    
+
     console.print(f"[green]✓[/green] Configuration saved to {config_dir.parent / 'config.yaml'}")
     console.print(f"[green]✓[/green] Template directory: {config_dir}")
     console.print("\n[bold]Next steps:[/bold]")
@@ -58,14 +58,14 @@ def create(
     output: str,
 ) -> None:
     """Create a new application from prompt or template."""
-    from infinity_matrix.core.engine.builder import UniversalBuilder
     from infinity_matrix.core.ai.cortex import VisionCortex
-    
+    from infinity_matrix.core.engine.builder import UniversalBuilder
+
     config: Config = ctx.obj["config"]
     console: Console = ctx.obj["console"]
-    
+
     builder = UniversalBuilder(config)
-    
+
     if interactive:
         console.print("[bold cyan]Interactive Application Builder[/bold cyan]\n")
         prompt = click.prompt("Describe your application", type=str)
@@ -74,7 +74,7 @@ def create(
             default="auto",
             type=str
         )
-    
+
     if prompt and not template:
         # Use AI to interpret prompt and select template
         console.print("[yellow]Analyzing your requirements with AI Vision Cortex...[/yellow]")
@@ -82,53 +82,52 @@ def create(
         requirements = cortex.analyze_prompt(prompt)
         template = cortex.select_blueprint(requirements)
         console.print(f"[green]✓[/green] Selected template: [cyan]{template}[/cyan]")
-    
+
     # Parse parameters
     params = {}
     for p in param:
         key, value = p.split("=", 1)
         params[key] = value
-    
+
     # Build the application
-    console.print(f"\n[bold]Building application...[/bold]")
+    console.print("\n[bold]Building application...[/bold]")
     result = builder.build(
         template=template,
         params=params,
         output_dir=output,
         prompt=prompt
     )
-    
+
     if result["success"]:
-        console.print(f"\n[bold green]✓ Application created successfully![/bold green]")
+        console.print("\n[bold green]✓ Application created successfully![/bold green]")
         console.print(f"\n[bold]Location:[/bold] {result['output_path']}")
-        console.print(f"\n[bold]Next steps:[/bold]")
+        console.print("\n[bold]Next steps:[/bold]")
         for step in result.get("next_steps", []):
             console.print(f"  • {step}")
     else:
-        console.print(f"[bold red]✗ Failed to create application[/bold red]")
+        console.print("[bold red]✗ Failed to create application[/bold red]")
         console.print(f"Error: {result.get('error', 'Unknown error')}")
 
 
 @cli.group()
 def templates() -> None:
     """Manage templates."""
-    pass
 
 
 @templates.command("list")
 @click.pass_context
 def templates_list(ctx: click.Context) -> None:
-    """List available templates."""
+    """list available templates."""
     from infinity_matrix.core.engine.template_manager import TemplateManager
-    
+
     config: Config = ctx.obj["config"]
     console: Console = ctx.obj["console"]
-    
+
     manager = TemplateManager(config)
     template_list = manager.list_templates()
-    
+
     console.print("\n[bold cyan]Available Templates:[/bold cyan]\n")
-    
+
     for category, templates in template_list.items():
         console.print(f"[bold]{category.upper()}[/bold]")
         for tmpl in templates:
@@ -139,7 +138,6 @@ def templates_list(ctx: click.Context) -> None:
 @cli.group()
 def agent() -> None:
     """Manage agents."""
-    pass
 
 
 @agent.command("enable")

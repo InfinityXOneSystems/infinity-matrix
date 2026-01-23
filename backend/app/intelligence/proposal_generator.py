@@ -1,11 +1,11 @@
 """
 Proposal Generator - AI-powered proposal creation
 """
-from typing import Dict, Any, List
-from sqlalchemy.ext.asyncio import AsyncSession
 import logging
+from typing import Any, dict, list
 
-from app.models.models import Proposal, IntelligenceReport
+from app.models.models import IntelligenceReport, Proposal
+from sqlalchemy.ext.asyncio import AsyncSession
 
 logger = logging.getLogger(__name__)
 
@@ -13,7 +13,7 @@ logger = logging.getLogger(__name__)
 class ProposalGenerator:
     """
     Generates AI-powered proposals tailored to discovery findings.
-    
+
     Creates:
     - Custom AI agent proposals
     - System integration proposals
@@ -22,18 +22,18 @@ class ProposalGenerator:
     - Automation workflow proposals
     - MVP/startup blueprints
     """
-    
+
     async def generate_proposals(
         self,
         discovery_id: int,
         intelligence_report: IntelligenceReport,
         db: AsyncSession
-    ) -> List[Proposal]:
+    ) -> list[Proposal]:
         """Generate comprehensive set of tailored proposals"""
         logger.info(f"Generating proposals for discovery {discovery_id}")
-        
+
         proposals = []
-        
+
         # Generate different types of proposals based on intelligence
         proposal_types = [
             self._generate_ai_agent_proposal,
@@ -42,7 +42,7 @@ class ProposalGenerator:
             self._generate_mvp_blueprint,
             self._generate_strategic_rebrand_proposal
         ]
-        
+
         for proposal_generator in proposal_types:
             proposal_data = proposal_generator(intelligence_report)
             proposal = Proposal(
@@ -51,16 +51,16 @@ class ProposalGenerator:
             )
             db.add(proposal)
             proposals.append(proposal)
-        
+
         await db.commit()
-        
+
         logger.info(f"Generated {len(proposals)} proposals")
         return proposals
-    
+
     def _generate_ai_agent_proposal(
         self,
         intelligence_report: IntelligenceReport
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """Generate AI agent system proposal"""
         return {
             "proposal_type": "ai_agent",
@@ -182,11 +182,11 @@ class ProposalGenerator:
                 "competitive_edge": "Unique differentiation strategies and implementation patterns"
             }
         }
-    
+
     def _generate_system_proposal(
         self,
         intelligence_report: IntelligenceReport
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """Generate system integration proposal"""
         return {
             "proposal_type": "system_integration",
@@ -235,11 +235,11 @@ class ProposalGenerator:
             },
             "narrative_style": "excitement"
         }
-    
+
     def _generate_automation_proposal(
         self,
         intelligence_report: IntelligenceReport
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """Generate automation workflow proposal"""
         return {
             "proposal_type": "automation_workflow",
@@ -285,11 +285,11 @@ class ProposalGenerator:
             },
             "narrative_style": "excitement"
         }
-    
+
     def _generate_mvp_blueprint(
         self,
         intelligence_report: IntelligenceReport
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """Generate MVP startup blueprint"""
         return {
             "proposal_type": "mvp_blueprint",
@@ -337,11 +337,11 @@ class ProposalGenerator:
             },
             "narrative_style": "excitement"
         }
-    
+
     def _generate_strategic_rebrand_proposal(
         self,
         intelligence_report: IntelligenceReport
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """Generate strategic rebranding proposal"""
         return {
             "proposal_type": "strategic_rebrand",
@@ -388,7 +388,7 @@ class ProposalGenerator:
             },
             "narrative_style": "excitement"
         }
-    
+
     def _create_narrative(self, content: str) -> str:
         """Create excitement-generating narrative"""
         # In production, this would use LLMs to enhance the narrative

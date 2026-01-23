@@ -1,6 +1,6 @@
 """Review Agent - Performs comprehensive code and system reviews."""
 
-from typing import Any, Dict, List
+from typing import Any, dict, list
 
 from infinity_matrix.agents.base_agent import AgentCapability, BaseAgent
 from infinity_matrix.core.logging import get_logger
@@ -40,7 +40,7 @@ class ReviewAgent(BaseAgent):
             capabilities=capabilities,
         )
 
-    async def _execute(self, task: Dict[str, Any]) -> Dict[str, Any]:
+    async def _execute(self, task: dict[str, Any]) -> dict[str, Any]:
         """Execute review task."""
         action = task.get("action", "code_review")
 
@@ -56,13 +56,13 @@ class ReviewAgent(BaseAgent):
         else:
             raise ValueError(f"Unknown action: {action}")
 
-    async def validate(self, task: Dict[str, Any]) -> bool:
+    async def validate(self, task: dict[str, Any]) -> bool:
         """Validate task input."""
         if "action" not in task:
             return False
         return True
 
-    async def _code_review(self, code: str, context: Dict[str, Any]) -> Dict[str, Any]:
+    async def _code_review(self, code: str, context: dict[str, Any]) -> dict[str, Any]:
         """Perform comprehensive code review."""
         self.logger.info("performing_code_review", code_length=len(code))
 
@@ -117,7 +117,7 @@ class ReviewAgent(BaseAgent):
             "review": review,
         }
 
-    async def _security_review(self, code: str) -> Dict[str, Any]:
+    async def _security_review(self, code: str) -> dict[str, Any]:
         """Review code for security vulnerabilities."""
         self.logger.info("performing_security_review", code_length=len(code))
 
@@ -161,7 +161,7 @@ class ReviewAgent(BaseAgent):
             "scan_timestamp": "2025-12-31T02:30:00Z",
         }
 
-    async def _architecture_review(self, architecture: Dict[str, Any]) -> Dict[str, Any]:
+    async def _architecture_review(self, architecture: dict[str, Any]) -> dict[str, Any]:
         """Review system architecture."""
         self.logger.info("performing_architecture_review")
 
@@ -199,7 +199,7 @@ class ReviewAgent(BaseAgent):
             "summary": "Solid foundation with room for improvement in scalability and observability",
         }
 
-    def _calculate_risk_level(self, vulnerabilities: List[Dict[str, Any]]) -> str:
+    def _calculate_risk_level(self, vulnerabilities: list[dict[str, Any]]) -> str:
         """Calculate overall risk level."""
         if not vulnerabilities:
             return "low"

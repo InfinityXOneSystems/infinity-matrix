@@ -2,17 +2,17 @@
 Infinity Matrix - Intelligence Discovery System
 Main FastAPI Application
 """
-from fastapi import FastAPI, Request
-from fastapi.middleware.cors import CORSMiddleware
-from fastapi.middleware.gzip import GZipMiddleware
-from fastapi.responses import JSONResponse
 import logging
 import time
 from contextlib import asynccontextmanager
 
-from app.core.config import settings
-from app.core.database import engine, Base
 from app.api import discovery, intelligence, proposals, simulations, vision_cortex
+from app.core.config import settings
+from app.core.database import Base, engine
+from fastapi import FastAPI, Request
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.middleware.gzip import GZipMiddleware
+from fastapi.responses import JSONResponse
 
 # Configure logging
 logging.basicConfig(
@@ -26,14 +26,14 @@ logger = logging.getLogger(__name__)
 async def lifespan(app: FastAPI):
     """Application lifespan manager"""
     logger.info("Starting Intelligence Discovery System...")
-    
+
     # Create database tables
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
-    
+
     logger.info("Database initialized")
     yield
-    
+
     logger.info("Shutting down Intelligence Discovery System...")
     await engine.dispose()
 

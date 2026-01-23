@@ -5,7 +5,7 @@ Custom exceptions for the MCP server
 
 class MCPException(Exception):
     """Base exception for MCP errors"""
-    
+
     def __init__(
         self,
         message: str,
@@ -22,7 +22,7 @@ class MCPException(Exception):
 
 class DatabaseException(MCPException):
     """Database-related exceptions"""
-    
+
     def __init__(self, message: str, details: dict | None = None):
         super().__init__(
             message=message,
@@ -34,7 +34,7 @@ class DatabaseException(MCPException):
 
 class RedisException(MCPException):
     """Redis-related exceptions"""
-    
+
     def __init__(self, message: str, details: dict | None = None):
         super().__init__(
             message=message,
@@ -46,7 +46,7 @@ class RedisException(MCPException):
 
 class AuthenticationException(MCPException):
     """Authentication-related exceptions"""
-    
+
     def __init__(self, message: str = "Authentication failed", details: dict | None = None):
         super().__init__(
             message=message,
@@ -58,7 +58,7 @@ class AuthenticationException(MCPException):
 
 class AuthorizationException(MCPException):
     """Authorization-related exceptions"""
-    
+
     def __init__(self, message: str = "Access denied", details: dict | None = None):
         super().__init__(
             message=message,
@@ -70,7 +70,7 @@ class AuthorizationException(MCPException):
 
 class ValidationException(MCPException):
     """Validation-related exceptions"""
-    
+
     def __init__(self, message: str, details: dict | None = None):
         super().__init__(
             message=message,
@@ -82,7 +82,7 @@ class ValidationException(MCPException):
 
 class AIProviderException(MCPException):
     """AI provider-related exceptions"""
-    
+
     def __init__(self, provider: str, message: str, details: dict | None = None):
         super().__init__(
             message=f"{provider}: {message}",
@@ -94,7 +94,7 @@ class AIProviderException(MCPException):
 
 class RateLimitException(MCPException):
     """Rate limiting exceptions"""
-    
+
     def __init__(self, message: str = "Rate limit exceeded", details: dict | None = None):
         super().__init__(
             message=message,

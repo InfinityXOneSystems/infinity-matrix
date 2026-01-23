@@ -37,30 +37,30 @@ _tasks: dict[str, dict[str, Any]] = {}
 
 @router.get(
     "/",
-    summary="List all tasks",
+    summary="list all tasks",
     response_model=list[TaskStatus],
 )
 async def list_tasks(
     agent_id: str | None = None,
     status_filter: str | None = None,
 ) -> list[TaskStatus]:
-    """List all tasks, optionally filtered by agent or status.
-    
+    """list all tasks, optionally filtered by agent or status.
+
     Args:
         agent_id: Optional agent ID to filter tasks
         status_filter: Optional status to filter tasks
-        
+
     Returns:
-        List of task status information
+        list of task status information
     """
     tasks = _tasks.values()
-    
+
     # Apply filters
     if agent_id:
         tasks = [t for t in tasks if t.get("agent_id") == agent_id]
     if status_filter:
         tasks = [t for t in tasks if t.get("status") == status_filter]
-    
+
     return [
         TaskStatus(
             task_id=task["task_id"],
@@ -84,17 +84,17 @@ async def list_tasks(
 )
 async def create_task(task: TaskRequest) -> TaskStatus:
     """Create a new task for an agent.
-    
+
     Args:
         task: Task creation details
-        
+
     Returns:
         Created task status
     """
     # Generate task ID
     task_id = f"task_{uuid4().hex[:12]}"
     timestamp = "2025-12-30T22:47:42.913Z"
-    
+
     # Store task data
     task_data = {
         "task_id": task_id,
@@ -107,9 +107,9 @@ async def create_task(task: TaskRequest) -> TaskStatus:
         "updated_at": timestamp,
     }
     _tasks[task_id] = task_data
-    
+
     # TODO: Send task to orchestrator for execution
-    
+
     return TaskStatus(**task_data, result=None)
 
 
@@ -120,13 +120,13 @@ async def create_task(task: TaskRequest) -> TaskStatus:
 )
 async def get_task(task_id: str) -> TaskStatus:
     """Get details of a specific task.
-    
+
     Args:
         task_id: Unique task identifier
-        
+
     Returns:
         Task status information
-        
+
     Raises:
         HTTPException: If task not found
     """
@@ -135,7 +135,7 @@ async def get_task(task_id: str) -> TaskStatus:
             status_code=status.HTTP_404_NOT_FOUND,
             detail=f"Task {task_id} not found",
         )
-    
+
     task_data = _tasks[task_id]
     return TaskStatus(**task_data, result=task_data.get("result"))
 
@@ -151,15 +151,15 @@ async def update_task(
     result: dict[str, Any] | None = None,
 ) -> TaskStatus:
     """Update the status of a task.
-    
+
     Args:
         task_id: Unique task identifier
         new_status: New task status
         result: Optional task result data
-        
+
     Returns:
         Updated task status
-        
+
     Raises:
         HTTPException: If task not found
     """
@@ -168,13 +168,13 @@ async def update_task(
             status_code=status.HTTP_404_NOT_FOUND,
             detail=f"Task {task_id} not found",
         )
-    
+
     # Update task
     _tasks[task_id]["status"] = new_status
     _tasks[task_id]["updated_at"] = "2025-12-30T22:47:42.913Z"
     if result:
         _tasks[task_id]["result"] = result
-    
+
     task_data = _tasks[task_id]
     return TaskStatus(**task_data, result=task_data.get("result"))
 
@@ -186,10 +186,10 @@ async def update_task(
 )
 async def cancel_task(task_id: str) -> None:
     """Cancel a pending or running task.
-    
+
     Args:
         task_id: Unique task identifier
-        
+
     Raises:
         HTTPException: If task not found or already completed
     """
@@ -198,14 +198,14 @@ async def cancel_task(task_id: str) -> None:
             status_code=status.HTTP_404_NOT_FOUND,
             detail=f"Task {task_id} not found",
         )
-    
+
     task = _tasks[task_id]
     if task["status"] in ["completed", "failed"]:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Cannot cancel a completed or failed task",
         )
-    
+
     # Update task status to cancelled
     _tasks[task_id]["status"] = "cancelled"
     _tasks[task_id]["updated_at"] = "2025-12-30T22:47:42.913Z"

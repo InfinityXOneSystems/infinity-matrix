@@ -9,7 +9,7 @@ from jinja2 import Environment, FileSystemLoader, Template
 class CodeGenerator:
     """
     Code generator using templates.
-    
+
     Generates code, configuration files, and documentation using
     Jinja2 templates.
     """
@@ -17,7 +17,7 @@ class CodeGenerator:
     def __init__(self, templates_dir: Path):
         """
         Initialize code generator.
-        
+
         Args:
             templates_dir: Directory containing templates
         """
@@ -35,11 +35,11 @@ class CodeGenerator:
     ) -> str:
         """
         Generate code from a template.
-        
+
         Args:
             template_name: Name of the template file
             context: Context variables for the template
-            
+
         Returns:
             Generated code as string
         """
@@ -53,11 +53,11 @@ class CodeGenerator:
     ) -> str:
         """
         Generate code from a template string.
-        
+
         Args:
             template_string: Template as string
             context: Context variables for the template
-            
+
         Returns:
             Generated code as string
         """
@@ -73,13 +73,13 @@ class CodeGenerator:
     ) -> str:
         """
         Generate a Python module.
-        
+
         Args:
             module_name: Name of the module
-            classes: List of class definitions
-            functions: List of function definitions
-            imports: List of import statements
-            
+            classes: list of class definitions
+            functions: list of function definitions
+            imports: list of import statements
+
         Returns:
             Generated Python code
         """
@@ -132,14 +132,14 @@ def {{ func.name }}({{ func.params }}):
     ) -> str:
         """
         Generate a FastAPI endpoint.
-        
+
         Args:
             path: API path
             method: HTTP method
             function_name: Function name
-            params: List of parameters
+            params: list of parameters
             response_model: Response model name
-            
+
         Returns:
             Generated endpoint code
         """
@@ -172,11 +172,11 @@ async def {{ function_name }}(
     ) -> str:
         """
         Generate a test file.
-        
+
         Args:
             module_name: Module being tested
-            test_cases: List of test cases
-            
+            test_cases: list of test cases
+
         Returns:
             Generated test code
         """

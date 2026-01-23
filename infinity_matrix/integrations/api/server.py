@@ -1,11 +1,10 @@
 """REST API server using FastAPI."""
 
 from contextlib import asynccontextmanager
-from typing import Any, Dict, List
+from typing import Any, dict
 
-from fastapi import FastAPI, HTTPException, Request, status
+from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse
 from pydantic import BaseModel
 
 from infinity_matrix.agents import get_registry
@@ -36,13 +35,13 @@ class AgentExecuteRequest(BaseModel):
     """Agent execution request."""
 
     agent_name: str
-    task: Dict[str, Any]
+    task: dict[str, Any]
 
 
 class AgentExecuteResponse(BaseModel):
     """Agent execution response."""
 
-    result: Dict[str, Any]
+    result: dict[str, Any]
     status: str
 
 
@@ -67,7 +66,7 @@ async def lifespan(app: FastAPI):
     """Application lifespan manager."""
     # Startup
     logger.info("application_starting")
-    settings = get_settings()
+    get_settings()
 
     # Initialize services
     registry = get_registry()
@@ -183,7 +182,7 @@ def create_app() -> FastAPI:
         )
 
     @app.get("/ready")
-    async def readiness() -> Dict[str, Any]:
+    async def readiness() -> dict[str, Any]:
         """Readiness check endpoint."""
         registry = app.state.registry
         status = await registry.get_registry_status()
@@ -194,8 +193,8 @@ def create_app() -> FastAPI:
 
     # Agent endpoints
     @app.get(f"{settings.api_prefix}/agents")
-    async def list_agents() -> Dict[str, Any]:
-        """List all registered agents."""
+    async def list_agents() -> dict[str, Any]:
+        """list all registered agents."""
         registry = app.state.registry
         status = await registry.get_registry_status()
         return status
@@ -246,10 +245,11 @@ def create_app() -> FastAPI:
 
     # Vision endpoints
     @app.post(f"{settings.api_prefix}/vision/process")
-    async def process_vision(request: VisionProcessRequest) -> Dict[str, Any]:
+    async def process_vision(request: VisionProcessRequest) -> dict[str, Any]:
         """Process vision task."""
-        from infinity_matrix.core.base import Task
         import base64
+
+        from infinity_matrix.core.base import Task
 
         vision = app.state.vision
 
@@ -274,7 +274,7 @@ def create_app() -> FastAPI:
 
     # Builder endpoints
     @app.post(f"{settings.api_prefix}/build")
-    async def start_build(request: BuildRequest) -> Dict[str, Any]:
+    async def start_build(request: BuildRequest) -> dict[str, Any]:
         """Start a build."""
         pipeline = app.state.pipeline
         audit_logger = app.state.audit_logger
@@ -308,7 +308,7 @@ def create_app() -> FastAPI:
         return result.model_dump()
 
     @app.get(f"{settings.api_prefix}/build/{{build_id}}")
-    async def get_build_status(build_id: str) -> Dict[str, Any]:
+    async def get_build_status(build_id: str) -> dict[str, Any]:
         """Get build status."""
         pipeline = app.state.pipeline
         result = pipeline.get_build_status(build_id)
@@ -323,7 +323,7 @@ def create_app() -> FastAPI:
     async def get_audit_events(
         event_type: str = None,
         limit: int = 100,
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """Get audit events."""
         from infinity_matrix.logs.audit import AuditEventType
 

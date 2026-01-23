@@ -1,9 +1,10 @@
 """Cross-repository intelligence orchestration."""
 
-from typing import Any, Dict, List, Optional
 from datetime import datetime
+from typing import Any, dict, list
 
 import httpx
+
 from infinity_matrix.core.config import settings
 from infinity_matrix.core.logging import LoggerMixin
 
@@ -19,7 +20,7 @@ class CrossRepoOrchestrator(LoggerMixin):
             "sentiment_pulse": settings.sentiment_pulse_url,
             "lead_nexus": settings.lead_nexus_url,
         }
-        self.client: Optional[httpx.AsyncClient] = None
+        self.client: httpx.AsyncClient | None = None
 
     async def initialize(self) -> None:
         """Initialize HTTP client."""
@@ -34,16 +35,16 @@ class CrossRepoOrchestrator(LoggerMixin):
 
     async def gather_intelligence(
         self,
-        query: Dict[str, Any],
-        repos: Optional[List[str]] = None,
-    ) -> Dict[str, Any]:
+        query: dict[str, Any],
+        repos: list[str] | None = None,
+    ) -> dict[str, Any]:
         """
         Gather intelligence from multiple repositories.
-        
+
         Args:
             query: Intelligence query parameters
-            repos: List of repositories to query (default: all)
-            
+            repos: list of repositories to query (default: all)
+
         Returns:
             Aggregated intelligence results
         """
@@ -51,12 +52,12 @@ class CrossRepoOrchestrator(LoggerMixin):
             await self.initialize()
 
         repos_to_query = repos or list(self.repos.keys())
-        
+
         results = {}
         for repo in repos_to_query:
             if repo not in self.repos:
                 continue
-            
+
             url = self.repos[repo]
             if not url:
                 self.log_warning(f"{repo}_not_configured")
@@ -71,7 +72,7 @@ class CrossRepoOrchestrator(LoggerMixin):
 
         # Aggregate results
         aggregated = await self._aggregate_results(results)
-        
+
         self.log_info(
             "intelligence_gathered",
             repos=list(results.keys()),
@@ -84,8 +85,8 @@ class CrossRepoOrchestrator(LoggerMixin):
         self,
         repo: str,
         url: str,
-        query: Dict[str, Any],
-    ) -> Dict[str, Any]:
+        query: dict[str, Any],
+    ) -> dict[str, Any]:
         """Query a specific repository."""
         endpoint = self._get_endpoint_for_repo(repo, query)
         full_url = f"{url}{endpoint}"
@@ -93,7 +94,7 @@ class CrossRepoOrchestrator(LoggerMixin):
         try:
             response = await self.client.get(full_url, params=query)
             response.raise_for_status()
-            
+
             return {
                 "data": response.json(),
                 "success": True,
@@ -105,7 +106,7 @@ class CrossRepoOrchestrator(LoggerMixin):
                 "success": False,
             }
 
-    def _get_endpoint_for_repo(self, repo: str, query: Dict[str, Any]) -> str:
+    def _get_endpoint_for_repo(self, repo: str, query: dict[str, Any]) -> str:
         """Get appropriate endpoint for repository based on query."""
         endpoint_map = {
             "real_estate": "/api/v1/market-analysis",
@@ -113,13 +114,13 @@ class CrossRepoOrchestrator(LoggerMixin):
             "sentiment_pulse": "/api/v1/sentiment",
             "lead_nexus": "/api/v1/leads",
         }
-        
+
         return endpoint_map.get(repo, "/api/v1/query")
 
     async def _aggregate_results(
         self,
-        results: Dict[str, Any],
-    ) -> Dict[str, Any]:
+        results: dict[str, Any],
+    ) -> dict[str, Any]:
         """Aggregate results from multiple repositories."""
         aggregated = {
             "repositories": list(results.keys()),
@@ -133,8 +134,8 @@ class CrossRepoOrchestrator(LoggerMixin):
 
     async def _calculate_consensus(
         self,
-        results: Dict[str, Any],
-    ) -> Dict[str, Any]:
+        results: dict[str, Any],
+    ) -> dict[str, Any]:
         """Calculate consensus from multiple results."""
         successful_results = [
             r for r in results.values() if r.get("success")
@@ -145,13 +146,13 @@ class CrossRepoOrchestrator(LoggerMixin):
 
         # Simple consensus based on majority
         # In production, this would use more sophisticated algorithms
-        
+
         return {
             "consensus": "positive",  # Placeholder
             "agreement_level": len(successful_results) / len(results),
         }
 
-    def _calculate_confidence(self, results: Dict[str, Any]) -> float:
+    def _calculate_confidence(self, results: dict[str, Any]) -> float:
         """Calculate confidence score based on result quality."""
         if not results:
             return 0.0
@@ -164,16 +165,16 @@ class CrossRepoOrchestrator(LoggerMixin):
 
     async def sync_lead_data(
         self,
-        lead: Dict[str, Any],
-        target_repos: Optional[List[str]] = None,
-    ) -> Dict[str, Any]:
+        lead: dict[str, Any],
+        target_repos: list[str] | None = None,
+    ) -> dict[str, Any]:
         """
         Sync lead data across repositories.
-        
+
         Args:
             lead: Lead data to sync
             target_repos: Target repositories
-            
+
         Returns:
             Sync results
         """
@@ -181,7 +182,7 @@ class CrossRepoOrchestrator(LoggerMixin):
             await self.initialize()
 
         repos_to_sync = target_repos or ["lead_nexus"]
-        
+
         results = {}
         for repo in repos_to_sync:
             if repo not in self.repos or not self.repos[repo]:
@@ -191,7 +192,7 @@ class CrossRepoOrchestrator(LoggerMixin):
                 url = f"{self.repos[repo]}/api/v1/leads"
                 response = await self.client.post(url, json=lead)
                 response.raise_for_status()
-                
+
                 results[repo] = {
                     "success": True,
                     "response": response.json(),
@@ -204,7 +205,7 @@ class CrossRepoOrchestrator(LoggerMixin):
                 }
 
         self.log_info("lead_data_synced", repos=list(results.keys()))
-        
+
         return {
             "synced_repos": list(results.keys()),
             "results": results,
@@ -215,20 +216,20 @@ class CrossRepoOrchestrator(LoggerMixin):
         self,
         asset: str,
         asset_type: str = "stock",
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """
         Get unified market view combining multiple data sources.
-        
+
         Args:
             asset: Asset identifier
             asset_type: Type of asset
-            
+
         Returns:
             Unified market view
         """
         # Query relevant repositories
         query = {"symbol": asset, "type": asset_type}
-        
+
         intelligence = await self.gather_intelligence(
             query,
             repos=["financial_oracle", "sentiment_pulse"],
@@ -236,7 +237,7 @@ class CrossRepoOrchestrator(LoggerMixin):
 
         # Add local analysis
         from infinity_matrix.industries.finance import FinancialAnalyzer
-        
+
         analyzer = FinancialAnalyzer()
         await analyzer.initialize()
         local_analysis = await analyzer.analyze_stock(asset)
@@ -259,13 +260,13 @@ class CrossRepoOrchestrator(LoggerMixin):
 
     def _calculate_unified_score(
         self,
-        local: Dict[str, Any],
-        remote: Dict[str, Any],
+        local: dict[str, Any],
+        remote: dict[str, Any],
     ) -> float:
         """Calculate unified score from multiple sources."""
         # Simple averaging - production would use weighted algorithms
         scores = []
-        
+
         if local.get("success"):
             # Convert signal to score
             signal_map = {
@@ -278,5 +279,5 @@ class CrossRepoOrchestrator(LoggerMixin):
             scores.append(signal_map.get(local.get("signal", "neutral"), 0.5))
 
         # Add more scoring logic here
-        
+
         return sum(scores) / len(scores) if scores else 0.5

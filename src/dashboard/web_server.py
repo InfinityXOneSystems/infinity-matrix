@@ -1,12 +1,12 @@
 """Web-based real-time dashboard for system monitoring."""
-import json
 from datetime import datetime
-from flask import Flask, render_template, jsonify
 from pathlib import Path
+
+from flask import Flask, jsonify, render_template
+
 from agents.health import HealthMonitor, WorkflowTracker
 from agents.orchestrator import CDOrchestrator
 from exporters.artifact_exporter import ArtifactExporter, ComplianceTracker
-
 
 app = Flask(__name__)
 app.config['JSON_SORT_KEYS'] = False
@@ -79,7 +79,7 @@ def export_data(format):
             file_path = exporter.export_json()
         else:
             return jsonify({"error": "Invalid format"}), 400
-        
+
         return jsonify({
             "success": True,
             "file": file_path,

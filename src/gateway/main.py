@@ -16,8 +16,8 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.gzip import GZipMiddleware
 from fastapi.responses import JSONResponse
 
-from .routers import agents, health, tasks
 from .middleware import RateLimitMiddleware, RequestLoggingMiddleware
+from .routers import agents, health, tasks
 
 
 @asynccontextmanager

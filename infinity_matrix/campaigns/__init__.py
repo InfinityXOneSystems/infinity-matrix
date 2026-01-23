@@ -1,7 +1,7 @@
 """Campaign automation engine with email and voice integration."""
 
 from datetime import datetime
-from typing import Any, Dict, List, Optional
+from typing import Any, dict, list
 from uuid import uuid4
 
 from infinity_matrix.core.base import BaseCampaignEngine
@@ -14,7 +14,7 @@ class CampaignEngine(BaseCampaignEngine):
     def __init__(self, **kwargs: Any):
         """Initialize campaign engine."""
         super().__init__(kwargs)
-        self.campaigns: Dict[str, Dict[str, Any]] = {}
+        self.campaigns: dict[str, dict[str, Any]] = {}
 
     async def initialize(self) -> None:
         """Initialize campaign resources."""
@@ -27,24 +27,24 @@ class CampaignEngine(BaseCampaignEngine):
     async def create_campaign(
         self,
         name: str,
-        leads: List[Dict[str, Any]],
+        leads: list[dict[str, Any]],
         template: str,
         channel: str = "email",
     ) -> str:
         """
         Create a new campaign.
-        
+
         Args:
             name: Campaign name
-            leads: List of leads to target
+            leads: list of leads to target
             template: Template name or content
             channel: Communication channel (email, voice, sms)
-            
+
         Returns:
             Campaign ID
         """
         campaign_id = str(uuid4())
-        
+
         campaign = {
             "id": campaign_id,
             "name": name,
@@ -64,20 +64,20 @@ class CampaignEngine(BaseCampaignEngine):
         }
 
         self.campaigns[campaign_id] = campaign
-        
+
         self.log_info(
             "campaign_created",
             campaign_id=campaign_id,
             name=name,
             leads_count=len(leads),
         )
-        
+
         return campaign_id
 
     async def launch_campaign(self, campaign_id: str) -> None:
         """
         Launch a campaign.
-        
+
         Args:
             campaign_id: Campaign ID
         """
@@ -85,7 +85,7 @@ class CampaignEngine(BaseCampaignEngine):
             raise ValueError(f"Campaign {campaign_id} not found")
 
         campaign = self.campaigns[campaign_id]
-        
+
         if campaign["status"] != "created":
             raise ValueError(f"Campaign {campaign_id} already launched")
 
@@ -94,7 +94,7 @@ class CampaignEngine(BaseCampaignEngine):
 
         # Execute campaign based on channel
         channel = campaign["channel"]
-        
+
         if channel == "email":
             await self._execute_email_campaign(campaign)
         elif channel == "voice":
@@ -109,10 +109,10 @@ class CampaignEngine(BaseCampaignEngine):
 
         self.log_info("campaign_launched", campaign_id=campaign_id)
 
-    async def _execute_email_campaign(self, campaign: Dict[str, Any]) -> None:
+    async def _execute_email_campaign(self, campaign: dict[str, Any]) -> None:
         """Execute email campaign."""
         from infinity_matrix.campaigns.email import EmailSender
-        
+
         if not settings.enable_email:
             self.log_warning("email_disabled")
             return
@@ -121,16 +121,16 @@ class CampaignEngine(BaseCampaignEngine):
         await sender.initialize()
 
         template = campaign["template"]
-        
+
         for lead in campaign["leads"]:
             email = lead.get("contact", {}).get("email")
-            
+
             if not email:
                 continue
 
             # Personalize template
             content = await self._personalize_template(template, lead)
-            
+
             # Send email
             result = await sender.send_email(
                 to_email=email,
@@ -143,10 +143,10 @@ class CampaignEngine(BaseCampaignEngine):
 
         await sender.shutdown()
 
-    async def _execute_voice_campaign(self, campaign: Dict[str, Any]) -> None:
+    async def _execute_voice_campaign(self, campaign: dict[str, Any]) -> None:
         """Execute voice campaign."""
         from infinity_matrix.campaigns.voice import VoiceCaller
-        
+
         if not settings.enable_voice:
             self.log_warning("voice_disabled")
             return
@@ -156,7 +156,7 @@ class CampaignEngine(BaseCampaignEngine):
 
         for lead in campaign["leads"]:
             phone = lead.get("contact", {}).get("phone")
-            
+
             if not phone:
                 continue
 
@@ -171,22 +171,22 @@ class CampaignEngine(BaseCampaignEngine):
 
         await caller.shutdown()
 
-    async def _execute_sms_campaign(self, campaign: Dict[str, Any]) -> None:
+    async def _execute_sms_campaign(self, campaign: dict[str, Any]) -> None:
         """Execute SMS campaign."""
         from infinity_matrix.campaigns.sms import SMSSender
-        
+
         sender = SMSSender()
         await sender.initialize()
 
         for lead in campaign["leads"]:
             phone = lead.get("contact", {}).get("phone")
-            
+
             if not phone:
                 continue
 
             # Personalize message
             message = await self._personalize_template(campaign["template"], lead)
-            
+
             # Send SMS
             result = await sender.send_sms(
                 to_phone=phone,
@@ -201,14 +201,14 @@ class CampaignEngine(BaseCampaignEngine):
     async def _personalize_template(
         self,
         template: str,
-        lead: Dict[str, Any],
+        lead: dict[str, Any],
     ) -> str:
         """Personalize template with lead data."""
         # Simple template variable replacement
         content = template
-        
+
         contact = lead.get("contact", {})
-        
+
         replacements = {
             "{name}": contact.get("name", "there"),
             "{email}": contact.get("email", ""),
@@ -221,13 +221,13 @@ class CampaignEngine(BaseCampaignEngine):
 
         return content
 
-    async def get_campaign_status(self, campaign_id: str) -> Dict[str, Any]:
+    async def get_campaign_status(self, campaign_id: str) -> dict[str, Any]:
         """
         Get campaign status.
-        
+
         Args:
             campaign_id: Campaign ID
-            
+
         Returns:
             Campaign status
         """
@@ -235,7 +235,7 @@ class CampaignEngine(BaseCampaignEngine):
             return {"error": f"Campaign {campaign_id} not found", "success": False}
 
         campaign = self.campaigns[campaign_id]
-        
+
         return {
             "campaign_id": campaign_id,
             "name": campaign["name"],
@@ -254,7 +254,7 @@ class CampaignEngine(BaseCampaignEngine):
             raise ValueError(f"Campaign {campaign_id} not found")
 
         campaign = self.campaigns[campaign_id]
-        
+
         if campaign["status"] == "running":
             campaign["status"] = "paused"
             self.log_info("campaign_paused", campaign_id=campaign_id)
@@ -265,7 +265,7 @@ class CampaignEngine(BaseCampaignEngine):
             raise ValueError(f"Campaign {campaign_id} not found")
 
         campaign = self.campaigns[campaign_id]
-        
+
         if campaign["status"] == "paused":
             campaign["status"] = "running"
             self.log_info("campaign_resumed", campaign_id=campaign_id)
@@ -278,7 +278,7 @@ class CampaignEngine(BaseCampaignEngine):
     ) -> None:
         """
         Update campaign statistics.
-        
+
         Args:
             campaign_id: Campaign ID
             lead_id: Lead ID
@@ -288,7 +288,7 @@ class CampaignEngine(BaseCampaignEngine):
             return
 
         campaign = self.campaigns[campaign_id]
-        
+
         if action == "responded":
             campaign["stats"]["responded"] += 1
         elif action == "converted":
@@ -300,14 +300,14 @@ class CampaignEngine(BaseCampaignEngine):
             action=action,
         )
 
-    async def get_campaign_analytics(self, campaign_id: str) -> Dict[str, Any]:
+    async def get_campaign_analytics(self, campaign_id: str) -> dict[str, Any]:
         """Get detailed campaign analytics."""
         if campaign_id not in self.campaigns:
             return {"error": f"Campaign {campaign_id} not found", "success": False}
 
         campaign = self.campaigns[campaign_id]
         stats = campaign["stats"]
-        
+
         total = stats["total_leads"]
         contacted = stats["contacted"]
         responded = stats["responded"]

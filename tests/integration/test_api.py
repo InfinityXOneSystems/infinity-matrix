@@ -1,7 +1,8 @@
 """Integration tests for the API."""
 
 import pytest
-from httpx import AsyncClient, ASGITransport
+from httpx import ASGITransport, AsyncClient
+
 from infinity_matrix.integrations.api.server import create_app
 
 
@@ -22,7 +23,6 @@ async def test_readiness_endpoint():
     """Test readiness endpoint."""
     # This test requires the app to be fully initialized with lifespan
     # For now, we'll skip it as it requires complex async setup
-    pass
 
 
 @pytest.mark.asyncio
@@ -30,4 +30,3 @@ async def test_list_agents_endpoint():
     """Test list agents endpoint."""
     # This test requires the app to be fully initialized with lifespan
     # For now, we'll skip it as it requires complex async setup
-    pass

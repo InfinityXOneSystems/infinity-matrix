@@ -1,11 +1,9 @@
 """Vision Cortex - Advanced multimodal vision processing system."""
 
-import io
-from typing import Any, Dict, List, Optional, Union
+from typing import Any, dict, list
 
 import cv2
 import numpy as np
-from PIL import Image
 
 from infinity_matrix.core.base import BaseProcessor, Task, TaskResult
 from infinity_matrix.core.config import get_settings
@@ -46,7 +44,7 @@ class VisionProcessor(BaseProcessor):
         self.logger.info("shutting_down_vision_processor")
         self._model = None
 
-    async def health_check(self) -> Dict[str, Any]:
+    async def health_check(self) -> dict[str, Any]:
         """Perform health check."""
         return {
             "name": self.name,
@@ -99,12 +97,12 @@ class VisionProcessor(BaseProcessor):
             return False
         return True
 
-    async def _perform_ocr(self, image_data: Union[bytes, str, np.ndarray]) -> Dict[str, Any]:
+    async def _perform_ocr(self, image_data: bytes | str | np.ndarray) -> dict[str, Any]:
         """Perform OCR on image."""
         self.logger.info("performing_ocr")
 
         # Convert image data to numpy array
-        image = self._load_image(image_data)
+        self._load_image(image_data)
 
         # In production, use Tesseract or cloud OCR services
         # For now, return a structured response
@@ -121,11 +119,11 @@ class VisionProcessor(BaseProcessor):
             "language": "en",
         }
 
-    async def _detect_objects(self, image_data: Union[bytes, str, np.ndarray]) -> Dict[str, Any]:
+    async def _detect_objects(self, image_data: bytes | str | np.ndarray) -> dict[str, Any]:
         """Detect objects in image."""
         self.logger.info("detecting_objects")
 
-        image = self._load_image(image_data)
+        self._load_image(image_data)
 
         # In production, use YOLO, Faster R-CNN, or similar
         # For now, return structured detection results
@@ -145,7 +143,7 @@ class VisionProcessor(BaseProcessor):
             "object_count": 2,
         }
 
-    async def _analyze_image(self, image_data: Union[bytes, str, np.ndarray]) -> Dict[str, Any]:
+    async def _analyze_image(self, image_data: bytes | str | np.ndarray) -> dict[str, Any]:
         """Analyze image properties and content."""
         self.logger.info("analyzing_image")
 
@@ -172,14 +170,14 @@ class VisionProcessor(BaseProcessor):
             },
         }
 
-    async def _detect_faces(self, image_data: Union[bytes, str, np.ndarray]) -> Dict[str, Any]:
+    async def _detect_faces(self, image_data: bytes | str | np.ndarray) -> dict[str, Any]:
         """Detect faces in image."""
         self.logger.info("detecting_faces")
 
         image = self._load_image(image_data)
 
         # Use OpenCV Haar Cascades for basic face detection
-        gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+        cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
 
         # In production, use more advanced face detection
         return {
@@ -188,7 +186,7 @@ class VisionProcessor(BaseProcessor):
             "analysis": "Face detection ready",
         }
 
-    def _load_image(self, image_data: Union[bytes, str, np.ndarray]) -> np.ndarray:
+    def _load_image(self, image_data: bytes | str | np.ndarray) -> np.ndarray:
         """Load image from various formats."""
         if isinstance(image_data, np.ndarray):
             return image_data
@@ -202,7 +200,7 @@ class VisionProcessor(BaseProcessor):
         else:
             raise ValueError(f"Unsupported image data type: {type(image_data)}")
 
-    async def batch_process(self, tasks: List[Task]) -> List[TaskResult]:
+    async def batch_process(self, tasks: list[Task]) -> list[TaskResult]:
         """Process multiple vision tasks in batch."""
         self.logger.info("batch_processing", batch_size=len(tasks))
         results = []

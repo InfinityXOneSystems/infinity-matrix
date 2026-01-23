@@ -14,7 +14,7 @@ def setup_logging() -> None:
         stream=sys.stdout,
         level=logging.INFO,
     )
-    
+
     structlog.configure(
         processors=[
             structlog.contextvars.merge_contextvars,

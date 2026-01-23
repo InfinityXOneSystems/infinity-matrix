@@ -2,7 +2,7 @@
 
 import time
 from functools import wraps
-from typing import Any, Callable, Dict, Optional
+from collections.abc import Callable, Any, , dict, Optional
 
 from prometheus_client import Counter, Gauge, Histogram, start_http_server
 
@@ -91,7 +91,7 @@ class MetricsCollector:
 
 
 def track_execution_time(
-    metric_name: str = "execution", labels: Optional[Dict[str, str]] = None
+    metric_name: str = "execution", labels: Optional[dict[str, str]] = None
 ) -> Callable:
     """Decorator to track execution time."""
 

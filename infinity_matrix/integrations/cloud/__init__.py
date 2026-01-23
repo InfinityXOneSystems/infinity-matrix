@@ -2,7 +2,7 @@
 
 from abc import ABC, abstractmethod
 from enum import Enum
-from typing import Any, Dict, List, Optional
+from typing import Any, Optional, dict
 
 from pydantic import BaseModel
 
@@ -26,43 +26,40 @@ class DeploymentConfig(BaseModel):
 
 class CloudIntegration(ABC):
     """Abstract base class for cloud integrations."""
-    
+
     @abstractmethod
-    def deploy(self, config: DeploymentConfig) -> Dict[str, Any]:
+    def deploy(self, config: DeploymentConfig) -> dict[str, Any]:
         """Deploy application to cloud."""
-        pass
-    
+
     @abstractmethod
     def scale(self, instances: int) -> bool:
         """Scale application instances."""
-        pass
-    
+
     @abstractmethod
-    def get_status(self) -> Dict[str, Any]:
+    def get_status(self) -> dict[str, Any]:
         """Get deployment status."""
-        pass
 
 
 class AWSIntegration(CloudIntegration):
     """AWS cloud integration."""
-    
-    def __init__(self, access_key: Optional[str] = None, secret_key: Optional[str] = None):
+
+    def __init__(self, access_key: str | None = None, secret_key: str | None = None):
         self.access_key = access_key
         self.secret_key = secret_key
-    
-    def deploy(self, config: DeploymentConfig) -> Dict[str, Any]:
+
+    def deploy(self, config: DeploymentConfig) -> dict[str, Any]:
         """Deploy to AWS."""
         return {
             "success": True,
             "provider": "aws",
             "deployment_id": "aws-deploy-123"
         }
-    
+
     def scale(self, instances: int) -> bool:
         """Scale AWS deployment."""
         return True
-    
-    def get_status(self) -> Dict[str, Any]:
+
+    def get_status(self) -> dict[str, Any]:
         """Get AWS deployment status."""
         return {
             "status": "running",
@@ -73,23 +70,23 @@ class AWSIntegration(CloudIntegration):
 
 class GCPIntegration(CloudIntegration):
     """GCP cloud integration."""
-    
-    def __init__(self, credentials: Optional[str] = None):
+
+    def __init__(self, credentials: str | None = None):
         self.credentials = credentials
-    
-    def deploy(self, config: DeploymentConfig) -> Dict[str, Any]:
+
+    def deploy(self, config: DeploymentConfig) -> dict[str, Any]:
         """Deploy to GCP."""
         return {
             "success": True,
             "provider": "gcp",
             "deployment_id": "gcp-deploy-123"
         }
-    
+
     def scale(self, instances: int) -> bool:
         """Scale GCP deployment."""
         return True
-    
-    def get_status(self) -> Dict[str, Any]:
+
+    def get_status(self) -> dict[str, Any]:
         """Get GCP deployment status."""
         return {
             "status": "running",
@@ -100,23 +97,23 @@ class GCPIntegration(CloudIntegration):
 
 class AzureIntegration(CloudIntegration):
     """Azure cloud integration."""
-    
-    def __init__(self, subscription_id: Optional[str] = None):
+
+    def __init__(self, subscription_id: str | None = None):
         self.subscription_id = subscription_id
-    
-    def deploy(self, config: DeploymentConfig) -> Dict[str, Any]:
+
+    def deploy(self, config: DeploymentConfig) -> dict[str, Any]:
         """Deploy to Azure."""
         return {
             "success": True,
             "provider": "azure",
             "deployment_id": "azure-deploy-123"
         }
-    
+
     def scale(self, instances: int) -> bool:
         """Scale Azure deployment."""
         return True
-    
-    def get_status(self) -> Dict[str, Any]:
+
+    def get_status(self) -> dict[str, Any]:
         """Get Azure deployment status."""
         return {
             "status": "running",

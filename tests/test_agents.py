@@ -4,14 +4,14 @@ import pytest
 
 from infinity_matrix.agents.base import AgentTask, AgentType
 from infinity_matrix.agents.implementations import (
-    CrawlerAgent,
-    IngestionAgent,
-    PredictorAgent,
     CEOAgent,
-    StrategistAgent,
-    OrganizerAgent,
-    ValidatorAgent,
+    CrawlerAgent,
     DocumentorAgent,
+    IngestionAgent,
+    OrganizerAgent,
+    PredictorAgent,
+    StrategistAgent,
+    ValidatorAgent,
 )
 
 

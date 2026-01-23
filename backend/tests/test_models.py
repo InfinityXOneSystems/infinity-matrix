@@ -1,4 +1,3 @@
-import pytest
 from app.models.models import Discovery, DiscoveryStatus
 
 
@@ -9,7 +8,7 @@ def test_discovery_model():
         business_name="Test Business",
         status=DiscoveryStatus.PENDING
     )
-    
+
     assert discovery.client_name == "Test Client"
     assert discovery.business_name == "Test Business"
     assert discovery.status == DiscoveryStatus.PENDING

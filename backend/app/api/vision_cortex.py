@@ -1,21 +1,16 @@
 """
 Vision Cortex API Endpoints - Interactive Intelligence Interface
 """
-from fastapi import APIRouter, Depends, HTTPException, WebSocket, WebSocketDisconnect
-from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select
-from typing import List
-import uuid
 import json
+import uuid
 
 from app.core.database import get_db
-from app.models.models import VisionCortexSession, Discovery
-from app.models.schemas import (
-    VisionCortexChatRequest,
-    VisionCortexChatResponse,
-    VisionCortexMessage
-)
+from app.models.models import Discovery, VisionCortexSession
+from app.models.schemas import VisionCortexChatRequest, VisionCortexChatResponse
 from app.services.vision_cortex_service import VisionCortexService
+from fastapi import APIRouter, Depends, HTTPException, WebSocket, WebSocketDisconnect
+from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
 
 router = APIRouter()
 
@@ -35,7 +30,7 @@ async def create_vision_cortex_session(
         discovery = result.scalar_one_or_none()
         if not discovery:
             raise HTTPException(status_code=404, detail="Discovery not found")
-    
+
     # Create session
     session_token = str(uuid.uuid4())
     session = VisionCortexSession(
@@ -44,11 +39,11 @@ async def create_vision_cortex_session(
         user_type=user_type,
         conversation_history=[]
     )
-    
+
     db.add(session)
     await db.commit()
     await db.refresh(session)
-    
+
     return {
         "session_token": session_token,
         "discovery_id": discovery_id,
@@ -64,7 +59,7 @@ async def vision_cortex_chat(
 ):
     """
     Interactive chat with Vision Cortex intelligence system.
-    
+
     Features:
     - Conversational Q&A about discovery findings
     - Knowledge summaries
@@ -75,13 +70,13 @@ async def vision_cortex_chat(
     result = await db.execute(
         select(VisionCortexSession)
         .where(VisionCortexSession.session_token == request.session_token)
-        .where(VisionCortexSession.is_active == True)
+        .where(VisionCortexSession.is_active)
     )
     session = result.scalar_one_or_none()
-    
+
     if not session:
         raise HTTPException(status_code=404, detail="Session not found or inactive")
-    
+
     # Process chat message
     cortex_service = VisionCortexService(db)
     response = await cortex_service.process_message(
@@ -89,11 +84,11 @@ async def vision_cortex_chat(
         message=request.message,
         context_ids=request.context_ids
     )
-    
+
     # Update session
     await db.commit()
     await db.refresh(session)
-    
+
     return response
 
 
@@ -108,10 +103,10 @@ async def get_session_history(
         .where(VisionCortexSession.session_token == session_token)
     )
     session = result.scalar_one_or_none()
-    
+
     if not session:
         raise HTTPException(status_code=404, detail="Session not found")
-    
+
     return {
         "session_token": session_token,
         "conversation_history": session.conversation_history,
@@ -125,7 +120,7 @@ async def vision_cortex_websocket(websocket: WebSocket, session_token: str):
     WebSocket endpoint for real-time Vision Cortex interaction
     """
     await websocket.accept()
-    
+
     try:
         # Get database session (this is a simplified version)
         # In production, you'd use a proper async context manager
@@ -133,39 +128,39 @@ async def vision_cortex_websocket(websocket: WebSocket, session_token: str):
             result = await db.execute(
                 select(VisionCortexSession)
                 .where(VisionCortexSession.session_token == session_token)
-                .where(VisionCortexSession.is_active == True)
+                .where(VisionCortexSession.is_active)
             )
             session = result.scalar_one_or_none()
-            
+
             if not session:
                 await websocket.send_json({
                     "error": "Invalid or inactive session"
                 })
                 await websocket.close()
                 return
-            
+
             cortex_service = VisionCortexService(db)
-            
+
             while True:
                 # Receive message
                 data = await websocket.receive_text()
                 message_data = json.loads(data)
-                
+
                 # Process message
                 response = await cortex_service.process_message(
                     session=session,
                     message=message_data.get("message", ""),
                     context_ids=message_data.get("context_ids")
                 )
-                
+
                 await db.commit()
-                
+
                 # Send response
                 await websocket.send_json({
                     "response": response.response,
                     "related_insights": response.related_insights
                 })
-                
+
     except WebSocketDisconnect:
         pass
     except Exception as e:
@@ -186,13 +181,13 @@ async def close_session(
         .where(VisionCortexSession.session_token == session_token)
     )
     session = result.scalar_one_or_none()
-    
+
     if not session:
         raise HTTPException(status_code=404, detail="Session not found")
-    
+
     session.is_active = False
     await db.commit()
-    
+
     return {"status": "closed"}
 
 

@@ -1,20 +1,19 @@
 """Tests for base agent functionality."""
 
 import pytest
-from ai_stack.agents.base_agent import BaseAgent, AgentStatus
+
+from ai_stack.agents.base_agent import AgentStatus, BaseAgent
 
 
 class TestAgent(BaseAgent):
     """Test agent implementation."""
-    
+
     async def on_start(self):
         """Start handler."""
-        pass
-    
+
     async def on_stop(self):
         """Stop handler."""
-        pass
-    
+
     async def run(self):
         """Run handler."""
         return {"result": "success"}

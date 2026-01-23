@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: autofix-devops-deployment
+  labels:
+    app: autofix-devops
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: autofix-devops
+  template:
+    metadata:
+      labels:
+        app: autofix-devops
+    spec:
+      containers:
+      - name: autofix-devops
+        image: your-dockerhub-username/autofix-devops:latest # This will be replaced by GitHub Actions
+        ports:
+        - containerPort: 5000
+        livenessProbe:
+          httpGet:
+            path: /healthz
+            port: 5000
+          initialDelaySeconds: 15
+          periodSeconds: 20
+        readinessProbe:
+          httpGet:
+            path: /ready
+            port: 5000
+          initialDelaySeconds: 5
+          periodSeconds: 10
+        envFrom:
+        - secretRef:
+            name: autofix-devops-secrets

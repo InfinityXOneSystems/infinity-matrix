@@ -1,6 +1,6 @@
 """Voice calling integration using Twilio."""
 
-from typing import Any, Dict, Optional
+from typing import Any, dict
 
 from infinity_matrix.core.config import settings
 from infinity_matrix.core.logging import LoggerMixin
@@ -37,16 +37,16 @@ class VoiceCaller(LoggerMixin):
         self,
         to_phone: str,
         message: str,
-        from_phone: Optional[str] = None,
-    ) -> Dict[str, Any]:
+        from_phone: str | None = None,
+    ) -> dict[str, Any]:
         """
         Make a voice call.
-        
+
         Args:
             to_phone: Recipient phone number
             message: Message to speak (TwiML)
             from_phone: Caller phone number (optional)
-            
+
         Returns:
             Call result
         """
@@ -95,16 +95,16 @@ class VoiceCaller(LoggerMixin):
         self,
         to_phone: str,
         twiml_url: str,
-        from_phone: Optional[str] = None,
-    ) -> Dict[str, Any]:
+        from_phone: str | None = None,
+    ) -> dict[str, Any]:
         """
         Make an interactive call using a TwiML URL.
-        
+
         Args:
             to_phone: Recipient phone number
             twiml_url: URL serving TwiML instructions
             from_phone: Caller phone number (optional)
-            
+
         Returns:
             Call result
         """
@@ -140,13 +140,13 @@ class VoiceCaller(LoggerMixin):
                 "error": str(e),
             }
 
-    async def get_call_status(self, call_sid: str) -> Dict[str, Any]:
+    async def get_call_status(self, call_sid: str) -> dict[str, Any]:
         """
         Get status of a call.
-        
+
         Args:
             call_sid: Call SID
-            
+
         Returns:
             Call status
         """
@@ -208,16 +208,16 @@ class SMSSender(LoggerMixin):
         self,
         to_phone: str,
         message: str,
-        from_phone: Optional[str] = None,
-    ) -> Dict[str, Any]:
+        from_phone: str | None = None,
+    ) -> dict[str, Any]:
         """
         Send an SMS message.
-        
+
         Args:
             to_phone: Recipient phone number
             message: SMS message
             from_phone: Sender phone number (optional)
-            
+
         Returns:
             Send result
         """
@@ -259,26 +259,26 @@ class SMSSender(LoggerMixin):
         self,
         recipients: list[str],
         message: str,
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """
         Send bulk SMS messages.
-        
+
         Args:
-            recipients: List of phone numbers
+            recipients: list of phone numbers
             message: SMS message
-            
+
         Returns:
             Bulk send result
         """
         import asyncio
-        
+
         tasks = [
             self.send_sms(to_phone=phone, message=message)
             for phone in recipients
         ]
 
         results = await asyncio.gather(*tasks, return_exceptions=True)
-        
+
         successful = sum(
             1 for r in results
             if isinstance(r, dict) and r.get("success")

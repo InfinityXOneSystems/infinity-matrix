@@ -5,8 +5,9 @@ This file demonstrates how to use the auto-builder programmatically.
 """
 
 import asyncio
+
 from infinity_matrix import AutoBuilder, Blueprint
-from infinity_matrix.core.blueprint import ProjectType, Component, ComponentType
+from infinity_matrix.core.blueprint import Component, ComponentType, ProjectType
 
 
 async def example_build_from_prompt():
@@ -77,7 +78,6 @@ async def example_monitor_build():
     print(f"Started build: {build_id}")
 
     # Monitor progress
-    import time
     for _ in range(5):
         await asyncio.sleep(1)
         status = await builder.get_build_status(build_id)
@@ -88,7 +88,7 @@ async def example_monitor_build():
 
 
 async def example_list_builds():
-    """Example: List all builds."""
+    """Example: list all builds."""
     print("\n" + "=" * 60)
     print("Example 4: Listing all builds")
     print("=" * 60)
@@ -111,7 +111,7 @@ async def example_vision_cortex_agents():
     builder = AutoBuilder()
     vision_cortex = builder.get_vision_cortex()
 
-    # List all agents
+    # list all agents
     agents = vision_cortex.list_agents()
     print(f"Registered agents: {len(agents)}")
     for agent in agents:

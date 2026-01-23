@@ -3,7 +3,7 @@ API v1 router
 """
 from fastapi import APIRouter
 
-from .endpoints import mcp, context, intelligence, providers, github, health
+from .endpoints import context, github, health, intelligence, mcp, providers
 
 router = APIRouter()
 

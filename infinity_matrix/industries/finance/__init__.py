@@ -1,14 +1,14 @@
 """Financial analysis module for stocks, crypto, and market predictions."""
 
-from datetime import datetime, timedelta
-from typing import Any, Dict, List, Optional
+from datetime import datetime
+from typing import Any, dict, list
 
 import pandas as pd
-from infinity_matrix.core.base import BaseAnalyzer, BasePredictor
-from infinity_matrix.core.config import settings
+
+from infinity_matrix.core.base import BaseAnalyzer
 
 
-class FinancialAnalyzer(BaseAnalyzer[Dict[str, Any], Dict[str, Any]]):
+class FinancialAnalyzer(BaseAnalyzer[dict[str, Any], dict[str, Any]]):
     """Advanced financial analysis engine."""
 
     def __init__(self, **kwargs: Any):
@@ -25,11 +25,11 @@ class FinancialAnalyzer(BaseAnalyzer[Dict[str, Any], Dict[str, Any]]):
         """Cleanup resources."""
         self.log_info("financial_analyzer_shutdown")
 
-    async def analyze(self, data: Dict[str, Any]) -> Dict[str, Any]:
+    async def analyze(self, data: dict[str, Any]) -> dict[str, Any]:
         """Analyze financial data."""
         symbol = data.get("symbol")
         timeframe = data.get("timeframe", "1d")
-        
+
         if not symbol:
             return {"error": "Symbol required", "success": False}
 
@@ -40,26 +40,26 @@ class FinancialAnalyzer(BaseAnalyzer[Dict[str, Any], Dict[str, Any]]):
         symbol: str,
         timeframe: str = "1d",
         period: str = "1mo",
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """
         Analyze stock performance and generate insights.
-        
+
         Args:
             symbol: Stock ticker symbol
             timeframe: Data timeframe (1m, 5m, 1h, 1d, etc.)
             period: Historical period (1d, 5d, 1mo, 1y, etc.)
-            
+
         Returns:
             Analysis results with predictions
         """
         try:
             import yfinance as yf
-            
+
             stock = yf.Ticker(symbol)
-            
+
             # Get historical data
             hist = stock.history(period=period, interval=timeframe)
-            
+
             if hist.empty:
                 return {"error": f"No data for {symbol}", "success": False}
 
@@ -76,14 +76,14 @@ class FinancialAnalyzer(BaseAnalyzer[Dict[str, Any], Dict[str, Any]]):
             # Calculate returns
             if len(hist) > 1:
                 analysis["daily_return"] = float(
-                    (hist["Close"].iloc[-1] - hist["Close"].iloc[-2]) 
+                    (hist["Close"].iloc[-1] - hist["Close"].iloc[-2])
                     / hist["Close"].iloc[-2] * 100
                 )
 
             # Calculate moving averages
             if len(hist) >= 20:
                 analysis["sma_20"] = float(hist["Close"].rolling(window=20).mean().iloc[-1])
-            
+
             if len(hist) >= 50:
                 analysis["sma_50"] = float(hist["Close"].rolling(window=50).mean().iloc[-1])
 
@@ -116,79 +116,79 @@ class FinancialAnalyzer(BaseAnalyzer[Dict[str, Any], Dict[str, Any]]):
     def _calculate_rsi(self, prices: Any, period: int = 14) -> float:
         """Calculate Relative Strength Index."""
         import numpy as np
-        
+
         deltas = np.diff(prices)
         gains = np.where(deltas > 0, deltas, 0)
         losses = np.where(deltas < 0, -deltas, 0)
-        
+
         avg_gain = np.mean(gains[-period:])
         avg_loss = np.mean(losses[-period:])
-        
+
         if avg_loss == 0:
             return 100.0
-        
+
         rs = avg_gain / avg_loss
         rsi = 100 - (100 / (1 + rs))
-        
+
         return float(rsi)
 
-    def _generate_signal(self, analysis: Dict[str, Any]) -> str:
+    def _generate_signal(self, analysis: dict[str, Any]) -> str:
         """Generate trading signal based on analysis."""
         signals = []
-        
+
         # RSI signal
         if "rsi" in analysis:
             if analysis["rsi"] < 30:
                 signals.append("oversold")
             elif analysis["rsi"] > 70:
                 signals.append("overbought")
-        
+
         # Moving average signal
         if "sma_20" in analysis and "sma_50" in analysis:
             if analysis["sma_20"] > analysis["sma_50"]:
                 signals.append("bullish")
             else:
                 signals.append("bearish")
-        
+
         # Default
         if not signals:
             return "neutral"
-        
+
         # Return most common signal
         from collections import Counter
         return Counter(signals).most_common(1)[0][0]
 
     async def analyze_portfolio(
         self,
-        portfolio: Dict[str, float],
-    ) -> Dict[str, Any]:
+        portfolio: dict[str, float],
+    ) -> dict[str, Any]:
         """
         Analyze a portfolio of stocks.
-        
+
         Args:
             portfolio: Dictionary of {symbol: quantity}
-            
+
         Returns:
             Portfolio analysis
         """
         import asyncio
-        
+
         analyses = await asyncio.gather(
             *[self.analyze_stock(symbol) for symbol in portfolio.keys()],
             return_exceptions=True,
         )
-        
+
         total_value = 0.0
         holdings = []
-        
+
         for symbol, quantity in portfolio.items():
             idx = list(portfolio.keys()).index(symbol)
             analysis = analyses[idx]
-            
+
             if isinstance(analysis, dict) and analysis.get("success"):
                 value = analysis["current_price"] * quantity
                 total_value += value
-                
+
                 holdings.append({
                     "symbol": symbol,
                     "quantity": quantity,
@@ -204,35 +204,35 @@ class FinancialAnalyzer(BaseAnalyzer[Dict[str, Any], Dict[str, Any]]):
             "success": True,
         }
 
-    async def get_market_sentiment(self, symbols: List[str]) -> Dict[str, Any]:
+    async def get_market_sentiment(self, symbols: list[str]) -> dict[str, Any]:
         """
         Analyze overall market sentiment for given symbols.
-        
+
         Args:
-            symbols: List of stock symbols
-            
+            symbols: list of stock symbols
+
         Returns:
             Market sentiment analysis
         """
         import asyncio
-        
+
         analyses = await asyncio.gather(
             *[self.analyze_stock(symbol) for symbol in symbols],
             return_exceptions=True,
         )
-        
+
         signals = [
             a.get("signal", "neutral")
             for a in analyses
             if isinstance(a, dict) and a.get("success")
         ]
-        
+
         bullish = signals.count("bullish") + signals.count("oversold")
         bearish = signals.count("bearish") + signals.count("overbought")
         neutral = signals.count("neutral")
-        
+
         total = len(signals)
-        
+
         if bullish > bearish:
             overall = "bullish"
         elif bearish > bullish:
@@ -245,12 +245,12 @@ class FinancialAnalyzer(BaseAnalyzer[Dict[str, Any], Dict[str, Any]]):
             "bullish_percentage": (bullish / total * 100) if total > 0 else 0,
             "bearish_percentage": (bearish / total * 100) if total > 0 else 0,
             "neutral_percentage": (neutral / total * 100) if total > 0 else 0,
-            "signals": dict(zip(symbols, signals)),
+            "signals": dict(zip(symbols, signals, strict=False)),
             "success": True,
         }
 
 
-class CryptoAnalyzer(BaseAnalyzer[Dict[str, Any], Dict[str, Any]]):
+class CryptoAnalyzer(BaseAnalyzer[dict[str, Any], dict[str, Any]]):
     """Cryptocurrency analysis engine."""
 
     def __init__(self, **kwargs: Any):
@@ -265,10 +265,10 @@ class CryptoAnalyzer(BaseAnalyzer[Dict[str, Any], Dict[str, Any]]):
         """Cleanup resources."""
         self.log_info("crypto_analyzer_shutdown")
 
-    async def analyze(self, data: Dict[str, Any]) -> Dict[str, Any]:
+    async def analyze(self, data: dict[str, Any]) -> dict[str, Any]:
         """Analyze cryptocurrency data."""
         symbol = data.get("symbol")
-        
+
         if not symbol:
             return {"error": "Symbol required", "success": False}
 
@@ -278,32 +278,32 @@ class CryptoAnalyzer(BaseAnalyzer[Dict[str, Any], Dict[str, Any]]):
         self,
         symbol: str,
         vs_currency: str = "usd",
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """
         Analyze cryptocurrency.
-        
+
         Args:
             symbol: Crypto symbol (BTC, ETH, etc.)
             vs_currency: Quote currency
-            
+
         Returns:
             Analysis results
         """
         try:
             import ccxt
-            
+
             exchange = ccxt.binance()
-            
+
             # Get ticker data
             ticker = exchange.fetch_ticker(f"{symbol}/{vs_currency.upper()}")
-            
+
             # Get OHLCV data
             ohlcv = exchange.fetch_ohlcv(
                 f"{symbol}/{vs_currency.upper()}",
                 "1d",
                 limit=30,
             )
-            
+
             df = pd.DataFrame(
                 ohlcv,
                 columns=["timestamp", "open", "high", "low", "close", "volume"],

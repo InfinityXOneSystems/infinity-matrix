@@ -1,6 +1,6 @@
 """Vision Cortex package."""
 
-from .vision_cortex import VisionCortex
 from .config import Config
+from .vision_cortex import VisionCortex
 
 __all__ = ['VisionCortex', 'Config']

@@ -2,6 +2,7 @@
 AI provider management endpoints
 """
 from fastapi import APIRouter
+
 from ....core.mcp_protocol import AIProvider
 
 router = APIRouter()
@@ -9,7 +10,7 @@ router = APIRouter()
 
 @router.get("/")
 async def list_providers() -> dict:
-    """List all supported AI providers"""
+    """list all supported AI providers"""
     return {
         "providers": [
             {

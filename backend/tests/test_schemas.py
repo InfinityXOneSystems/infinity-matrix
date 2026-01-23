@@ -1,5 +1,5 @@
 import pytest
-from app.models.schemas import DiscoveryRequest, DiscoveryResponse
+from app.models.schemas import DiscoveryRequest
 from pydantic import ValidationError
 
 
@@ -9,7 +9,7 @@ def test_discovery_request_valid():
         client_name="John Doe",
         business_name="Acme Corp"
     )
-    
+
     assert request.client_name == "John Doe"
     assert request.business_name == "Acme Corp"
 
@@ -21,7 +21,7 @@ def test_discovery_request_invalid_empty():
             client_name="",
             business_name="Acme Corp"
         )
-    
+
     with pytest.raises(ValidationError):
         DiscoveryRequest(
             client_name="John Doe",
@@ -35,6 +35,6 @@ def test_discovery_request_strips_whitespace():
         client_name="  John Doe  ",
         business_name="  Acme Corp  "
     )
-    
+
     assert request.client_name == "John Doe"
     assert request.business_name == "Acme Corp"

@@ -1,8 +1,10 @@
 """Tests for audit logger."""
 
-import pytest
 from datetime import datetime, timedelta
-from infinity_matrix.logs.audit import AuditLogger, AuditEventType
+
+import pytest
+
+from infinity_matrix.logs.audit import AuditEventType, AuditLogger
 
 
 @pytest.mark.asyncio

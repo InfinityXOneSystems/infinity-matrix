@@ -6,11 +6,11 @@ their states in the correct dependency order.
 """
 
 from .infinity_matrix import (
+    AutoMerger,
     InfinityMatrix,
     System,
-    SystemState,
     SystemResolver,
-    AutoMerger,
+    SystemState,
     create_sample_systems,
 )
 

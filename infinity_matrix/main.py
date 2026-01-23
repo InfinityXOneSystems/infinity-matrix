@@ -1,8 +1,6 @@
 """Main application entry point for Infinity Matrix."""
 
 import argparse
-import asyncio
-import sys
 
 import uvicorn
 

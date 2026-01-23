@@ -142,7 +142,7 @@ class AuditTrail:
             end_time: Filter by end time (ISO format)
 
         Returns:
-            List of matching audit events
+            list of matching audit events
         """
         filtered_events = self.events
 

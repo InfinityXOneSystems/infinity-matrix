@@ -7,8 +7,9 @@ To run tests:
 
 import pytest
 from fastapi.testclient import TestClient
-from backend.main import app
+
 from backend.database import Base, engine
+from backend.main import app
 
 # Create test client
 client = TestClient(app)
@@ -50,7 +51,7 @@ def test_create_lead():
         "email": "test@example.com",
         "company": "Test Corp"
     }
-    
+
     response = client.post("/api/leads", json=lead_data)
     assert response.status_code == 201
     data = response.json()
@@ -68,8 +69,8 @@ def test_list_leads():
         "phone_number": "+15551234568",
         "name": "Test User 2"
     })
-    
-    # List leads
+
+    # list leads
     response = client.get("/api/leads")
     assert response.status_code == 200
     data = response.json()
@@ -85,7 +86,7 @@ def test_get_lead():
         "name": "Test User 3"
     })
     lead_id = create_response.json()["id"]
-    
+
     # Get the lead
     response = client.get(f"/api/leads/{lead_id}")
     assert response.status_code == 200
@@ -102,7 +103,7 @@ def test_update_lead():
         "name": "Test User 4"
     })
     lead_id = create_response.json()["id"]
-    
+
     # Update the lead
     update_data = {
         "status": "qualified",
@@ -123,11 +124,11 @@ def test_delete_lead():
         "name": "Test User 5"
     })
     lead_id = create_response.json()["id"]
-    
+
     # Delete the lead
     response = client.delete(f"/api/leads/{lead_id}")
     assert response.status_code == 204
-    
+
     # Verify it's deleted
     get_response = client.get(f"/api/leads/{lead_id}")
     assert get_response.status_code == 404
@@ -139,7 +140,7 @@ def test_invalid_phone_number():
         "phone_number": "invalid",
         "name": "Test User"
     }
-    
+
     response = client.post("/api/leads", json=lead_data)
     assert response.status_code == 422  # Validation error
 
@@ -150,10 +151,10 @@ def test_duplicate_phone_number():
         "phone_number": "+15551234572",
         "name": "Test User"
     }
-    
+
     # Create first lead
     client.post("/api/leads", json=lead_data)
-    
+
     # Try to create duplicate
     response = client.post("/api/leads", json=lead_data)
     assert response.status_code == 400
@@ -167,7 +168,7 @@ def test_create_calendar_event():
         "name": "Test User 6"
     })
     lead_id = lead_response.json()["id"]
-    
+
     # Create calendar event
     event_data = {
         "lead_id": lead_id,
@@ -177,7 +178,7 @@ def test_create_calendar_event():
         "end_time": "2025-12-31T14:30:00Z",
         "event_type": "callback"
     }
-    
+
     response = client.post("/api/calendar/events", json=event_data)
     assert response.status_code == 201
     data = response.json()
@@ -201,7 +202,7 @@ def test_create_interaction():
         "name": "Test User 7"
     })
     lead_id = lead_response.json()["id"]
-    
+
     # Create interaction
     interaction_data = {
         "lead_id": lead_id,
@@ -209,7 +210,7 @@ def test_create_interaction():
         "content": "Test call interaction",
         "duration": 300
     }
-    
+
     response = client.post("/api/interactions", json=interaction_data)
     assert response.status_code == 201
     data = response.json()
@@ -225,13 +226,13 @@ def test_create_note():
         "name": "Test User 8"
     })
     lead_id = lead_response.json()["id"]
-    
+
     # Create note
     note_data = {
         "lead_id": lead_id,
         "content": "Test note content"
     }
-    
+
     response = client.post("/api/notes", json=note_data)
     assert response.status_code == 201
     data = response.json()

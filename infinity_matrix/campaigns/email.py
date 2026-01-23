@@ -1,6 +1,6 @@
 """Email sending integration using SendGrid."""
 
-from typing import Any, Dict, Optional
+from typing import Any, dict
 
 from infinity_matrix.core.config import settings
 from infinity_matrix.core.logging import LoggerMixin
@@ -35,13 +35,13 @@ class EmailSender(LoggerMixin):
         to_email: str,
         subject: str,
         content: str,
-        from_email: Optional[str] = None,
-        from_name: Optional[str] = None,
+        from_email: str | None = None,
+        from_name: str | None = None,
         content_type: str = "text/plain",
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """
         Send an email.
-        
+
         Args:
             to_email: Recipient email
             subject: Email subject
@@ -49,7 +49,7 @@ class EmailSender(LoggerMixin):
             from_email: Sender email (optional)
             from_name: Sender name (optional)
             content_type: Content type (text/plain or text/html)
-            
+
         Returns:
             Send result
         """
@@ -95,16 +95,16 @@ class EmailSender(LoggerMixin):
         self,
         to_email: str,
         template_id: str,
-        template_data: Dict[str, Any],
-    ) -> Dict[str, Any]:
+        template_data: dict[str, Any],
+    ) -> dict[str, Any]:
         """
         Send email using a SendGrid template.
-        
+
         Args:
             to_email: Recipient email
             template_id: SendGrid template ID
             template_data: Template data
-            
+
         Returns:
             Send result
         """
@@ -121,7 +121,7 @@ class EmailSender(LoggerMixin):
                 from_email=(settings.sendgrid_from_email, settings.sendgrid_from_name),
                 to_emails=to_email,
             )
-            
+
             message.template_id = template_id
             message.dynamic_template_data = template_data
 
@@ -148,23 +148,23 @@ class EmailSender(LoggerMixin):
 
     async def send_bulk_emails(
         self,
-        recipients: list[Dict[str, str]],
+        recipients: list[dict[str, str]],
         subject: str,
         content: str,
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """
         Send bulk emails.
-        
+
         Args:
-            recipients: List of recipient dictionaries with 'email' and optionally 'name'
+            recipients: list of recipient dictionaries with 'email' and optionally 'name'
             subject: Email subject
             content: Email content
-            
+
         Returns:
             Bulk send result
         """
         import asyncio
-        
+
         tasks = [
             self.send_email(
                 to_email=recipient["email"],
@@ -175,7 +175,7 @@ class EmailSender(LoggerMixin):
         ]
 
         results = await asyncio.gather(*tasks, return_exceptions=True)
-        
+
         successful = sum(
             1 for r in results
             if isinstance(r, dict) and r.get("success")

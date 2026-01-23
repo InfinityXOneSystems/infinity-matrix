@@ -6,33 +6,42 @@ with authentication, database, API, and all security features.
 """
 
 from infinity_matrix import UniversalBuilder, VisionCortex
-from infinity_matrix.core.config import Config
 from infinity_matrix.agents.registry import Agent, AgentType, get_registry
 from infinity_matrix.agents.scheduler import ScheduledTask, TaskPriority, get_scheduler
-from infinity_matrix.security.rbac import User, get_rbac_manager, Permission
+from infinity_matrix.core.config import Config
+from infinity_matrix.integrations.cicd import (
+    CICDPlatform,
+    PipelineConfig,
+    PipelineStep,
+    get_cicd_integration,
+)
+from infinity_matrix.integrations.cloud import (
+    CloudProvider,
+    DeploymentConfig,
+    get_cloud_integration,
+)
+from infinity_matrix.security.audit import AuditAction, get_audit_logger
+from infinity_matrix.security.rbac import User, get_rbac_manager
 from infinity_matrix.security.secrets import get_secrets_manager
-from infinity_matrix.security.audit import get_audit_logger, AuditAction
-from infinity_matrix.integrations.cloud import CloudProvider, DeploymentConfig, get_cloud_integration
-from infinity_matrix.integrations.cicd import CICDPlatform, PipelineConfig, PipelineStep, get_cicd_integration
 
 
 def create_application():
     """Create a full-stack application with all features."""
-    
+
     print("=" * 60)
     print("CREATING FULL-STACK APPLICATION WITH INFINITY MATRIX")
     print("=" * 60)
-    
+
     # Initialize configuration
     config = Config()
-    
+
     # Initialize components
     builder = UniversalBuilder(config)
     cortex = VisionCortex(config)
     secrets = get_secrets_manager()
     rbac = get_rbac_manager()
     audit = get_audit_logger()
-    
+
     # Define application requirements
     prompt = """
     Build a complete e-commerce platform with:
@@ -47,7 +56,7 @@ def create_application():
     - Payment integration
     - Email notifications
     """
-    
+
     print("\n1. ANALYZING REQUIREMENTS")
     print("-" * 60)
     analysis = cortex.analyze_prompt(prompt)
@@ -56,14 +65,14 @@ def create_application():
     print(f"Suggested Stack: {', '.join(analysis.suggested_stack)}")
     print(f"Suggested Modules: {', '.join(analysis.suggested_modules)}")
     print(f"Requirements extracted: {len(analysis.requirements)}")
-    
+
     # Select blueprint - use a known existing template
     template = cortex.select_blueprint(analysis)
     # Ensure we use an existing template
     if template not in ["python-fastapi-starter", "node-express-starter", "go-gin-starter"]:
         template = "python-fastapi-starter"
     print(f"\nSelected Template: {template}")
-    
+
     # Set up secrets
     print("\n2. CONFIGURING SECURITY")
     print("-" * 60)
@@ -71,7 +80,7 @@ def create_application():
     secrets.set("jwt_secret", "jwt_signing_key_2024")
     secrets.set("stripe_api_key", "sk_test_...")
     print("✓ Secrets configured and encrypted")
-    
+
     # Set up RBAC
     admin_user = User(
         username="admin",
@@ -80,7 +89,7 @@ def create_application():
     rbac.create_user(admin_user)
     rbac.assign_role("admin", "admin")
     print("✓ RBAC configured with admin user")
-    
+
     # Log action
     audit.info(
         AuditAction.CREATE,
@@ -89,7 +98,7 @@ def create_application():
         details={"template": template, "prompt": prompt[:100]}
     )
     print("✓ Audit logging enabled")
-    
+
     # Build application (use template name directly since it exists)
     print("\n3. BUILDING APPLICATION")
     print("-" * 60)
@@ -103,19 +112,19 @@ def create_application():
         },
         output_dir="/tmp/infinity-apps"
     )
-    
+
     if result["success"]:
         print(f"✓ Application created: {result['output_path']}")
     else:
         print(f"✗ Failed: {result.get('error')}")
         return
-    
+
     # Set up agents
     print("\n4. CONFIGURING AGENTS")
     print("-" * 60)
     registry = get_registry()
     scheduler = get_scheduler()
-    
+
     # Code review agent
     code_review_agent = Agent(
         name="Code Review Agent",
@@ -129,7 +138,7 @@ def create_application():
     )
     registry.register(code_review_agent)
     print("✓ Code Review Agent registered")
-    
+
     # Security scan agent
     security_agent = Agent(
         name="Security Scanner",
@@ -142,7 +151,7 @@ def create_application():
     )
     registry.register(security_agent)
     print("✓ Security Scanner Agent registered")
-    
+
     # Monitoring agent with auto-healing
     monitoring_agent = Agent(
         name="Monitoring & Healing",
@@ -155,10 +164,10 @@ def create_application():
     )
     registry.register(monitoring_agent)
     print("✓ Monitoring Agent with auto-healing registered")
-    
+
     # Schedule tasks
     from datetime import timedelta
-    
+
     daily_scan = ScheduledTask(
         name="Daily Security Scan",
         description="Scan for vulnerabilities",
@@ -167,12 +176,12 @@ def create_application():
     )
     scheduler.schedule(daily_scan, lambda t: print(f"Running: {t.name}"))
     print("✓ Scheduled daily security scans")
-    
+
     # CI/CD Pipeline
     print("\n5. SETTING UP CI/CD")
     print("-" * 60)
     cicd = get_cicd_integration(CICDPlatform.GITHUB_ACTIONS)
-    
+
     pipeline = PipelineConfig(
         name="CI/CD Pipeline",
         platform=CICDPlatform.GITHUB_ACTIONS,
@@ -196,15 +205,15 @@ def create_application():
         ],
         triggers=["push", "pull_request"]
     )
-    
-    workflow_config = cicd.generate_config(pipeline)
+
+    cicd.generate_config(pipeline)
     print("✓ GitHub Actions workflow generated")
-    
+
     # Cloud deployment
     print("\n6. CONFIGURING CLOUD DEPLOYMENT")
     print("-" * 60)
     cloud = get_cloud_integration(CloudProvider.AWS)
-    
+
     deployment_config = DeploymentConfig(
         provider=CloudProvider.AWS,
         region="us-east-1",
@@ -213,10 +222,10 @@ def create_application():
         min_instances=2,
         max_instances=10
     )
-    
+
     deployment = cloud.deploy(deployment_config)
     print(f"✓ Configured for deployment: {deployment['deployment_id']}")
-    
+
     # Summary
     print("\n" + "=" * 60)
     print("APPLICATION SETUP COMPLETE!")
@@ -224,14 +233,14 @@ def create_application():
     print(f"\n📦 Application: {result['output_path']}")
     print(f"🤖 Agents: {len(registry.list())} active")
     print(f"📅 Scheduled Tasks: {len(scheduler.list())} configured")
-    print(f"🔐 Security: RBAC, Secrets, Audit enabled")
-    print(f"🚀 CI/CD: Pipeline configured")
+    print("🔐 Security: RBAC, Secrets, Audit enabled")
+    print("🚀 CI/CD: Pipeline configured")
     print(f"☁️  Cloud: Ready for {deployment_config.provider.value}")
-    
+
     print("\n📋 Next Steps:")
     for step in result.get("next_steps", []):
         print(f"  • {step}")
-    
+
     print("\n🎉 Your enterprise-grade application is ready!")
     print("=" * 60)
 
