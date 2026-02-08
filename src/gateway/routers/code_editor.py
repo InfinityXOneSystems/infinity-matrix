@@ -192,6 +192,9 @@ async def chat(request: ChatRequest) -> ChatResponse:
     """
     message_lower = request.message.lower()
     
+    # Initialize code_edit
+    code_edit = None
+    
     # Determine action type and response
     if any(keyword in message_lower for keyword in ["fix", "bug", "error", "debug"]):
         action = "debug"

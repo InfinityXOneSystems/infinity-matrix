@@ -3,7 +3,9 @@
  * Handles code editing, chat, and orchestration requests
  */
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+const API_BASE_URL = import.meta.env.VITE_API_URL || (
+  import.meta.env.PROD ? 'https://api.infinitymatrix.io' : 'http://localhost:8000'
+);
 
 export class MonacoIDEService {
   /**
