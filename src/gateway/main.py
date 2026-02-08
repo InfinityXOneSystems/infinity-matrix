@@ -9,6 +9,7 @@ This module serves as the entry point for the API Gateway, handling:
 """
 
 import time
+import traceback
 from contextlib import asynccontextmanager
 from typing import Any
 
@@ -17,7 +18,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.gzip import GZipMiddleware
 from fastapi.responses import JSONResponse
 
-from .middleware import RateLimitMiddleware, RequestLoggingMiddleware
+from .middleware import RateLimitMiddleware, RequestLoggingMiddleware, logger
 from .routers import agents, health, tasks
 
 
@@ -25,13 +26,13 @@ from .routers import agents, health, tasks
 async def lifespan(app: FastAPI):
     """Application lifespan manager for startup and shutdown events."""
     # Startup
-    print("🚀 Infinity Matrix API Gateway starting...")
-    print("📡 Initializing connections...")
+    logger.info("Infinity Matrix API Gateway starting")
+    logger.info("Initializing connections")
     # TODO: Initialize database connections, cache, etc.
     yield
     # Shutdown
-    print("🛑 Infinity Matrix API Gateway shutting down...")
-    print("🔌 Closing connections...")
+    logger.info("Infinity Matrix API Gateway shutting down")
+    logger.info("Closing connections")
     # TODO: Close database connections, cache, etc.
 
 
@@ -79,13 +80,19 @@ app.include_router(tasks.router, prefix="/api/v1/tasks", tags=["Tasks"])
 @app.exception_handler(Exception)
 async def global_exception_handler(request: Request, exc: Exception) -> JSONResponse:
     """Global exception handler for unhandled errors."""
-    # Log the full error for debugging (should go to secure logging system)
-    import traceback
+    # Generate error ID
     error_id = f"err_{int(time.time() * 1000000)}"
     
-    # Log full error details securely
-    print(f"❌ [{error_id}] Unhandled exception: {exc}")
-    print(f"   Traceback: {traceback.format_exc()}")
+    # Log full error details securely using structured logger
+    logger.error(
+        "Unhandled exception",
+        error_id=error_id,
+        error_type=type(exc).__name__,
+        error_message=str(exc),
+        path=str(request.url.path),
+        method=request.method,
+        traceback=traceback.format_exc(),
+    )
     
     # Return sanitized error response
     return JSONResponse(

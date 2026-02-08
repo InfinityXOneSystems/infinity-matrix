@@ -9,25 +9,24 @@ Includes:
 
 import time
 from collections import defaultdict
-from collections.abc import Awaitable, Callable
+from collections.abc import Callable
 
 from fastapi import Request, Response, status
 from fastapi.responses import JSONResponse
 from starlette.middleware.base import BaseHTTPMiddleware
 
-# Import structured logger from our custom logging module
-import sys
-import os
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-
+# Import structured logger with fallback
 try:
-    from ..im_logging import logger
-except ImportError:
-    # Fallback to print statements if custom logger not available
-    class FallbackLogger:
-        def info(self, msg, **kwargs):
-            print(f"INFO: {msg} {kwargs}")
-    logger = FallbackLogger()
+    import sys
+    import os
+    # Add parent directory to path to access im_logging
+    sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+    from im_logging import logger
+except (ImportError, ModuleNotFoundError):
+    # Fallback to simple logging if custom logger not available
+    import logging
+    logger = logging.getLogger("gateway.middleware")
+    logging.basicConfig(level=logging.INFO)
 
 
 class RequestLoggingMiddleware(BaseHTTPMiddleware):
