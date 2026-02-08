@@ -179,3 +179,4 @@ __marimo__/
 # Infinity-Matrix generated files
 system_manifest.json
 health_report.md
+node_modules/
