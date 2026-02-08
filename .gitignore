@@ -179,4 +179,49 @@ __marimo__/
 # Infinity-Matrix generated files
 system_manifest.json
 health_report.md
-node_modules/
+
+# Security & Secrets
+*.key
+*.pem
+*.crt
+*.p12
+*.pfx
+credentials.json
+*_credentials.json
+service-account*.json
+*.secret
+secret.*
+
+# IDE & Editor
+.idea/
+.vscode/settings.json
+.vscode/launch.json
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Temporary files
+*.tmp
+*.temp
+tmp/
+temp/
+.scratch/
+
+# Database files
+*.db
+*.sqlite
+*.sqlite3
+
+# Security scans
+bandit-report.json
+.bandit
+safety-report.json
+
+# Docker
+docker-compose.override.yml
+.dockerignore.local

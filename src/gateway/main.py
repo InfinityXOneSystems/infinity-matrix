@@ -8,6 +8,8 @@ This module serves as the entry point for the API Gateway, handling:
 - API versioning
 """
 
+import time
+import traceback
 from contextlib import asynccontextmanager
 from typing import Any
 
@@ -16,21 +18,21 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.gzip import GZipMiddleware
 from fastapi.responses import JSONResponse
 
-from .middleware import RateLimitMiddleware, RequestLoggingMiddleware
-from .routers import agents, health, tasks, code_editor
+from .middleware import RateLimitMiddleware, RequestLoggingMiddleware, logger
+from .routers import agents, health, tasks
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """Application lifespan manager for startup and shutdown events."""
     # Startup
-    print("🚀 Infinity Matrix API Gateway starting...")
-    print("📡 Initializing connections...")
+    logger.info("Infinity Matrix API Gateway starting")
+    logger.info("Initializing connections")
     # TODO: Initialize database connections, cache, etc.
     yield
     # Shutdown
-    print("🛑 Infinity Matrix API Gateway shutting down...")
-    print("🔌 Closing connections...")
+    logger.info("Infinity Matrix API Gateway shutting down")
+    logger.info("Closing connections")
     # TODO: Close database connections, cache, etc.
 
 
@@ -46,11 +48,19 @@ app = FastAPI(
 )
 
 # Configure CORS
+# For production, set ALLOWED_ORIGINS environment variable with comma-separated origins
+import os
+
+allowed_origins = os.getenv(
+    "ALLOWED_ORIGINS",
+    "http://localhost:3000,http://localhost:8000"  # Default for development
+).split(",")
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # TODO: Configure specific origins in production
+    allow_origins=allowed_origins,
     allow_credentials=True,
-    allow_methods=["*"],
+    allow_methods=["GET", "POST", "PUT", "DELETE", "PATCH"],
     allow_headers=["*"],
 )
 
@@ -71,12 +81,28 @@ app.include_router(code_editor.router, prefix="/api/v1/code", tags=["Code Editor
 @app.exception_handler(Exception)
 async def global_exception_handler(request: Request, exc: Exception) -> JSONResponse:
     """Global exception handler for unhandled errors."""
+    # Generate error ID
+    error_id = f"err_{int(time.time() * 1000000)}"
+    
+    # Log full error details securely using structured logger
+    logger.error(
+        "Unhandled exception",
+        error_id=error_id,
+        error_type=type(exc).__name__,
+        error_message=str(exc),
+        path=str(request.url.path),
+        method=request.method,
+        traceback=traceback.format_exc(),
+    )
+    
+    # Return sanitized error response
     return JSONResponse(
         status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
         content={
             "error": "Internal server error",
-            "message": str(exc),
-            "path": str(request.url),
+            "message": "An unexpected error occurred. Please contact support.",
+            "error_id": error_id,
+            "path": str(request.url.path),  # Don't expose query params
         },
     )
 
