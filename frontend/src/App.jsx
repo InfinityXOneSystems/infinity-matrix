@@ -31,6 +31,9 @@ import {
   InfinityCoinTool
 } from '@/app/(protected)/tools/tool-apps';
 
+// Monaco IDE
+import MonacoIDEPage from '@/pages/MonacoIDEPage';
+
 import ProtectedRoute from '@/components/ProtectedRoute';
 import { AdminProvider } from '@/lib/AdminProvider.jsx';
 import { AuthProvider } from '@/lib/AuthContext.jsx';
@@ -90,6 +93,8 @@ function App() {
                 <Route path="/app/predict" element={<PredictTool />} />
                 <Route path="/app/simulate" element={<SimulateTool />} />
                 <Route path="/app/infinity-coin" element={<InfinityCoinTool />} />
+                <Route path="/app/monaco-ide" element={<MonacoIDEPage />} />
+                <Route path="/ide" element={<MonacoIDEPage />} />
 
                 {/* Fallback */}
                 <Route path="*" element={<Navigate to="/" replace />} />
