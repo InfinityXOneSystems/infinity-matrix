@@ -15,11 +15,19 @@ from fastapi import Request, Response, status
 from fastapi.responses import JSONResponse
 from starlette.middleware.base import BaseHTTPMiddleware
 
-# Import structured logger
+# Import structured logger from our custom logging module
 import sys
 import os
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from logging import logger
+
+try:
+    from ..im_logging import logger
+except ImportError:
+    # Fallback to print statements if custom logger not available
+    class FallbackLogger:
+        def info(self, msg, **kwargs):
+            print(f"INFO: {msg} {kwargs}")
+    logger = FallbackLogger()
 
 
 class RequestLoggingMiddleware(BaseHTTPMiddleware):
