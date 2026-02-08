@@ -9,11 +9,17 @@ Includes:
 
 import time
 from collections import defaultdict
-from collections.abc import Callable, 
+from collections.abc import Awaitable, Callable
 
 from fastapi import Request, Response, status
 from fastapi.responses import JSONResponse
 from starlette.middleware.base import BaseHTTPMiddleware
+
+# Import structured logger
+import sys
+import os
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+from logging import logger
 
 
 class RequestLoggingMiddleware(BaseHTTPMiddleware):
@@ -26,8 +32,14 @@ class RequestLoggingMiddleware(BaseHTTPMiddleware):
         # Generate request ID
         request_id = f"req_{int(start_time * 1000000)}"
         
-        # Log request
-        print(f"📨 [{request_id}] {request.method} {request.url.path}")
+        # Log request with structured logger
+        logger.info(
+            "Incoming request",
+            request_id=request_id,
+            method=request.method,
+            path=request.url.path,
+            client_ip=request.client.host if request.client else "unknown",
+        )
         
         # Process request
         response = await call_next(request)
@@ -39,10 +51,12 @@ class RequestLoggingMiddleware(BaseHTTPMiddleware):
         response.headers["X-Request-ID"] = request_id
         response.headers["X-Process-Time"] = str(process_time)
         
-        # Log response
-        print(
-            f"📤 [{request_id}] {response.status_code} "
-            f"({process_time:.3f}s)"
+        # Log response with structured logger
+        logger.info(
+            "Request completed",
+            request_id=request_id,
+            status_code=response.status_code,
+            process_time_ms=round(process_time * 1000, 2),
         )
         
         return response

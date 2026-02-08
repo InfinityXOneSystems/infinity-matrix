@@ -8,6 +8,7 @@ This module serves as the entry point for the API Gateway, handling:
 - API versioning
 """
 
+import time
 from contextlib import asynccontextmanager
 from typing import Any
 
@@ -46,11 +47,19 @@ app = FastAPI(
 )
 
 # Configure CORS
+# For production, set ALLOWED_ORIGINS environment variable with comma-separated origins
+import os
+
+allowed_origins = os.getenv(
+    "ALLOWED_ORIGINS",
+    "http://localhost:3000,http://localhost:8000"  # Default for development
+).split(",")
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # TODO: Configure specific origins in production
+    allow_origins=allowed_origins,
     allow_credentials=True,
-    allow_methods=["*"],
+    allow_methods=["GET", "POST", "PUT", "DELETE", "PATCH"],
     allow_headers=["*"],
 )
 
@@ -70,12 +79,22 @@ app.include_router(tasks.router, prefix="/api/v1/tasks", tags=["Tasks"])
 @app.exception_handler(Exception)
 async def global_exception_handler(request: Request, exc: Exception) -> JSONResponse:
     """Global exception handler for unhandled errors."""
+    # Log the full error for debugging (should go to secure logging system)
+    import traceback
+    error_id = f"err_{int(time.time() * 1000000)}"
+    
+    # Log full error details securely
+    print(f"❌ [{error_id}] Unhandled exception: {exc}")
+    print(f"   Traceback: {traceback.format_exc()}")
+    
+    # Return sanitized error response
     return JSONResponse(
         status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
         content={
             "error": "Internal server error",
-            "message": str(exc),
-            "path": str(request.url),
+            "message": "An unexpected error occurred. Please contact support.",
+            "error_id": error_id,
+            "path": str(request.url.path),  # Don't expose query params
         },
     )
 

@@ -341,3 +341,113 @@ We appreciate responsible disclosure and will acknowledge security researchers w
 ---
 
 **Remember**: Automation is a tool, not a replacement for security awareness. Always prioritize security over convenience.
+
+---
+
+## API Security Best Practices
+
+### Authentication & Authorization
+
+1. **API Key Management**
+   - API keys are generated using cryptographically secure random values
+   - Keys are hashed using SHA-256 before storage
+   - Raw keys are only shown once during registration
+   - Never log or expose API keys in error messages
+
+2. **Input Validation**
+   - All user inputs are validated using Pydantic models
+   - Maximum lengths enforced on all string fields
+   - Only whitelisted agent types are allowed
+   - Capabilities list limited to prevent abuse
+
+3. **CORS Configuration**
+   - NEVER use wildcard (`*`) origins in production
+   - Configure specific allowed origins via `ALLOWED_ORIGINS` environment variable
+   - Validate origins against whitelist
+   - Default development origins: `http://localhost:3000,http://localhost:8000`
+
+### Error Handling
+
+1. **Information Disclosure Prevention**
+   - Generic error messages returned to clients
+   - Detailed errors logged securely with error IDs
+   - Stack traces never exposed in API responses
+   - Query parameters not logged in error messages
+
+2. **Structured Logging**
+   - All requests logged with correlation IDs
+   - Sensitive data excluded from logs
+   - JSON structured logging for easy parsing
+   - Audit trail for all agent operations
+
+### Rate Limiting
+
+1. **Request Throttling**
+   - Default: 100 requests per 60 seconds per client
+   - Configurable via environment variables
+   - Health check endpoints excluded from rate limiting
+   - Rate limit headers included in responses
+
+2. **Production Deployment**
+   - Use Redis for distributed rate limiting
+   - In-memory storage only suitable for development
+   - Consider implementing per-endpoint limits
+   - Monitor for abuse patterns
+
+### Data Protection
+
+1. **Encryption**
+   - All API traffic must use HTTPS/TLS 1.3 in production
+   - API keys encrypted at rest (planned)
+   - Database credentials stored in secret manager
+   - Environment variables never committed to git
+
+2. **Secrets Management**
+   - Use Google Secret Manager or similar in production
+   - Never hardcode credentials in code
+   - Rotate API keys regularly
+   - Audit secret access
+
+### Monitoring & Alerting
+
+1. **Security Monitoring**
+   - Monitor failed authentication attempts
+   - Alert on rate limit violations
+   - Track unusual API usage patterns
+   - Log all admin operations
+
+2. **Incident Response**
+   - Error IDs enable incident tracking
+   - Structured logs facilitate forensics
+   - Audit trail provides accountability
+   - Have incident response playbook ready
+
+### Compliance Requirements
+
+1. **GDPR/Privacy**
+   - Log retention policies enforced
+   - Personal data handling documented
+   - Right to deletion supported
+   - Data minimization practiced
+
+2. **SOC 2 / ISO 27001**
+   - Access controls documented
+   - Change management process
+   - Security controls tested
+   - Compliance evidence collected
+
+### Security Testing
+
+1. **Automated Scanning**
+   - Bandit security scanner in CI/CD
+   - Dependency vulnerability checks
+   - SAST (Static Application Security Testing)
+   - Container image scanning
+
+2. **Manual Testing**
+   - Penetration testing annually
+   - Security code reviews required
+   - Threat modeling for new features
+   - Red team exercises periodically
+
+---
