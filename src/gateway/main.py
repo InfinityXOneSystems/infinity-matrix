@@ -17,7 +17,7 @@ from fastapi.middleware.gzip import GZipMiddleware
 from fastapi.responses import JSONResponse
 
 from .middleware import RateLimitMiddleware, RequestLoggingMiddleware
-from .routers import agents, health, tasks
+from .routers import agents, health, tasks, code_editor
 
 
 @asynccontextmanager
@@ -65,6 +65,7 @@ app.add_middleware(RateLimitMiddleware)
 app.include_router(health.router, tags=["Health"])
 app.include_router(agents.router, prefix="/api/v1/agents", tags=["Agents"])
 app.include_router(tasks.router, prefix="/api/v1/tasks", tags=["Tasks"])
+app.include_router(code_editor.router, prefix="/api/v1/code", tags=["Code Editor"])
 
 
 @app.exception_handler(Exception)
